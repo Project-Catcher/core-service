@@ -11,6 +11,14 @@ java {
 	sourceCompatibility = '17'
 }
 
+compileJava {
+	options.compilerArgs << "--enable-preview"
+}
+
+compileTestJava {
+	options.compilerArgs << "--enable-preview"
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
@@ -35,5 +43,6 @@ dependencies {
 }
 
 tasks.named('test') {
+	jvmArgs(["--enable-preview"])
 	useJUnitPlatform()
 }

@@ -1,8 +1,9 @@
 package com.catcher.core;
 
-import com.catcher.core.domain.command.Command;
-import org.springframework.stereotype.Component;
 import com.catcher.core.domain.User;
+import com.catcher.core.domain.command.Command;
+import com.catcher.core.domain.command.UserByUserIdCommand;
+import org.springframework.stereotype.Component;
 
 @Component
 public class UserCommandExecutor implements CommandExecutor<User>{
@@ -11,14 +12,15 @@ public class UserCommandExecutor implements CommandExecutor<User>{
     public User run(Command command) {
         //1. datasource layer 호출(DB)
         //2. 가공해서 넘겨줘야 한다
-        return switch (command.getClass().getSimpleName()){
-            case "UserByUserIdCommand" -> getUserByUserId(command);
+        return switch (command) {
+            case UserByUserIdCommand userByUserIdCommand -> getUserByUserId(userByUserIdCommand);
             default -> null;
         };
     }
 
-    private User getUserByUserId(Command command){
+    private User getUserByUserId(UserByUserIdCommand command){
         //이 부분은 임시
-        return new User("kakao_user", "1234", "charles");
+        final String userId = command.getUserId();
+        return new User(userId, "1234", "charles");
     }
 }
