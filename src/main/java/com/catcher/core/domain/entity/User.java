@@ -19,6 +19,7 @@ public class User {
     @Column(unique = true)
     private String userId;
 
+    // TODO: encrypted maybe?
     private String password;
 
     private String name;
