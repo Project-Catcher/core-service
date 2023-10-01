@@ -3,7 +3,7 @@ package com.catcher.resource;
 
 import com.catcher.app.AppApplication;
 import com.catcher.core.UserCommandExecutor;
-import com.catcher.core.domain.User;
+import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.command.UserByUserIdCommand;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

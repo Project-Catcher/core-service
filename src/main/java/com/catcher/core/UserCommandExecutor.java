@@ -2,7 +2,7 @@ package com.catcher.core;
 
 import com.catcher.core.domain.command.Command;
 import org.springframework.stereotype.Component;
-import com.catcher.core.domain.User;
+import com.catcher.core.domain.entity.User;
 
 @Component
 public class UserCommandExecutor implements CommandExecutor<User>{

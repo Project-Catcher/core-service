@@ -1,4 +1,4 @@
-package com.catcher.core.domain;
+package com.catcher.core.domain.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
