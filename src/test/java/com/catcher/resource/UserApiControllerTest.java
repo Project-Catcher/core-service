@@ -3,9 +3,10 @@ package com.catcher.resource;
 
 import com.catcher.app.AppApplication;
 import com.catcher.core.UserCommandExecutor;
-import com.catcher.core.datasource.UserRepository;
+import com.catcher.datasource.UserRepository;
 import com.catcher.core.domain.command.UserByUserIdCommand;
 import com.catcher.core.domain.entity.User;
+import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -35,6 +36,9 @@ public class UserApiControllerTest {
 
     @MockBean
     private UserRepository userRepository;
+
+    @MockBean
+    private EntityManagerFactory entityManagerFactory;
 
     @BeforeEach
     public void setUp() {

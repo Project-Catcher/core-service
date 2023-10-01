@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {"com.catcher.core", "com.catcher.resource"})
-@EnableJpaRepositories(basePackages = {"com.catcher.core.datasource"})
+@EnableJpaRepositories(basePackages = {"com.catcher.datasource"})
 @EntityScan(basePackages = {"com.catcher.core.domain.entity"})
 public class AppApplication {
 
