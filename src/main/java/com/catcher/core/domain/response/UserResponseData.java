@@ -2,7 +2,7 @@ package com.catcher.core.domain.response;
 
 import lombok.Builder;
 import lombok.Getter;
-import com.catcher.core.domain.User;
+import com.catcher.core.domain.entity.User;
 
 @Getter
 public class UserResponseData {
