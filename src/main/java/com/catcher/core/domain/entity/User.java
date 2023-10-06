@@ -1,15 +1,16 @@
 package com.catcher.core.domain.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+
+import java.time.ZonedDateTime;
 
 @Entity
 @Getter
 @Setter
+@Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class User {
 
     @Id
@@ -23,6 +24,14 @@ public class User {
     private String password;
 
     private String name;
+
+    private ZonedDateTime createdAt;
+
+    private ZonedDateTime updatedAt;
+
+    private ZonedDateTime deletedAt;
+
+    private UserRole userRole;
 
     public User(String userId, String password, String name){
         this.userId = userId;

@@ -1,4 +1,5 @@
 package com.catcher.core.domain.command;
 
-public interface Command {
+public interface Command <T>{
+    T execute();
 }

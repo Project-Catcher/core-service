@@ -3,6 +3,7 @@ package com.catcher.resource;
 
 import com.catcher.app.AppApplication;
 import com.catcher.core.UserCommandExecutor;
+import com.catcher.core.service.UserService;
 import com.catcher.datasource.UserRepository;
 import com.catcher.core.domain.command.UserByUserIdCommand;
 import com.catcher.core.domain.entity.User;
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -40,10 +42,13 @@ public class UserApiControllerTest {
     @MockBean
     private EntityManagerFactory entityManagerFactory;
 
+    @Autowired
+    private UserService userService;
+
     @BeforeEach
     public void setUp() {
         MockitoAnnotations.initMocks(this);
-        mockMvc = MockMvcBuilders.standaloneSetup(new UserApiController(userCommandExecutor)).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(new UserApiController(userCommandExecutor, userService)).build();
     }
 
     private String generateRandomString() {
@@ -59,13 +64,14 @@ public class UserApiControllerTest {
         User user = new User(userId, password, name);
 
         //when
-        when(userCommandExecutor.run(new UserByUserIdCommand(userId)))
+        when(userCommandExecutor.run(new UserByUserIdCommand(userService, userId)))
                 .thenReturn(user);
 
         //then
         mockMvc.perform(MockMvcRequestBuilders
-                        .get("/user/" + user.getUserId())
-                        .accept(MediaType.APPLICATION_JSON))
+                        .get("/user/{userId}",user.getUserId())
+                        .accept(MediaType.APPLICATION_JSON)
+                )
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.userId").value(userId))
                 .andExpect(jsonPath("$.password").value(password))

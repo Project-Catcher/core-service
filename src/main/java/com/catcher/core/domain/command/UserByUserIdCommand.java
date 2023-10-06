@@ -1,12 +1,18 @@
 package com.catcher.core.domain.command;
 
-import lombok.Data;
+import com.catcher.core.domain.entity.User;
+import com.catcher.core.service.UserService;
+import lombok.RequiredArgsConstructor;
 
-@Data
-public class UserByUserIdCommand implements Command {
-    String userId;
+@RequiredArgsConstructor
+public class UserByUserIdCommand implements Command<User> {
 
-    public UserByUserIdCommand(String userId) {
-        this.userId = userId;
+    private final UserService userService;
+
+    private final String userId;
+
+    @Override
+    public User execute() {
+        return userService.findUserByUserId(userId);
     }
 }

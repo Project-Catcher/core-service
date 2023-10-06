@@ -7,12 +7,12 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.catcher.core", "com.catcher.resource"})
+@ComponentScan(basePackages = {"com.catcher"})
 @EnableJpaRepositories(basePackages = {"com.catcher.datasource"})
 @EntityScan(basePackages = {"com.catcher.core.domain.entity"})
 public class AppApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(AppApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(AppApplication.class, args);
+    }
 }
