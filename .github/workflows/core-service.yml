@@ -64,5 +64,5 @@ jobs:
 
       - name: Publish Image to ECR(CORE-SERVICE)
         run: |
-          docker tag core-service:latest ${{ env.ecr_url }}/core-service:latest
-          docker push ${{ env.ecr_url }}/core-service:latest
+          docker tag core-service:latest ${{ env.ecr_url }}:core-service
+          docker push ${{ env.ecr_url }}:core-service
