@@ -66,3 +66,4 @@ jobs:
         run: |
           docker tag core-service:latest ${{ env.ecr_url }}
           docker push ${{ env.ecr_url }}
+          
