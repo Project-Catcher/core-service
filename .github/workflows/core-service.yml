@@ -9,7 +9,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "Taein2-patch-1" ]
 
 env:
   ecr_url: ${{ secrets.ECR_REPO_DEV }}
