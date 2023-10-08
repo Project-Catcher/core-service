@@ -63,7 +63,5 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
 
       - name: Publish Image to ECR(CORE-SERVICE)
-        run: |
-          docker tag core-service:latest ${{ env.ecr_url }}
-          docker push ${{ env.ecr_url }}
+        run: docker push core-service:latest
         
