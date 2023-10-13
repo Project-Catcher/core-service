@@ -38,6 +38,15 @@ dependencies {
 	implementation 'org.zalando:spring-cloud-config-aws-kms:5.1.2'
 	implementation 'com.amazonaws:aws-java-sdk-kms:1.12.429'
 	implementation 'com.amazonaws:jmespath-java:1.12.468'
+
+	//ssh
+	implementation 'com.jcraft:jsch:0.1.55'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2022.0.3"
+	}
 }
 
 tasks.named('test') {
