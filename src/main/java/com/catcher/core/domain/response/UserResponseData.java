@@ -24,7 +24,7 @@ public class UserResponseData {
                 .id(user.getId())
                 .userId(user.getUserId())
                 .password(user.getPassword())
-                .name(user.getName())
                 .build();
+//                .name(user.getName())
     }
 }
