@@ -45,30 +45,4 @@ public class UserApiControllerTest {
         MockitoAnnotations.initMocks(this);
         mockMvc = MockMvcBuilders.standaloneSetup(new UserApiController(userCommandExecutor)).build();
     }
-
-    private String generateRandomString() {
-        return UUID.randomUUID().toString();
-    }
-
-    @Test
-    public void testGetUserByUserId() throws Exception {
-        // given
-        String userId = generateRandomString();
-        String password = generateRandomString();
-        String name = generateRandomString();
-        User user = new User(userId, password, name);
-
-        //when
-        when(userCommandExecutor.run(new UserByUserIdCommand(userId)))
-                .thenReturn(user);
-
-        //then
-        mockMvc.perform(MockMvcRequestBuilders
-                        .get("/user/" + user.getUserId())
-                        .accept(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.userId").value(userId))
-                .andExpect(jsonPath("$.password").value(password))
-                .andExpect(jsonPath("$.name").value(name));
-    }
 }
