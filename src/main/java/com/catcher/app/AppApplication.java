@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@ComponentScan(basePackages = {"com.catcher.core", "com.catcher.resource"})
+@ComponentScan(basePackages = {"com.catcher.core", "com.catcher.resource", "com.catcher.infrastructure", "com.catcher.datasource"})
 @EnableJpaRepositories(basePackages = {"com.catcher.datasource"})
 @EntityScan(basePackages = {"com.catcher.core.domain.entity"})
 @EnableJpaAuditing
