@@ -27,7 +27,7 @@ public class UserCommandExecutor implements CommandExecutor<User>{
 
         final UserByUserIdCommand userByUserIdCommand = (UserByUserIdCommand) command;
         return userRepository
-                .findByUserId(userByUserIdCommand.getUserId())
+                .findByUsername(userByUserIdCommand.getUserId())
                 .orElseThrow(); // TODO: fill custom Exception
     }
 }
