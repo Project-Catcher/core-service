@@ -20,7 +20,7 @@ public class User extends BaseTimeEntity {
     private Long id;
 
     @Column(unique = true, nullable = false)
-    private String userId;
+    private String username;
 
     // TODO: encrypted maybe?
     @Column(nullable = false)
