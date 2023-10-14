@@ -1,5 +1,7 @@
 package com.catcher.core.domain.entity;
 
+import com.catcher.core.domain.entity.enums.UserProvider;
+import com.catcher.core.domain.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -7,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-import static com.catcher.core.domain.entity.UserEnums.*;
 
 @Entity
 @Getter
@@ -31,7 +32,7 @@ public class User extends BaseTimeEntity {
     private String profileImageUrl;
 
     @Enumerated(value = EnumType.STRING)
-    private UserProvider UserProvider;
+    private UserProvider userProvider;
 
     @Enumerated(value = EnumType.STRING)
     private UserRole userRole;
