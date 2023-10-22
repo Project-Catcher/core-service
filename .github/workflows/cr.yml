@@ -26,4 +26,4 @@ jobs:
         uses: roharon/action-swit@v1
         with:
           webhooks_url: ${{ env.webhook_url }}
-          MESSAGE: "백엔드 OpenAI 코드 리뷰 성공 : Core-service"
+          MESSAGE: "${{ job.status }} 백엔드 OpenAI 코드 리뷰 성공 : Core-service - by ${{ github.actor }}"
