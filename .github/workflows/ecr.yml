@@ -15,6 +15,7 @@ env:
   ecr_url: ${{ secrets.ECR_REPO_DEV }}
   role_arn: ${{ secrets.OIDC_ROLE }}
   aws_region: ${{ secrets.AWS_REGION }}
+  webhook_url: ${{ secrets.WEBHOOK }}
 
 permissions:
       id-token: write
@@ -66,3 +67,8 @@ jobs:
         run: |
           docker tag core-service:latest ${{ env.ecr_url }}:core-service
           docker push ${{ env.ecr_url }}:core-service
+
+      - name: notification to swit
+        uses: roharon/action-swit@v1
+        with:
+          webhooks_url: ${{ env.webhook_url }}
