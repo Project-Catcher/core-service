@@ -10,10 +10,11 @@ env:
   aws_region: ${{ secrets.AWS_REGION }}
   aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
   aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  default_output: ${{ secrets.AWS_DEFAULT_OUTPUT }}
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -34,20 +35,12 @@ jobs:
           aws configure set aws_access_key_id ${{ env.aws_access_key }}
           aws configure set aws_secret_access_key ${{ env.aws_secret_key }}
           aws configure set default.region ${{ env.aws_region }}
-          aws configure set default.output ${{ secrets.AWS_DEFAULT_OUTPUT }}
-        env:
-          AWS_ACCESS_KEY_ID: ${{ env.aws_access_key }}
-          AWS_SECRET_ACCESS_KEY: ${{ env.aws_secret_key }}
-          AWS_DEFAULT_REGION: ${{ env.aws_region }}
-          AWS_DEFAULT_OUTPUT: json
-
-      # - name: Configure AWS Credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     aws-region: ${{ env.aws_region }}
-      #     role-session-name: GitHubActions
-      #     role-to-assume: ${{ env.role_arn }}
-
+          aws configure set default.output ${{ env.default_output }}
+        # env:
+        #   AWS_ACCESS_KEY_ID: ${{ env.aws_access_key }}
+        #   AWS_SECRET_ACCESS_KEY: ${{ env.aws_secret_key }}
+        #   AWS_DEFAULT_REGION: ${{ env.aws_region }}
+        #   AWS_DEFAULT_OUTPUT: json
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -67,4 +60,3 @@ jobs:
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: build/test-results/**/*.xml
-          
