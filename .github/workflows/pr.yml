@@ -27,7 +27,7 @@ jobs:
           fetch-depth: 1
 
       - name: Set up AWS CLI
-        uses: aws-actions/setup-aws-cli@v1
+        uses: unfor19/install-aws-cli-action@v1
 
       - name: Configure AWS credentials
         run: |
