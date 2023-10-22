@@ -8,6 +8,8 @@ env:
   ecr_url: ${{ secrets.ECR_REPO_DEV }}
   role_arn: ${{ secrets.OIDC_ROLE }}
   aws_region: ${{ secrets.AWS_REGION }}
+  aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
 permissions:
   id-token: write
@@ -24,12 +26,18 @@ jobs:
         with:
           fetch-depth: 1
 
+      # - name: Configure AWS Credentials
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     aws-region: ${{ env.aws_region }}
+      #     role-session-name: GitHubActions
+      #     role-to-assume: ${{ env.role_arn }}
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
+          aws-access-key-id: ${{ env.aws_access_key }}
+          aws-secret-access-key: ${{ env.aws_secret_key }}
           aws-region: ${{ env.aws_region }}
-          role-session-name: GitHubActions
-          role-to-assume: ${{ env.role_arn }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
