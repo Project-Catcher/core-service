@@ -12,9 +12,7 @@ env:
   aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
   default_output: ${{ secrets.AWS_DEFAULT_OUTPUT }}
 
-permissions:
-  id-token: write
-  contents: write
+permissions: write-all
 
 jobs:
   build:
