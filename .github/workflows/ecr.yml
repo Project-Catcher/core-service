@@ -72,4 +72,4 @@ jobs:
         uses: roharon/action-swit@v1
         with:
           webhooks_url: ${{ env.webhook_url }}
-          MESSAGE: "${{ job.status }} 백엔드 ECR 도커파일 업로드 성공 : Core-service - by ${{ github.actor }}"
+          MESSAGE: "🏷 ${{ job.status }} 백엔드 ECR 도커파일 업로드 : Core-service - by ${{ github.actor }}"
