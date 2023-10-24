@@ -18,8 +18,8 @@ env:
   webhook_url: ${{ secrets.WEBHOOK }}
 
 permissions:
-      id-token: write
-      contents: read
+  id-token: write
+  contents: read
       
 jobs:
   build:
