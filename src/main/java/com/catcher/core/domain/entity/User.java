@@ -20,8 +20,8 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(unique = true, nullable = false)
-    private String uid;
+    @Column(nullable = false)
+    private String name;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -50,24 +50,27 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private UserRole userRole;
 
-    @Column(nullable = false) // 필수 약관이라 가정
-    private LocalDateTime userAgeTerm;
+    @Column(nullable = false)
+    private LocalDateTime userAgeTerm; // 필수 약관
 
-    private LocalDateTime userServiceTerm; // 선택 약관이라 가정
+    @Column(nullable = false)
+    private LocalDateTime userServiceTerm; // 필수 약관
 
-    private LocalDateTime userPrivacyTerm;
+    @Column(nullable = false)
+    private LocalDateTime userPrivacyTerm; // 필수 약관
 
-    private LocalDateTime userLocationTerm;
+    @Column(nullable = false)
+    private LocalDateTime userLocationTerm; // 필수 약관
 
-    private LocalDateTime userMarketingTerm;
+    private LocalDateTime userMarketingTerm; // 선택 약관
 
     private LocalDateTime deletedAt;
 
     @Builder
-    public User(String uid, String password, String username, String email, String profileImageUrl, String phone, String nickname, UserRole role, LocalDateTime userAgeTerm, LocalDateTime userServiceTerm, LocalDateTime userPrivacyTerm, LocalDateTime userLocationTerm, String introduceContent, LocalDateTime userMarketingTerm){
-        this.uid = uid;
-        this.password = password;
+    public User(String username, String password, String name, String email, String profileImageUrl, String phone, String nickname, UserRole role, LocalDateTime userAgeTerm, LocalDateTime userServiceTerm, LocalDateTime userPrivacyTerm, LocalDateTime userLocationTerm, String introduceContent, LocalDateTime userMarketingTerm){
         this.username = username;
+        this.password = password;
+        this.name = name;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
         this.phone = phone;

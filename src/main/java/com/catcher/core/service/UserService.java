@@ -39,10 +39,10 @@ public class UserService {
 
     @Transactional
     public UserCreateResDto signUpUser(UserCreateReqDto userCreateReqDto) throws BaseException {
-        validateDuplicateUser(userCreateReqDto.getUid());
+        validateDuplicateUser(userCreateReqDto.getName());
 
         User user = User.builder()
-                .uid(userCreateReqDto.getUid())
+                .name(userCreateReqDto.getName())
                 .password(passwordEncoder.encode(userCreateReqDto.getPassword()))
                 .role(userCreateReqDto.getRole() == 0 ? UserRole.ADMIN : UserRole.USER)
                 .username(userCreateReqDto.getUsername())
@@ -77,7 +77,7 @@ public class UserService {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
-                            userLoginReqDto.getUid(),
+                            userLoginReqDto.getUsername(),
                             userLoginReqDto.getPassword()
                     )
             );

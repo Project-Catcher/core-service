@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserCreateReqDto {
-    @NotNull(message = "아이디를 입력하세요.")
-    private String uid;
-
     @NotNull(message = "이름을 입력하세요.")
+    private String name;
+
+    @NotNull(message = "아이디를 입력하세요.")
     private String username;
 
     @NotNull(message = "비밀번호를 입력하세요.")
@@ -50,8 +50,8 @@ public class UserCreateReqDto {
 
 
     @Builder
-    public UserCreateReqDto(String uid, String username, String password, int role, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, String introduceContent, LocalDateTime marketingTerm){
-        this.uid = uid;
+    public UserCreateReqDto(String name, String username, String password, int role, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, String introduceContent, LocalDateTime marketingTerm){
+        this.name = name;
         this.username = username;
         this.password = password;
         this.role = role;

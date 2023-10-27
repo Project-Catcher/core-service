@@ -10,14 +10,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserLoginReqDto {
     @NotNull(message = "아이디를 입력하세요.")
-    private String uid;
+    private String username;
 
     @NotNull(message = "비밀번호를 입력하세요.")
     private String password;
 
     @Builder
-    public UserLoginReqDto(String uid, String password){
-        this.uid = uid;
+    public UserLoginReqDto(String username, String password){
+        this.username = username;
         this.password = password;
     }
 }

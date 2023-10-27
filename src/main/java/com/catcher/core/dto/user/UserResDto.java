@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 public class UserResDto {
     Long id;
-    String uid;
+    String username;
     String name;
     String email;
     String department;
@@ -24,8 +24,8 @@ public class UserResDto {
     public static UserResDto from(User user){
         return UserResDto.builder()
                 .id(user.getId())
-                .uid(user.getUid())
-                .name(user.getUsername())
+                .username(user.getUsername())
+                .name(user.getName())
                 .email(user.getEmail())
                 .contact(user.getPhone())
                 .profileUrl(user.getProfileImageUrl())
