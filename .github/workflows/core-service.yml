@@ -61,3 +61,9 @@ jobs:
           # docker push ${{ env.ecr_url }}:core-service
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
+
+      - name: Edit kustomize file
+        run: |
+          cd ./kustomize/dev/
+          kustomize edit set images \
+          catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
