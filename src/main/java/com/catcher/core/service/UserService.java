@@ -65,10 +65,10 @@ public class UserService {
 
 
     // 유저 중복 확인
-    private void validateDuplicateUser(String uid) throws BaseException {
-        Optional<User> findUsers = userRepository.findByUid(uid);
+    private void validateDuplicateUser(String username) throws BaseException {
+        Optional<User> findUsers = userRepository.findByUsername(username);
         if (!findUsers.isEmpty()){
-            throw new BaseException(USERS_DUPLICATED_USER_ID);
+            throw new BaseException(USERS_DUPLICATED_USER_NAME);
         }
     }
 
@@ -95,11 +95,11 @@ public class UserService {
         }
     }
 
-    public UserResDto getUser(String uid) {
-        Optional<User> users = userRepository.findByUid(uid);
+    public UserResDto getUser(Long id) {
+        Optional<User> users = userRepository.findById(id);
         User user = users.orElseThrow(() -> {
-            log.error(INVALID_USER_UID.getMessage());
-            return new BaseException(INVALID_USER_UID);
+            log.error(INVALID_USER_NAME.getMessage());
+            return new BaseException(INVALID_USER_NAME);
         });
 
         return UserResDto.from(user);

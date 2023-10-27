@@ -57,8 +57,8 @@ public class UserController {
     }
 
     @Operation(summary = "사용자 조회")
-    @GetMapping("/{uid}")
-    public BaseResponse<UserResDto> getUser(@PathVariable("uid") String uid) {
+    @GetMapping("/{id}")
+    public BaseResponse<UserResDto> getUser(@PathVariable("id") Long uid) {
         try {
             return new BaseResponse<>(userService.getUser(uid));
         } catch(BaseException e){

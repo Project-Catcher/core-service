@@ -22,7 +22,7 @@ public class AuthService {
         // Refresh Token 검증
         jwtTokenProvider.validateToken(refreshToken);
 
-        // Access Token 에서 User uid를 가져옴
+        // Access Token 에서 User Name를 가져옴
         Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
 
         // Redis에서 저장된 Refresh Token 값을 가져옴

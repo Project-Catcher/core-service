@@ -21,15 +21,14 @@ public enum BaseResponseStatus {
     EXPIRED_JWT(false,2006,"만료된 Access 토큰입니다. Refresh 토큰을 이용해서 새로운 Access 토큰을 발급 받으세요."),
 
     // users
-    USERS_DUPLICATED_USER_ID(false, 2100, "이미 존재하는 아이디 입니다."),
-    USERS_EMPTY_USER_ID(false, 2101, "유저 아이디 값을 확인해주세요."),
+    USERS_DUPLICATED_USER_NAME(false, 2100, "이미 존재하는 아이디 입니다."),
+    USERS_EMPTY_USER_NAME(false, 2101, "유저 아이디 값을 확인해주세요."),
     INVALID_USER_INFO(false, 2102, "유저 아이디나 비밀번호를 확인해주세요."),
     INVALID_USER_CRAWLING(false, 2103, "유저 정보를 불러오는데 실패했습니다"),
-    POST_USERS_EMPTY_USER_ID(false, 2104, "유저 아이디를 입력해주세요."),
-    INVALID_USER_UID(false, 2105, "아이디를 확인해주세요"),
+    POST_USERS_EMPTY_USER_NAME(false, 2104, "유저 아이디를 입력해주세요."),
+    INVALID_USER_NAME(false, 2105, "아이디를 확인해주세요"),
     INVALID_USER_PW(false, 2106, "비밀번호를 확인해주세요."),
     INVALID_USER_ID(false, 2107, "유저 ID를 확인해주세요."),
-    INVALID_POST_ID(false, 2108, "post ID를 확인해주세요."),
 
     /**
      * 3000 : Response 오류
