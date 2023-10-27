@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+ name: catcher-core
+spec:
+ replicas: 1
+ template:
+  spec:
+   serviceAccountName: catcher-core
+   containers:
+    - name: catcher-core
+      command: ["/bin/sh","-c", "java -jar -Duser.timezone=Asia/Seoul -Dspring.profiles.active=dev catcher-core.jar"]

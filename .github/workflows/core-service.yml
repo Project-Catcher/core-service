@@ -1,14 +1,7 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: Java CI with Gradle
 
 on:
-  push:
+  pull_request:
     branches: [ "Taein2-patch-1" ]
 
 env:
@@ -23,7 +16,7 @@ permissions:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     permissions:
       id-token: write   # This is required for requesting the JWT
@@ -64,5 +57,7 @@ jobs:
 
       - name: Publish Image to ECR(CORE-SERVICE)
         run: |
-          docker tag core-service:latest ${{ env.ecr_url }}:core-service
-          docker push ${{ env.ecr_url }}:core-service
+          # docker tag core-service:latest ${{ env.ecr_url }}:core-service
+          # docker push ${{ env.ecr_url }}:core-service
+          docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
+          docker push ${{ env.ecr_url }}:${{ github.sha }}
