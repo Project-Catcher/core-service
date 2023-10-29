@@ -66,12 +66,12 @@ jobs:
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
 
-    - name: Set up Git
-      run: |
-        git config --global user.email ${{ env.GIT_EMAIL }}
-        git config --global user.name ${{ env.GIT_USER }}
-        cd ./kustomize/overlays/dev/
-        git init
+      - name: Set up Git
+        run: |
+          git config --global user.email ${{ env.GIT_EMAIL }}
+          git config --global user.name ${{ env.GIT_USER }}
+          cd ./kustomize/overlays/dev/
+          git init
 
       - name: Edit kustomize file
         run: |
