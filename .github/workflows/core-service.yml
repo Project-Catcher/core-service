@@ -72,7 +72,9 @@ jobs:
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
           git config --global pull.rebase true
+          pwd
           cd ./kustomize/overlays/dev/
+          pwd
           git init
           git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
 
@@ -81,6 +83,7 @@ jobs:
           pwd
           ls -al
           tree
+          cd ./kustomize/overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
