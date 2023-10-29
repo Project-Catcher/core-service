@@ -78,6 +78,9 @@ jobs:
 
       - name: Edit kustomize file
         run: |
+          pwd
+          ls -al
+          tree
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
