@@ -65,7 +65,7 @@ jobs:
       - name: Edit kustomize file
         run: |
           cd ./kustomize/overlays/dev/
-          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:latest
+          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
 
