@@ -72,17 +72,12 @@ jobs:
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
           git config --global pull.rebase true
-          pwd
-          cd ./kustomize/overlays/dev/
-          pwd
+          cd ./kustomize/
           git init
           git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
 
       - name: Edit kustomize file
         run: |
-          pwd
-          ls -al
-          tree
           cd ./kustomize/overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
@@ -90,7 +85,7 @@ jobs:
 
       - name: Commit and Push files
         run: |
-          cd ../..
+          cd ./kustomize/
           git add .
           git commit -m "test commit from runner"
           git push origin dev
