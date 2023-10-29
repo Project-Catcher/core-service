@@ -68,7 +68,6 @@ jobs:
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
-          kustomize build overlays/dev/ | kubectl apply -f -
 
       # - name: Commit and Push files
       #   run: |
