@@ -71,6 +71,7 @@ jobs:
         run: |
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
+          git config --global pull.rebase true
           cd ./kustomize/overlays/dev/
           git init
 
