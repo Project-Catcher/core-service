@@ -87,6 +87,7 @@ jobs:
         run: |
           cd ./kustomize/
           git remote -v
+          git pull origin main
           git add .
           git status
           git commit -m "test commit from runner"
