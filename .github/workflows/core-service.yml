@@ -69,8 +69,8 @@ jobs:
 
       - name: Set up Git
         run: |
-          git config --global user.email ${{ env.GIT_EMAIL }}
-          git config --global user.name ${{ env.GIT_USER }}
+          git config --global user.email ${{ env.git_email }}
+          git config --global user.name ${{ env.git_user }}
           cd ./kustomize/overlays/dev/
           git init
 
