@@ -8,6 +8,8 @@ env:
   ecr_url: ${{ secrets.ECR_REPO_DEV }}
   role_arn: ${{ secrets.OIDC_ROLE }}
   aws_region: ${{ secrets.AWS_REGION }}
+  git_token: ${{ secrets.GIT_TOKEN }}
+  git_url: "https://github.com/Project-Catcher/core-service-kusto.git"
 
 permissions:
       id-token: write
@@ -69,9 +71,14 @@ jobs:
           kustomize build .
           cat kustomization.yaml
 
-      # - name: Commit and Push files
-      #   run: |
-      #     cd ~/core-runner/_work/core-service/core-service/kustomize/
-      #     git add .
-      #     git commit -m "test commit from runner"
-      #     git push origin kustomize
+      - uses: actions/labeler@v4
+        with:
+          repo-token: ${{ env.git_token }}
+
+      - name: Commit and Push files
+        run: |
+          cd ~/core-runner/_work/core-service/core-service/kustomize/
+          git pull ${{ env.git_url }}
+          git add .
+          git commit -m "test commit from runner"
+          git push origin dev
