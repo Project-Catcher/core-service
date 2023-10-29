@@ -71,7 +71,7 @@ jobs:
 
       # - name: Commit and Push files
       #   run: |
-      #     cd ../..
-      #     git add -A
+      #     cd ~/core-runner/_work/core-service/core-service/kustomize/
+      #     git add .
       #     git commit -m "test commit from runner"
       #     git push origin kustomize
