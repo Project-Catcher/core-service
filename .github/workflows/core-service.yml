@@ -64,8 +64,14 @@ jobs:
 
       - name: Edit kustomize file
         run: |
-          cd ./kustomize/dev/
-          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
-          git add -A
-          git commit -m "test commit from runner"
-          git push origin jdb-cd-test
+          cd ./kustomize/overlays/dev/
+          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:latest
+          kustomize build .
+          cat kustomization.yaml
+
+      # - name: Commit and Push files
+      #   run: |
+      #     cd ../..
+      #     git add -A
+      #     git commit -m "test commit from runner"
+      #     git push origin kustomize

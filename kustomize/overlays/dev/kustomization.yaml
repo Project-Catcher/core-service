@@ -3,7 +3,7 @@ kind: Kustomization
 patchesStrategicMerge:
 - deployment.yaml
 resources:
-- ../base
+- ../../base
 images:
 - name: catcher-core-image
   newName: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ secrets.AWS_REGION }}.amazonaws.com/${{ secrets.AWS_BACK_ECR_NAME }}
