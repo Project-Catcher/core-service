@@ -9,7 +9,9 @@ env:
   role_arn: ${{ secrets.OIDC_ROLE }}
   aws_region: ${{ secrets.AWS_REGION }}
   git_token: ${{ secrets.GIT_TOKEN }}
-  git_url: "https://github.com/Project-Catcher/core-service-kusto.git"
+  git_url: "github.com/Project-Catcher/core-service-kusto.git"
+  git_user: ${{ secrets.GIT_USER }}
+  git_email: ${{ secrets.GIT_EMAIL }}
 
 permissions:
       id-token: write
@@ -64,21 +66,23 @@ jobs:
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
 
+    - name: Set up Git
+      run: |
+        git config --global user.email ${{ env.GIT_EMAIL }}
+        git config --global user.name ${{ env.GIT_USER }}
+        cd ./kustomize/overlays/dev/
+        git init
+
       - name: Edit kustomize file
         run: |
-          cd ./kustomize/overlays/dev/
+          git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
 
-      - uses: actions/labeler@v4
-        with:
-          repo-token: ${{ env.git_token }}
-
       - name: Commit and Push files
         run: |
-          cd ~/core-runner/_work/core-service/core-service/kustomize/
-          git pull ${{ env.git_url }}
+          cd ../..
           git add .
           git commit -m "test commit from runner"
           git push origin dev
