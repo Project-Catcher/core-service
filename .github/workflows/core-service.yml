@@ -74,12 +74,10 @@ jobs:
           git config --global pull.rebase true
           cd ./kustomize/overlays/dev/
           git init
+          git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
 
       - name: Edit kustomize file
         run: |
-          git stash
-          git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-          git stash pop
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
