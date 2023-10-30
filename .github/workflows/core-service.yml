@@ -67,7 +67,7 @@ jobs:
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
 
-      - name: Set up Git
+      - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
@@ -76,21 +76,37 @@ jobs:
           git init
           git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
 
-      - name: Edit kustomize file
-        run: |
-          cd ./kustomize/overlays/dev/
+          echo 'Edit kustomize file'
+          cd ./overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml
 
-      - name: Commit and Push files
-        run: |
-          cd ./kustomize/
+          echo 'Commit and Push files'
+          cd ../../
+          git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
           git remote update
           git fetch
           git checkout main
           git add .
-          git status
           git commit -m "test commit from runner"
-          git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-          git push -f origin main
+          git push -u origin main
+
+      # - name: Edit kustomize file
+      #   run: |
+      #     cd ./kustomize/overlays/dev/
+      #     kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
+      #     kustomize build .
+      #     cat kustomization.yaml
+
+      # - name: Commit and Push files
+      #   run: |
+      #     cd ./kustomize/
+      #     git remote update
+      #     git fetch
+      #     git checkout main
+      #     git add .
+      #     git status
+      #     git commit -m "test commit from runner"
+      #     git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
+      #     git push -f origin main
