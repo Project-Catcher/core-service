@@ -88,6 +88,7 @@ jobs:
           cd ./kustomize/
           git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
           git remote -v
+          git pull origin main
           git add .
           git status
           git commit -m "test commit from runner"
