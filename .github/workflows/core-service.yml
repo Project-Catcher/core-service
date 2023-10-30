@@ -87,6 +87,7 @@ jobs:
         run: |
           cd ./kustomize/
           git remote update
+          git fetch
           git checkout main
           git add .
           git status
