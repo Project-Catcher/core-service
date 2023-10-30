@@ -90,4 +90,4 @@ jobs:
           git status
           git commit -m "test commit from runner"
           git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-          git push -u origin main
+          git push -f origin main
