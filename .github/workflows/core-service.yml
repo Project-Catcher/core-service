@@ -90,6 +90,7 @@ jobs:
           cd core-service-kusto
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
+          git add -A
           git commit -m "test commit from runner"
           git push -u origin main
 
