@@ -75,6 +75,8 @@ jobs:
 
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
+          tree
+          
           echo 'Edit kustomize file'
           cd ./kustomize/overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
@@ -82,13 +84,11 @@ jobs:
           cat kustomization.yaml          
 
           echo 'Commit and Push files'
+          pwd
           cd ../../
-          git init
-          git add -A
-          git commit -m "test commit from runner"
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
-          git remote add origin ${{ env.git_url }}
+          git commit -m "test commit from runner"
           git push -u origin main
 
       # - name: Edit kustomize file
