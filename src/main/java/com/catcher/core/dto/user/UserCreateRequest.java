@@ -50,7 +50,7 @@ public class UserCreateRequest {
 
 
     @Builder
-    public UserCreateReqDto(String name, String username, String password, int role, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, String introduceContent, LocalDateTime marketingTerm){
+    public UserCreateRequest(String name, String username, String password, int role, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, String introduceContent, LocalDateTime marketingTerm){
         this.name = name;
         this.username = username;
         this.password = password;

@@ -16,8 +16,8 @@ public class UserCreateResponse {
     String contact;
     UserRole role;
 
-    public static UserCreateResDto from(User user){
-        return UserCreateResDto.builder()
+    public static UserCreateResponse from(User user){
+        return UserCreateResponse.builder()
                 .name(user.getName())
                 .username(user.getUsername())
                 .email(user.getEmail())
