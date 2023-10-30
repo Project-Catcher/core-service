@@ -83,10 +83,12 @@ jobs:
 
           echo 'Commit and Push files'
           cd ../../
-          git config --global user.email ${{ env.git_email }}
-          git config --global user.name ${{ env.git_user }}
+          git init
           git add -A
           git commit -m "test commit from runner"
+          git config --global user.email ${{ env.git_email }}
+          git config --global user.name ${{ env.git_user }}
+          git remote add origin ${{ env.git_url }}
           git push -u origin main
 
       # - name: Edit kustomize file
