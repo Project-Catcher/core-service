@@ -62,8 +62,6 @@ jobs:
 
       - name: Publish Image to ECR(CORE-SERVICE)
         run: |
-          # docker tag core-service:latest ${{ env.ecr_url }}:core-service
-          # docker push ${{ env.ecr_url }}:core-service
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
 
@@ -78,7 +76,7 @@ jobs:
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
           echo 'Edit kustomize file'
-          cd ./overlays/dev/
+          cd ./kustomize/overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
           cat kustomization.yaml          
