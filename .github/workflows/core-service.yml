@@ -75,19 +75,24 @@ jobs:
 
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
-          tree
+          echo 'Check Git Origin'
+          git remote -v
           
           echo 'Edit kustomize file'
           cd ./kustomize/overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
-          kustomize build .
-          cat kustomization.yaml          
+          kustomize build .          
 
-          echo 'Commit and Push files'
+          echo 'Move kustomize files'
           pwd
           cd ../../../
-          mv kustomize core-service-kusto/
+          mv kustomize/* core-service-kusto/
+          mv kustomize/.* core-service-kusto/
           cd core-service-kusto
+          tree .
+
+          echo 'Commit and Push files'
+          git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
           git add -A
