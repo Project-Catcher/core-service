@@ -92,6 +92,7 @@ jobs:
           git config --global user.name ${{ env.git_user }}
           git add -A
           git commit -m "test commit from runner"
+          git remote -v
           git push -u origin main
 
       # - name: Edit kustomize file
