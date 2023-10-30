@@ -20,8 +20,8 @@ permissions:
 jobs:
   build:
     name: Build
-    # runs-on: self-hosted
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
+    # runs-on: ubuntu-latest
 
     permissions:
       id-token: write   # This is required for requesting the JWT
