@@ -86,6 +86,7 @@ jobs:
       - name: Commit and Push files
         run: |
           cd ./kustomize/
+          git remote update
           git checkout main
           git add .
           git status
