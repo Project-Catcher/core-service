@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserCreateReqDto {
+public class UserCreateRequest {
     @NotNull(message = "이름을 입력하세요.")
     private String name;
 
