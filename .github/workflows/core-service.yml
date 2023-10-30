@@ -67,30 +67,26 @@ jobs:
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
 
+      - name: Checkout for Kustomize repository
+        uses: actions/checkout@v2
+        with:
+          repository: Project-Catcher/core-service-kusto
+          ref: main
+          token: ${{ env.git_token }}
+          path: core-service-kusto
+
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
-          git config --global user.email ${{ env.git_email }}
-          git config --global user.name ${{ env.git_user }}
-          git config --global pull.rebase true
-          cd ./kustomize/
-          git init
-          git pull https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-
           echo 'Edit kustomize file'
           cd ./overlays/dev/
           kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
           kustomize build .
-          cat kustomization.yaml
+          cat kustomization.yaml          
 
           echo 'Commit and Push files'
           cd ../../
-          git remote -v
-          git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-          # git remote update
-          # git fetch
-          # git checkout main
-          git remote -v
-          git add .
+          git config --global user.email ${{ env.git_email }}
+          git config --global user.name ${{ env.git_user }}
           git commit -m "test commit from runner"
           git push -u origin main
 
