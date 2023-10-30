@@ -14,7 +14,7 @@ public class SwaggerConfiguration {
     public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info().title("Catcher Core Service API")
-                        .description("API's using to call Batch Service")
+                        .description("API's using to call Core Service")
                         .version("v0.0.1")
                         .license(new License().name("Apache 2.0").url("http://springdoc.org")))
                 .externalDocs(new ExternalDocumentation()
