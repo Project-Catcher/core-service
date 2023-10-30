@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class UserLoginReqDto {
+public class UserLoginRequest {
     @NotNull(message = "아이디를 입력하세요.")
     private String username;
 
@@ -16,7 +16,7 @@ public class UserLoginReqDto {
     private String password;
 
     @Builder
-    public UserLoginReqDto(String username, String password){
+    public UserLoginRequest(String username, String password){
         this.username = username;
         this.password = password;
     }

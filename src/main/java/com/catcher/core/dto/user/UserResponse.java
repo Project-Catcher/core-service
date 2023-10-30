@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserResDto {
+public class UserResponse {
     Long id;
     String username;
     String name;
@@ -21,8 +21,8 @@ public class UserResDto {
     String profileUrl;
     UserRole role;
 
-    public static UserResDto from(User user){
-        return UserResDto.builder()
+    public static UserResponse from(User user){
+        return UserResponse.builder()
                 .id(user.getId())
                 .username(user.getUsername())
                 .name(user.getName())
