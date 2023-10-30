@@ -71,7 +71,7 @@ jobs:
           repository: Project-Catcher/core-service-kusto
           ref: main
           token: ${{ env.git_token }}
-          path: kustomize
+          path: core-service-kusto
 
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
@@ -85,7 +85,9 @@ jobs:
 
           echo 'Commit and Push files'
           pwd
-          cd ../../
+          cd ../../../
+          mv kustomize core-service-kusto/
+          cd core-service-kusto
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
           git commit -m "test commit from runner"
