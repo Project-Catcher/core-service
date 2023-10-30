@@ -4,8 +4,8 @@ import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.TokenDto;
-import com.catcher.core.dto.user.UserCreateReqDto;
-import com.catcher.core.dto.user.UserCreateResDto;
+import com.catcher.core.dto.user.UserCreateRequest;
+import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.core.dto.user.UserLoginReqDto;
 import com.catcher.core.dto.user.UserResDto;
 import com.catcher.core.domain.entity.User;
@@ -38,29 +38,29 @@ public class UserService {
     private PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserCreateResDto signUpUser(UserCreateReqDto userCreateReqDto) throws BaseException {
-        validateDuplicateUser(userCreateReqDto.getName());
+    public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) throws BaseException {
+        validateDuplicateUser(userCreateRequest.getName());
 
         User user = User.builder()
-                .name(userCreateReqDto.getName())
-                .password(passwordEncoder.encode(userCreateReqDto.getPassword()))
-                .role(userCreateReqDto.getRole() == 0 ? UserRole.ADMIN : UserRole.USER)
-                .username(userCreateReqDto.getUsername())
-                .email(userCreateReqDto.getEmail())
-                .phone(userCreateReqDto.getPhone())
-                .nickname(userCreateReqDto.getNickname())
+                .name(userCreateRequest.getName())
+                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
+                .role(userCreateRequest.getRole() == 0 ? UserRole.ADMIN : UserRole.USER)
+                .username(userCreateRequest.getUsername())
+                .email(userCreateRequest.getEmail())
+                .phone(userCreateRequest.getPhone())
+                .nickname(userCreateRequest.getNickname())
                 .profileImageUrl(null)
-                .userAgeTerm(userCreateReqDto.getAgeTerm())
-                .userServiceTerm(userCreateReqDto.getServiceTerm())
-                .userPrivacyTerm(userCreateReqDto.getPrivacyTerm())
-                .userLocationTerm(userCreateReqDto.getLocationTerm())
-                .userMarketingTerm(userCreateReqDto.getMarketingTerm())
-                .introduceContent(userCreateReqDto.getIntroduceContent())
+                .userAgeTerm(userCreateRequest.getAgeTerm())
+                .userServiceTerm(userCreateRequest.getServiceTerm())
+                .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
+                .userLocationTerm(userCreateRequest.getLocationTerm())
+                .userMarketingTerm(userCreateRequest.getMarketingTerm())
+                .introduceContent(userCreateRequest.getIntroduceContent())
                 .build();
 
         userRepository.save(user);
 
-        return UserCreateResDto.from(user);
+        return UserCreateResponse.from(user);
     }
 
 

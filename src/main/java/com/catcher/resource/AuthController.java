@@ -1,6 +1,7 @@
 package com.catcher.resource;
 
 import com.catcher.common.response.BaseResponse;
+import com.catcher.core.service.ApiService;
 import com.catcher.core.service.AuthService;
 import com.catcher.core.dto.TokenDto;
 import io.swagger.v3.oas.annotations.Operation;
@@ -15,11 +16,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-    private final AuthService authService;
+//    private final AuthService authService;
+    private final ApiService apiService;
 
     @Operation(summary = "토큰 재발행")
     @PostMapping("/reissue")
     public BaseResponse<TokenDto> reissue(String refreshToken){
-        return new BaseResponse<>(authService.reissueToken(refreshToken));
+        return new BaseResponse<>(apiService.reissueRefreshToken(refreshToken));
     }
 }

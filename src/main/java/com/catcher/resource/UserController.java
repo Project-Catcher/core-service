@@ -2,11 +2,11 @@ package com.catcher.resource;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.common.response.BaseResponse;
+import com.catcher.core.dto.user.UserCreateRequest;
+import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.core.dto.user.UserResDto;
 import com.catcher.core.service.UserService;
 import com.catcher.core.dto.TokenDto;
-import com.catcher.core.dto.user.UserCreateReqDto;
-import com.catcher.core.dto.user.UserCreateResDto;
 import com.catcher.core.dto.user.UserLoginReqDto;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
@@ -24,7 +24,7 @@ public class UserController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/signup")
-    public BaseResponse<UserCreateResDto> signUp(@Valid @RequestBody UserCreateReqDto userCreateReqDto, BindingResult br) {
+    public BaseResponse<UserCreateResponse> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest, BindingResult br) {
         // 형식적 validation
         if (br.hasErrors()){
             String errorName = br.getAllErrors().get(0).getDefaultMessage();
@@ -33,7 +33,7 @@ public class UserController {
         }
 
         try {
-            return new BaseResponse<>(userService.signUpUser(userCreateReqDto));
+            return new BaseResponse<>(userService.signUpUser(userCreateRequest));
         } catch(BaseException e){
             return new BaseResponse<>(e.getStatus());
         }
