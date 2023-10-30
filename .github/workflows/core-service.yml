@@ -89,7 +89,7 @@ jobs:
           cd core-service-kusto && ls -al
 
           echo 'Commit and Push files'
-          git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
+          git remote set-url origin https://${{ env.git_user }}@${{ env.git_url }}
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
           git add -A
