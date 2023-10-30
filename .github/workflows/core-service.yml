@@ -71,7 +71,7 @@ jobs:
           repository: Project-Catcher/core-service-kusto
           ref: main
           token: ${{ env.git_token }}
-          path: core-service-kusto
+          path: core-service-kusto/kustomize
 
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
