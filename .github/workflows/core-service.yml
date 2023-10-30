@@ -76,7 +76,7 @@ jobs:
       - name: Set up Git / Edit kustomize file / Commit and Push files
         run: |
           echo 'Check Git Origin'
-          git remote -v
+          git remote -v  # core-service
           
           echo 'Edit kustomize file'
           cd ./kustomize/overlays/dev/
@@ -86,10 +86,9 @@ jobs:
           echo 'Move kustomize files'
           pwd
           cd ../../../
+          tree ./kustomize
           mv kustomize/* core-service-kusto/
-          mv kustomize/.* core-service-kusto/
           cd core-service-kusto
-          tree .
 
           echo 'Commit and Push files'
           git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
