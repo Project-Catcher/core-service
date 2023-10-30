@@ -4,10 +4,10 @@ import com.catcher.common.exception.BaseException;
 import com.catcher.common.response.BaseResponse;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserCreateResponse;
-import com.catcher.core.dto.user.UserResDto;
+import com.catcher.core.dto.user.UserResponse;
 import com.catcher.core.service.UserService;
 import com.catcher.core.dto.TokenDto;
-import com.catcher.core.dto.user.UserLoginReqDto;
+import com.catcher.core.dto.user.UserLoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ public class UserController {
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public BaseResponse<TokenDto> login(@Valid @RequestBody UserLoginReqDto userLoginReqDto, BindingResult br) throws BaseException {
+    public BaseResponse<TokenDto> login(@Valid @RequestBody UserLoginRequest userLoginReqDto, BindingResult br) throws BaseException {
 
         if (br.hasErrors()){
             String errorName = br.getAllErrors().get(0).getDefaultMessage();
@@ -58,7 +58,7 @@ public class UserController {
 
     @Operation(summary = "사용자 조회")
     @GetMapping("/{id}")
-    public BaseResponse<UserResDto> getUser(@PathVariable("id") Long uid) {
+    public BaseResponse<UserResponse> getUser(@PathVariable("id") Long uid) {
         try {
             return new BaseResponse<>(userService.getUser(uid));
         } catch(BaseException e){

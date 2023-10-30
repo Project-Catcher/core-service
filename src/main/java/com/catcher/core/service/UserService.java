@@ -6,8 +6,8 @@ import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserCreateResponse;
-import com.catcher.core.dto.user.UserLoginReqDto;
-import com.catcher.core.dto.user.UserResDto;
+import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.core.dto.user.UserResponse;
 import com.catcher.core.domain.entity.User;
 import com.catcher.datasource.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +73,7 @@ public class UserService {
     }
 
     @Transactional
-    public TokenDto login(UserLoginReqDto userLoginReqDto) throws BaseException {
+    public TokenDto login(UserLoginRequest userLoginReqDto) throws BaseException {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -95,13 +95,13 @@ public class UserService {
         }
     }
 
-    public UserResDto getUser(Long id) {
+    public UserResponse getUser(Long id) {
         Optional<User> users = userRepository.findById(id);
         User user = users.orElseThrow(() -> {
             log.error(INVALID_USER_NAME.getMessage());
             return new BaseException(INVALID_USER_NAME);
         });
 
-        return UserResDto.from(user);
+        return UserResponse.from(user);
     }
 }

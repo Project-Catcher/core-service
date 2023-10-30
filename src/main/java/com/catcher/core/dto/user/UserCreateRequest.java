@@ -42,12 +42,8 @@ public class UserCreateRequest {
     private LocalDateTime locationTerm;
 
     private int role;
-
     private String introduceContent;
-
     private LocalDateTime marketingTerm;
-
-
 
     @Builder
     public UserCreateRequest(String name, String username, String password, int role, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, String introduceContent, LocalDateTime marketingTerm){

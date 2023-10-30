@@ -12,9 +12,6 @@ public enum ErrorCode {
     NOT_AUTHENTICATED(403, " Not authenticated"),
     EXTERNAL_ERROR(500, " External exception"),
     INTERNAL_SERVER_ERROR(500, " Server error"),
-
-    //AWS 4000
-    AWS_KMS_INVALID_ERROR(4000, " AWS KMS exception"),
     ;
 
     private final String message;
