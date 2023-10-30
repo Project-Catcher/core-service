@@ -84,7 +84,7 @@ jobs:
 
           echo 'Commit and Push files'
           cd ../../
-          git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
+          git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
           git remote update
           git fetch
           git checkout main
