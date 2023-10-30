@@ -84,10 +84,11 @@ jobs:
 
           echo 'Commit and Push files'
           cd ../../
+          git remote -v
           git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-          git remote update
-          git fetch
-          git checkout main
+          # git remote update
+          # git fetch
+          # git checkout main
           git remote -v
           git add .
           git commit -m "test commit from runner"
