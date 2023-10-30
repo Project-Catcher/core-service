@@ -84,12 +84,9 @@ jobs:
           kustomize build .          
 
           echo 'Move kustomize files'
-          pwd
           cd ../../../
-          ls -al ./kustomize
           mv kustomize/* core-service-kusto/
-          cd core-service-kusto
-          ls -al ./core-service-kusto
+          cd core-service-kusto && ls -al
 
           echo 'Commit and Push files'
           git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
