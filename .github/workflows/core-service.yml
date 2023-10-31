@@ -15,7 +15,7 @@ env:
 
 permissions:
       id-token: write
-      contents: read
+      contents: write
       
 jobs:
   build:
@@ -25,7 +25,7 @@ jobs:
 
     permissions:
       id-token: write   # This is required for requesting the JWT
-      contents: read    # This is required for actions/checkout
+      contents: write    # This is required for actions/checkout
 
     steps:
       - name: Checkout
@@ -90,11 +90,8 @@ jobs:
       - name: Commit minifest files
         run: |
           cd core-service-kusto
-          git remote -v && echo `git config -l`
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
-          git remote set-url origin https://${{ env.git_token }}@${{ env.git_url }}
-          echo `git config -l`
           git commit -am "Update image tag"
           git push -u origin main
 
