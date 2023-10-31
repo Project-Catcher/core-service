@@ -14,8 +14,8 @@ env:
   git_email: ${{ secrets.GIT_EMAIL }}
 
 permissions:
-      id-token: write
-      contents: write
+  id-token: write
+  contents: write
       
 jobs:
   build:
@@ -23,15 +23,9 @@ jobs:
     # runs-on: self-hosted
     runs-on: ubuntu-latest
 
-    permissions:
-      id-token: write   # This is required for requesting the JWT
-      contents: write    # This is required for actions/checkout
-
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
