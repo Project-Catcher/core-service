@@ -65,53 +65,59 @@ jobs:
           docker tag core-service:latest ${{ env.ecr_url }}:${{ github.sha }}
           docker push ${{ env.ecr_url }}:${{ github.sha }}
 
-      - name: Checkout for Kustomize repository
-        uses: actions/checkout@v2
-        with:
-          repository: Project-Catcher/core-service-kusto
-          ref: main
-          token: ${{ env.git_token }}
-          path: core-service-kusto
+    - name: Setup Kustomize
+      uses: imranismail/setup-kustomize@v1
 
-      - name: Set up Git / Edit kustomize file / Commit and Push files
-        run: |
-          echo 'Check Git Origin'
-          git remote -v  # core-service
-          
-          echo 'Edit kustomize file'
-          cd ./kustomize/overlays/dev/
-          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
-          kustomize build .          
+    - name: Checkout for Kustomize repository
+      uses: actions/checkout@v2
+      with:
+        repository: Project-Catcher/core-service-kusto
+        ref: main
+        token: ${{ env.git_token }}
+        path: core-service-kusto
 
-          echo 'Move kustomize files'
-          cd ../../../
-          mv kustomize/* core-service-kusto/
-          cd core-service-kusto && ls -al
+    - name: Update Kustomize image
+      run: |
+        KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+        FILE_NAME="deployment.yaml"
 
-          echo 'Commit and Push files'
-          git remote set-url origin https://${{ env.git_user }}@${{ env.git_url }}
-          git config --global user.email ${{ env.git_email }}
-          git config --global user.name ${{ env.git_user }}
-          git add -A
-          git commit -m "test commit from runner"
-          git remote -v
-          git push -u origin main
+        # Docker 이미지 URL 설정
+        cd $KUSTOMIZE_PATH
+        kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
+        cat kustomization.yaml
+        
+    # 수정된 파일 commit & push
+    - name: Commit minifest files
+      run: |
+        cd core-service-kusto
+        # git config --global user.email "github-actions@github.com"
+        # git config --global user.name "github-actions"
+        git config --global user.email ${{ env.git_email }}
+        git config --global user.name ${{ env.git_user }}
+        git commit -am "Update image tag"
+        git push -u origin main
 
-      # - name: Edit kustomize file
+      # - name: Set up Git / Edit kustomize file / Commit and Push files
       #   run: |
+      #     echo 'Check Git Origin'
+      #     git remote -v  # core-service
+          
+      #     echo 'Edit kustomize file'
       #     cd ./kustomize/overlays/dev/
       #     kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
-      #     kustomize build .
-      #     cat kustomization.yaml
+      #     kustomize build .          
 
-      # - name: Commit and Push files
-      #   run: |
-      #     cd ./kustomize/
-      #     git remote update
-      #     git fetch
-      #     git checkout main
-      #     git add .
-      #     git status
+      #     echo 'Move kustomize files'
+      #     cd ../../../
+      #     mv kustomize/* core-service-kusto/
+      #     cd core-service-kusto && ls -al
+
+      #     echo 'Commit and Push files'
+      #     # git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
+      #     # git remote set-url origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
+      #     git config --global user.email ${{ env.git_email }}
+      #     git config --global user.name ${{ env.git_user }}
+      #     git add -A
       #     git commit -m "test commit from runner"
-      #     git remote add origin https://${{ env.git_user }}:${{ env.git_token }}@${{ env.git_url }}
-      #     git push -f origin main
+      #     git remote -v
+      #     git push -u origin main
