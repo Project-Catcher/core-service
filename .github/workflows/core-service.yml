@@ -44,44 +44,44 @@ jobs:
       - name: Docker build
         run: docker build -t core-service .
 
-    - name: Configure AWS Credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-region: ${{ env.AWS_REGION }}
-        role-session-name: GitHubActions
-        role-to-assume: ${{ env.OIDC_ROLE_ARN }}
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActions
+          role-to-assume: ${{ env.OIDC_ROLE_ARN }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-    - name: Setup Kustomize
-      uses: imranismail/setup-kustomize@v1
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
 
-    - name: Checkout for Kustomize repository
-      uses: actions/checkout@v2
-      with:
-        repository: Project-Catcher/core-service-kusto
-        ref: main
-        token: ${{ env.GITHUB_TOKEN }}
-        path: core-service-kusto
+      - name: Checkout for Kustomize repository
+        uses: actions/checkout@v2
+        with:
+          repository: Project-Catcher/core-service-kusto
+          ref: main
+          token: ${{ env.GITHUB_TOKEN }}
+          path: core-service-kusto
 
-    - name: Update Kustomize image
-      run: |
-        KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
-        FILE_NAME="deployment.yaml"
+      - name: Update Kustomize image
+        run: |
+          KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+          FILE_NAME="deployment.yaml"
 
-        # Docker 이미지 URL 설정
-        cd $KUSTOMIZE_PATH
-        kustomize edit set image catcher-core-image="${{ steps.login-ecr.outputs.registry }}:${{ github.sha }}"
-        kustomize build .
-        cat kustomization.yaml
-        
-    # 수정된 파일 commit & push
-    - name: Commit minifest files
-      run: |
-        cd catcher-core-kusto
-        git config --global user.email "github-actions@github.com"
-        git config --global user.name "github-actions"
-        git commit -am "Update image tag"
-        git push -u origin main
+          # Docker 이미지 URL 설정
+          cd $KUSTOMIZE_PATH
+          kustomize edit set image catcher-core-image="${{ steps.login-ecr.outputs.registry }}:${{ github.sha }}"
+          kustomize build .
+          cat kustomization.yaml
+          
+      # 수정된 파일 commit & push
+      - name: Commit minifest files
+        run: |
+          cd catcher-core-kusto
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git commit -am "Update image tag"
+          git push -u origin main
