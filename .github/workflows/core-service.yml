@@ -93,7 +93,7 @@ jobs:
           git remote -v && echo `git config -l`
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
-          git remote set-url origin https://${{ env.git_user }}@${{ env.git_url }}
+          git remote set-url origin https://${{ env.git_token }}@${{ env.git_url }}
           echo `git config -l`
           git commit -am "Update image tag"
           git push -u origin main
