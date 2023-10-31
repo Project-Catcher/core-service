@@ -90,10 +90,10 @@ jobs:
       - name: Commit minifest files
         run: |
           cd core-service-kusto
-          # git config --global user.email "github-actions@github.com"
-          # git config --global user.name "github-actions"
-          git config --global user.email ${{ env.git_email }}
-          git config --global user.name ${{ env.git_user }}
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          # git config --global user.email ${{ env.git_email }}
+          # git config --global user.name ${{ env.git_user }}
           git commit -am "Update image tag"
           git push -u origin main
 
