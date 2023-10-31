@@ -72,21 +72,22 @@ jobs:
       - name: Update Kustomize image
         run: |
           if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
-            KUSTOMIZE_PATH="catcher-service-kusto/k8s/overlays/production"
-            FILE_NAME="production-patch.yaml"
+            KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
+            FILE_NAME="production.yaml"
           else
-            KUSTOMIZE_PATH="catcher-service-kusto/k8s/overlays/development"
-            FILE_NAME="deployment-patch.yaml"
+            KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+            FILE_NAME="deployment.yaml"
           fi
 
           cd $KUSTOMIZE_PATH
-          kustomize edit set image catcher-core-image=${{ env.ECR_URL }}:${{ github.sha }}
+          kustomize edit set image catcher-core-image="${{ steps.login-ecr.outputs.registry }}:${{ github.sha }}"
+          kustomize build .
           cat kustomization.yaml
           
       - name: Commit minifest files
         run: |
           cd core-service-kusto
-          git config --global user.email ${{ env.git_email }}
-          git config --global user.name ${{ env.git_user }}
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
           git commit -am "Update image tag"
           git push -u origin main
