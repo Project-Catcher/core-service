@@ -1,17 +1,15 @@
 name: Java CI with Gradle
 
 on:
-  pull_request:
-    branches: [ "Taein2-patch-1" ]
+  push:
+    branches:
+      - kustomize
 
 env:
-  ecr_url: ${{ secrets.ECR_REPO_DEV }}
-  role_arn: ${{ secrets.OIDC_ROLE }}
-  aws_region: ${{ secrets.AWS_REGION }}
-  git_token: ${{ secrets.GIT_TOKEN }}
-  git_url: "github.com/Project-Catcher/core-service-kusto.git"
-  git_user: ${{ secrets.GIT_USER }}
-  git_email: ${{ secrets.GIT_EMAIL }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE }}
+  DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
 
 permissions:
   id-token: write
@@ -70,39 +68,24 @@ jobs:
           token: ${{ env.git_token }}
           path: core-service-kusto
 
-      # - name: Update Kustomize image
-      #   run: |
-      #     KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
-      #     FILE_NAME="deployment.yaml"
-
-      #     # Docker 이미지 URL 설정
-      #     cd $KUSTOMIZE_PATH
-      #     kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
-      #     cat kustomization.yaml
-          
-      # # 수정된 파일 commit & push
-      # - name: Commit minifest files
-      #   run: |
-      #     cd core-service-kusto
-      #     git config --global user.email ${{ env.git_email }}
-      #     git config --global user.name ${{ env.git_user }}
-      #     git commit -am "Update image tag"
-      #     git push -u origin main
-
-      - name: Set up Git / Edit kustomize file / Commit and Push files
+      - name: Update Kustomize image
         run: |
-          echo 'Check Git Origin'
-          git remote -v  # core-service
-          
-          echo 'Edit kustomize file'
-          cd ./core-service-kusto/overlays/dev/
-          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
-          kustomize build .          
+          if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+            KUSTOMIZE_PATH="catcher-service-kusto/k8s/overlays/production"
+            FILE_NAME="production-patch.yaml"
+          else
+            KUSTOMIZE_PATH="catcher-service-kusto/k8s/overlays/development"
+            FILE_NAME="deployment-patch.yaml"
+          fi
 
-          echo 'Commit and Push files'
-          cd ../../../core-service-kusto
+          cd $KUSTOMIZE_PATH
+          kustomize edit set image catcher-core-image=${{ env.ecr_url }}:${{ github.sha }}
+          cat kustomization.yaml
+          
+      - name: Commit minifest files
+        run: |
+          cd core-service-kusto
           git config --global user.email ${{ env.git_email }}
           git config --global user.name ${{ env.git_user }}
-          git add -A
-          git commit -m "test commit from runner"
+          git commit -am "Update image tag"
           git push -u origin main
