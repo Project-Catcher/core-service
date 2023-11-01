@@ -12,12 +12,12 @@ public class NaverOAuthUserInfo extends OAuthUserInfo{
 
     @Override
     public String getId() {
-        return String.valueOf(attributes.get("id"));
+        return String.valueOf(((Map<String, Object>) attributes.get("response")).get("id"));
     }
 
     @Override
     public String getEmail() {
-        return String.valueOf(attributes.get("email"));
+        return String.valueOf(((Map<String, Object>) attributes.get("response")).get("email"));
     }
 
     @Override
