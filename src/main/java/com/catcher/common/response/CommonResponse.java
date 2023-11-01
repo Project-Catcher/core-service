@@ -22,4 +22,8 @@ public class CommonResponse<T> {
     public static <T> CommonResponse<T> success(int code, T result) {
         return new CommonResponse<>(code, true, result);
     }
+
+    public static <T> CommonResponse<T> failure(int code, T result) {
+        return new CommonResponse<>(code, false, result);
+    }
 }
