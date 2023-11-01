@@ -49,6 +49,7 @@ public class SecurityConfig {
                                 .requestMatchers(allowedUrls).permitAll()
                                 .requestMatchers("/api/**").permitAll()
                                 .requestMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
+                                .requestMatchers("/oauth/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
