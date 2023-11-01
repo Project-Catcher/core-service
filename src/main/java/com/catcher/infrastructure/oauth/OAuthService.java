@@ -34,6 +34,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 
+import static com.catcher.common.BaseResponseStatus.INVALID_USER_CRAWLING;
 import static com.catcher.common.BaseResponseStatus.INVALID_USER_PW;
 import static com.catcher.common.response.CommonResponse.*;
 import static jakarta.servlet.http.HttpServletResponse.SC_CONFLICT;
@@ -88,9 +89,8 @@ public class OAuthService {
         String accessToken = oAuthLoginRequest.getAccessToken();
         String email = getEmailByAccessToken(accessToken, oAuthProperties);
 
-        User user = userRepository.findByEmail(email).orElseThrow();// TODO : Custom Exception Handling
-
         try {
+            User user = userRepository.findByEmail(email).orElseThrow(); // TODO : Custom Exception Handling - hg
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
                             user.getUsername(),
@@ -104,10 +104,11 @@ public class OAuthService {
             );
 
             return CommonResponse.success(SC_OK, tokenDto);
-
         }catch(BadCredentialsException e){
             log.error(INVALID_USER_PW.getMessage());
             throw new BaseException(INVALID_USER_PW);
+        } catch (NoSuchElementException e) {
+            throw new BaseException(INVALID_USER_CRAWLING);
         }
 
     }
@@ -118,7 +119,10 @@ public class OAuthService {
         String accessToken = oAuthCreateRequest.getAccessToken();
         String email = getEmailByAccessToken(accessToken, oAuthProperties);
 
-        userRepository.findByEmail(email).orElseThrow(); // TODO : Custom Exception  Handling
+//        userRepository.findByEmail(email).ifPresent() -> ();orElseThrow(); // TODO : Custom Exception  Handling
+        if(userRepository.findByEmail(email).isPresent()) {
+            throw new RuntimeException("해당 이메일로 가입한 유저가 있습니다.");
+        }
 
         User user = createOAuthUser(oAuthCreateRequest, oAuthProperties, email);
 
