@@ -41,16 +41,13 @@ public class UserCreateRequest {
     @NotNull(message = "필수 약관 위치 정보 이용 동의해주세요.")
     private LocalDateTime locationTerm;
 
-    private int role;
-    private String introduceContent;
     private LocalDateTime marketingTerm;
 
     @Builder
-    public UserCreateRequest(String name, String username, String password, int role, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, String introduceContent, LocalDateTime marketingTerm){
+    public UserCreateRequest(String name, String username, String password, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, LocalDateTime marketingTerm){
         this.name = name;
         this.username = username;
         this.password = password;
-        this.role = role;
         this.email = email;
         this.phone = phone;
         this.nickname = nickname;
@@ -58,7 +55,6 @@ public class UserCreateRequest {
         this.serviceTerm = serviceTerm;
         this.privacyTerm = privacyTerm;
         this.locationTerm = locationTerm;
-        this.introduceContent = introduceContent;
         this.marketingTerm = marketingTerm;
     }
 }
