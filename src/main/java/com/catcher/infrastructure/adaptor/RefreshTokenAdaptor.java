@@ -5,20 +5,20 @@ import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.service.ApiService;
 import com.catcher.infrastructure.RedisManager;
+import com.catcher.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import static com.catcher.common.BaseResponseStatus.NOT_EXIST_REFRESH_JWT;
+import static com.catcher.utils.JwtUtils.*;
 
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenAdaptor implements ApiService<TokenDto> {
-
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisManager redisManager;
-    private final RedisTemplate<String, String> redisTemplate;
 
     @Override
     public TokenDto reissueRefreshToken(String refreshToken) throws BaseException {
@@ -30,12 +30,13 @@ public class RefreshTokenAdaptor implements ApiService<TokenDto> {
 
         compareRefreshToken(refreshToken, redisRefreshToken);
 
-        TokenDto tokenDto = new TokenDto(
-                jwtTokenProvider.createAccessToken(authentication),
-                jwtTokenProvider.createRefreshToken(authentication)
-        );
+        String newAccessToken = jwtTokenProvider.createAccessToken(authentication);
+        String newRefreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-        return tokenDto;
+        redisManager.deleteKey(refreshToken);
+        redisManager.putValue(authentication.getName(), newRefreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+
+        return new TokenDto(newAccessToken, newRefreshToken);
     }
 
     private String getRefreshToken(String name) {
@@ -44,7 +45,7 @@ public class RefreshTokenAdaptor implements ApiService<TokenDto> {
     }
 
     private void compareRefreshToken(String userRefreshToken, String redisRefreshToken) {
-        if(!redisRefreshToken.equals(userRefreshToken)) {
+        if (!redisRefreshToken.equals(userRefreshToken)) {
             throw new BaseException(NOT_EXIST_REFRESH_JWT);
         }
     }
