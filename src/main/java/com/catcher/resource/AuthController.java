@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
-//    private final AuthService authService;
     private final ApiService apiService;
 
     @Operation(summary = "토큰 재발행")
