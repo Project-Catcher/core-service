@@ -1,19 +1,24 @@
 package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
+import com.catcher.utils.HttpServletUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.apache.http.HttpHeaders;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.INVALID_JWT;
 import static com.catcher.common.BaseResponseStatus.REDIS_ERROR;
+import static com.catcher.utils.HttpServletUtils.*;
+import static org.apache.http.HttpHeaders.*;
 
 /**
  * 헤더(Authorization)에 있는 토큰을 꺼내 이상이 없는 경우 SecurityContext에 저장
@@ -33,10 +38,12 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
-        String token = jwtTokenProvider.resolveToken(request);
+
+        String accessToken = getAccessToken(request);
+
         try {
-            if (token != null && jwtTokenProvider.validateToken(token)) {
-                Authentication auth = jwtTokenProvider.getAuthentication(token);
+            if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+                Authentication auth = jwtTokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
             }
         } catch (RedisConnectionFailureException e) {
@@ -47,5 +54,14 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String getAccessToken(HttpServletRequest request) {
+        String header = getHeader(request, AUTHORIZATION).orElse(null);
+
+        if (header != null && header.startsWith("Bearer ")) {
+            header = header.substring(7);
+        }
+        return header;
     }
 }

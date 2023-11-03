@@ -2,8 +2,8 @@ package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.security.UserDetailServiceImpl;
+import com.catcher.utils.JwtUtils;
 import io.jsonwebtoken.*;
-import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +15,10 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
-import java.util.concurrent.TimeUnit;
 
 import static com.catcher.common.BaseResponseStatus.EXPIRED_JWT;
 import static com.catcher.common.BaseResponseStatus.INVALID_JWT;
+import static com.catcher.utils.JwtUtils.*;
 
 @Component
 @RequiredArgsConstructor
@@ -28,12 +28,6 @@ public class JwtTokenProvider {
 
     @Value("${spring.jwt.secret}")
     private String secretKey;
-
-    @Value("${spring.jwt.token.access-expiration-time}")
-    private long accessExpirationTime;
-
-    @Value("${spring.jwt.token.refresh-expiration-time}")
-    private long refreshExpirationTime;
 
     @Autowired
     private UserDetailServiceImpl userDetailsService;
@@ -45,7 +39,7 @@ public class JwtTokenProvider {
     public String createAccessToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + accessExpirationTime);
+        Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION_MILLIS);
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -61,7 +55,7 @@ public class JwtTokenProvider {
     public String createRefreshToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + refreshExpirationTime);
+        Date expireDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_MILLIS);
 
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
@@ -69,14 +63,6 @@ public class JwtTokenProvider {
                 .setExpiration(expireDate)
                 .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
-
-        // redis에 저장
-        redisTemplate.opsForValue().set(
-                authentication.getName(),
-                refreshToken,
-                refreshExpirationTime,
-                TimeUnit.MILLISECONDS
-        );
 
         return refreshToken;
     }
@@ -92,17 +78,6 @@ public class JwtTokenProvider {
         UserDetails userDetails = userDetailsService.loadUserByUsername(userPrincipal);
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
-    /**
-     * http 헤더로부터 bearer 토큰을 가져옴.
-     */
-    public String resolveToken(HttpServletRequest req) {
-        String bearerToken = req.getHeader("Authorization");
-        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
-        }
-        return null;
     }
 
     /**

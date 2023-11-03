@@ -2,7 +2,6 @@ package com.catcher.core.service;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
-import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserCreateResponse;
@@ -10,9 +9,12 @@ import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.dto.user.UserResponse;
 import com.catcher.core.domain.entity.User;
 import com.catcher.datasource.UserRepository;
+import com.catcher.infrastructure.RedisManager;
+import com.catcher.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.*;
+import static com.catcher.utils.JwtUtils.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -34,10 +37,12 @@ public class UserService {
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final RedisManager redisManager;
 
     @Transactional
     public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) {
-        validateDuplicateUser(userCreateRequest.getName());
+        validateDuplicateUsername(userCreateRequest.getName());
+        validateDuplicateEmail(userCreateRequest.getEmail());
 
         User user = User.builder()
                 .name(userCreateRequest.getName())
@@ -46,7 +51,6 @@ public class UserService {
                 .email(userCreateRequest.getEmail())
                 .phone(userCreateRequest.getPhone())
                 .nickname(userCreateRequest.getNickname())
-                .profileImageUrl(null)
                 .userAgeTerm(userCreateRequest.getAgeTerm())
                 .userServiceTerm(userCreateRequest.getServiceTerm())
                 .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
@@ -61,15 +65,18 @@ public class UserService {
 
 
     // 유저 중복 확인
-    private void validateDuplicateUser(String username) {
-        Optional<User> findUsers = userRepository.findByUsername(username);
-        if (!findUsers.isEmpty()){
+    private void validateDuplicateUsername(String username) {
+        Optional<User> userOptional = userRepository.findByUsername(username);
+        if (userOptional.isPresent()) {
             throw new BaseException(USERS_DUPLICATED_USER_NAME);
         }
     }
 
     private void validateDuplicateEmail(String email) {
-
+        Optional<User> userOptional = userRepository.findByEmail(email);
+        if (userOptional.isPresent()) {
+            throw new BaseException(USERS_DUPLICATED_USER_NAME);
+        }
     }
 
     @Transactional
@@ -82,14 +89,13 @@ public class UserService {
                     )
             );
 
-            TokenDto tokenDto = new TokenDto(
-                    jwtTokenProvider.createAccessToken(authentication),
-                    jwtTokenProvider.createRefreshToken(authentication)
-            );
+            String accessToken = jwtTokenProvider.createAccessToken(authentication);
+            String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-            return tokenDto;
+            redisManager.putValue(authentication.getName(), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
 
-        }catch(BadCredentialsException e){
+            return new TokenDto(accessToken, refreshToken);
+        } catch (BadCredentialsException e) {
             log.error(INVALID_USER_PW.getMessage());
             throw new BaseException(INVALID_USER_PW);
         }
@@ -103,5 +109,9 @@ public class UserService {
         });
 
         return UserResponse.from(user);
+    }
+
+    public void logout(String refreshToken) {
+
     }
 }

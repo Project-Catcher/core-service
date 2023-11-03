@@ -29,6 +29,8 @@ public enum BaseResponseStatus {
     INVALID_USER_NAME(false, 2105, "아이디를 확인해주세요"),
     INVALID_USER_PW(false, 2106, "비밀번호를 확인해주세요."),
     INVALID_USER_ID(false, 2107, "유저 ID를 확인해주세요."),
+    USERS_DUPLICATED_USER_EMAIL(false, 2108, "이미 존재하는 아이디 입니다."),
+
 
     /**
      * 3000 : Response 오류
