@@ -36,13 +36,12 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional
-    public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) throws BaseException {
+    public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) {
         validateDuplicateUser(userCreateRequest.getName());
 
         User user = User.builder()
                 .name(userCreateRequest.getName())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword()))
-                .role(userCreateRequest.getRole() == 0 ? UserRole.ADMIN : UserRole.USER)
                 .username(userCreateRequest.getUsername())
                 .email(userCreateRequest.getEmail())
                 .phone(userCreateRequest.getPhone())
@@ -53,7 +52,6 @@ public class UserService {
                 .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
                 .userLocationTerm(userCreateRequest.getLocationTerm())
                 .userMarketingTerm(userCreateRequest.getMarketingTerm())
-                .introduceContent(userCreateRequest.getIntroduceContent())
                 .build();
 
         userRepository.save(user);
@@ -63,15 +61,19 @@ public class UserService {
 
 
     // 유저 중복 확인
-    private void validateDuplicateUser(String username) throws BaseException {
+    private void validateDuplicateUser(String username) {
         Optional<User> findUsers = userRepository.findByUsername(username);
         if (!findUsers.isEmpty()){
             throw new BaseException(USERS_DUPLICATED_USER_NAME);
         }
     }
 
+    private void validateDuplicateEmail(String email) {
+
+    }
+
     @Transactional
-    public TokenDto login(UserLoginRequest userLoginReqDto) throws BaseException {
+    public TokenDto login(UserLoginRequest userLoginReqDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
