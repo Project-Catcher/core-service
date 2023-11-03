@@ -3,11 +3,9 @@ package com.catcher.infrastructure.adaptor;
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.dto.TokenDto;
-import com.catcher.core.service.ApiService;
+import com.catcher.core.service.AuthService;
 import com.catcher.infrastructure.RedisManager;
-import com.catcher.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +14,7 @@ import static com.catcher.utils.JwtUtils.*;
 
 @Component
 @RequiredArgsConstructor
-public class RefreshTokenAdaptor implements ApiService<TokenDto> {
+public class RefreshTokenAdaptor implements AuthService<TokenDto> {
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisManager redisManager;
 
