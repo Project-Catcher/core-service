@@ -2,14 +2,17 @@ package com.catcher.security;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.User;
+import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.datasource.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,12 +32,16 @@ public class UserDetailServiceImpl implements UserDetailsService {
                     return new BaseException(INVALID_USER_NAME);
                 });
 
-        Set<GrantedAuthority> grantedAuthorities = new HashSet<>();
+        Collection<? extends GrantedAuthority> authorities = createAuthorities(user.getUserRole());
         return new org
                 .springframework
                 .security
                 .core
                 .userdetails
-                .User(user.getUsername(), user.getPassword(), grantedAuthorities);
+                .User(user.getUsername(), user.getPassword(), authorities);
+    }
+
+    private Collection<? extends GrantedAuthority> createAuthorities(UserRole userRole) {
+        return Set.of(new SimpleGrantedAuthority(userRole.getValue()));
     }
 }
