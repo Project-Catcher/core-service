@@ -33,10 +33,4 @@ public class UserController {
     public BaseResponse<TokenDto> login(@Valid @RequestBody UserLoginRequest userLoginReqDto) {
         return new BaseResponse<>(userService.login(userLoginReqDto));
     }
-
-    @Operation(summary = "사용자 조회")
-    @GetMapping("/{id}")
-    public BaseResponse<UserResponse> getUser(@PathVariable("id") Long uid) {
-        return new BaseResponse<>(userService.getUser(uid));
-    }
 }

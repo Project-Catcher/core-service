@@ -17,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,7 +64,6 @@ public class UserService {
         return UserCreateResponse.from(user);
     }
 
-
     // 유저 중복 확인
     private void validateDuplicateUsername(String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
@@ -98,20 +98,8 @@ public class UserService {
         } catch (BadCredentialsException e) {
             log.error(INVALID_USER_PW.getMessage());
             throw new BaseException(INVALID_USER_PW);
+        } catch (InternalAuthenticationServiceException e) {
+            throw new BaseException(INVALID_USER_NAME);
         }
-    }
-
-    public UserResponse getUser(Long id) {
-        Optional<User> users = userRepository.findById(id);
-        User user = users.orElseThrow(() -> {
-            log.error(INVALID_USER_NAME.getMessage());
-            return new BaseException(INVALID_USER_NAME);
-        });
-
-        return UserResponse.from(user);
-    }
-
-    public void logout(String refreshToken) {
-
     }
 }
