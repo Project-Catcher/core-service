@@ -11,7 +11,6 @@ import lombok.*;
 public class UserCreateResponse {
     String username;
     String email;
-    String department;
     String contact;
     UserRole role;
 
