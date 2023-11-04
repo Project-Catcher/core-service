@@ -14,7 +14,6 @@ import lombok.NoArgsConstructor;
 public class UserResponse {
     Long id;
     String username;
-    String name;
     String email;
     String department;
     String contact;
@@ -31,5 +30,4 @@ public class UserResponse {
                 .role(user.getUserRole())
                 .build();
     }
-
 }
