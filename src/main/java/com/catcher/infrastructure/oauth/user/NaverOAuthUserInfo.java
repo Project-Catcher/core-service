@@ -5,14 +5,14 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 
 import java.util.Map;
 
-public class NaverOAuthUserInfo extends OAuthUserInfo{
+public class NaverOAuthUserInfo extends OAuthUserInfo {
     protected NaverOAuthUserInfo(Map<String, Object> attributes) {
         super(attributes);
     }
 
     @Override
     public String getId() {
-        return String.valueOf(((Map<String, Object>) attributes.get("response")).get("id"));
+        return this.getProvider().name() + "_" + ((Map<String, Object>) attributes.get("response")).get("id");
     }
 
     @Override
