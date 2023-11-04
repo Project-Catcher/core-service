@@ -4,6 +4,7 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 import com.catcher.core.domain.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -26,10 +27,19 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String password;
 
+    @Column(unique = true, nullable = false)
     private String phone;
+
+    @Column(unique = true, nullable = false)
+    private String email;
 
     // TODO : 첨부파일 외래키 참조해야 지
     private String profileImageUrl;
+
+    private String introduceContent;
+
+    @Column(unique = true, nullable = false)
+    private String nickname;
 
     @Enumerated(value = EnumType.STRING)
     private UserProvider userProvider;
@@ -37,15 +47,37 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private UserRole userRole;
 
-    @Column(nullable = false) // 필수 약관이라 가정
-    private LocalDateTime userTerm1;
+    @Column(nullable = false)
+    private LocalDateTime userAgeTerm; // 필수 약관
 
-    private LocalDateTime userTerm2; // 선택 약관이라 가정
+    @Column(nullable = false)
+    private LocalDateTime userServiceTerm; // 필수 약관
 
-    private LocalDateTime userTerm3;
+    @Column(nullable = false)
+    private LocalDateTime userPrivacyTerm; // 필수 약관
 
-    private LocalDateTime userTerm4;
+    @Column(nullable = false)
+    private LocalDateTime userLocationTerm; // 필수 약관
+
+    private LocalDateTime userMarketingTerm; // 선택 약관
 
     private LocalDateTime deletedAt;
 
+    @Builder
+    public User(String username, String password,  String email, String profileImageUrl, String phone, String nickname, UserProvider userProvider, UserRole role, LocalDateTime userAgeTerm, LocalDateTime userServiceTerm, LocalDateTime userPrivacyTerm, LocalDateTime userLocationTerm, String introduceContent, LocalDateTime userMarketingTerm){
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.profileImageUrl = profileImageUrl;
+        this.userProvider = userProvider;
+        this.phone = phone;
+        this.nickname = nickname;
+        this.userRole = role;
+        this.userAgeTerm = userAgeTerm;
+        this.userServiceTerm = userServiceTerm;
+        this.userPrivacyTerm = userPrivacyTerm;
+        this.userLocationTerm = userLocationTerm;
+        this.introduceContent = introduceContent;
+        this.userMarketingTerm = userMarketingTerm;
+    }
 }
