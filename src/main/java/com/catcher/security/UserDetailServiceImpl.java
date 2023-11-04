@@ -3,7 +3,7 @@ package com.catcher.security;
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
-import com.catcher.datasource.UserRepository;
+import com.catcher.core.database.UserRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
@@ -13,7 +13,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Set;
 
 import static com.catcher.common.BaseResponseStatus.INVALID_USER_NAME;

@@ -1,7 +1,6 @@
-package com.catcher.datasource;
+package com.catcher.core.database;
 
 import com.catcher.core.domain.entity.User;
-import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
