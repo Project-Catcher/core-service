@@ -52,7 +52,6 @@ public class OAuthService {
 
         String id = oAuthUserInfo.getId();
 
-
         validateExistsUsername(id);
         validateExistsEmail(oAuthUserInfo.getEmail());
 
