@@ -35,7 +35,7 @@ public class SecurityConfig {
     ) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
-    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/v3/**", "/api/users/login", "/api/users/signup", "/access-test"};
+    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/v3/**", "/users/**", "/access-test"};
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
@@ -47,8 +47,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests ->
                         authorizeHttpRequests
                                 .requestMatchers(allowedUrls).permitAll()
-                                .requestMatchers("/api/**").permitAll()
-                                .requestMatchers("/api/v1/users/join", "/api/v1/users/login").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
