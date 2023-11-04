@@ -30,6 +30,7 @@ public enum BaseResponseStatus {
     INVALID_USER_PW(false, 2106, "비밀번호를 확인해주세요."),
     INVALID_USER_ID(false, 2107, "유저 ID를 확인해주세요."),
     USERS_DUPLICATED_USER_EMAIL(false, 2108, "이미 존재하는 아이디 입니다."),
+    INVALID_USER_OAUTH_TYPE(false, 2109, "지원하지 않는 소셜로그인 입니다."),
 
     /**
      * 3000 : Response 오류
