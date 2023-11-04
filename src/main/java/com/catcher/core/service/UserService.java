@@ -2,17 +2,15 @@ package com.catcher.core.service;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
-import com.catcher.core.domain.entity.enums.UserProvider;
-import com.catcher.core.domain.entity.enums.UserRole;
+import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.database.UserRepository;
-import com.catcher.infrastructure.RedisManager;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -32,13 +30,13 @@ import static com.catcher.utils.JwtUtils.*;
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-@Log4j2
+@Slf4j
 public class UserService {
     private final UserRepository userRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
-    private final RedisManager redisManager;
+    private final DBManager dbManager;
 
     @Transactional
     public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) {
@@ -76,7 +74,7 @@ public class UserService {
     private void validateDuplicateEmail(String email) {
         Optional<User> userOptional = userRepository.findByEmail(email);
         if (userOptional.isPresent()) {
-            throw new BaseException(USERS_DUPLICATED_USER_NAME);
+            throw new BaseException(USERS_DUPLICATED_USER_EMAIL);
         }
     }
 
@@ -93,7 +91,7 @@ public class UserService {
             String accessToken = jwtTokenProvider.createAccessToken(authentication);
             String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-            redisManager.putValue(authentication.getName(), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+            dbManager.putValue(authentication.getName(), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
 
             return new TokenDto(accessToken, refreshToken);
         } catch (BadCredentialsException e) {

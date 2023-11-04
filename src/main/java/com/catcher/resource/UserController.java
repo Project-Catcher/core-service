@@ -11,14 +11,13 @@ import com.catcher.core.dto.user.UserLoginRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
-import org.springframework.validation.BindingResult;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
-@Log4j2
+@Slf4j
 public class UserController {
     private final UserService userService;
 

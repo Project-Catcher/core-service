@@ -6,6 +6,7 @@ import com.catcher.utils.JwtUtils;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -22,7 +23,7 @@ import static com.catcher.utils.JwtUtils.*;
 
 @Component
 @RequiredArgsConstructor
-@Log4j2
+@Slf4j
 public class JwtTokenProvider {
     private final RedisTemplate<String, String> redisTemplate;
 
