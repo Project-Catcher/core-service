@@ -11,9 +11,6 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserCreateRequest {
-    @NotNull(message = "이름을 입력하세요.")
-    private String name;
-
     @NotNull(message = "아이디를 입력하세요.")
     private String username;
 
@@ -44,8 +41,7 @@ public class UserCreateRequest {
     private LocalDateTime marketingTerm;
 
     @Builder
-    public UserCreateRequest(String name, String username, String password, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, LocalDateTime marketingTerm){
-        this.name = name;
+    public UserCreateRequest(String username, String password, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, LocalDateTime marketingTerm){
         this.username = username;
         this.password = password;
         this.email = email;

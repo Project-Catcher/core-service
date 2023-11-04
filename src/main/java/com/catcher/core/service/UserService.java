@@ -38,11 +38,10 @@ public class UserService {
 
     @Transactional
     public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) {
-        validateDuplicateUsername(userCreateRequest.getName());
+        validateDuplicateUsername(userCreateRequest.getUsername());
         validateDuplicateEmail(userCreateRequest.getEmail());
 
         User user = User.builder()
-                .name(userCreateRequest.getName())
                 .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .username(userCreateRequest.getUsername())
                 .email(userCreateRequest.getEmail())
