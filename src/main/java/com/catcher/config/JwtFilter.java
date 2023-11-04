@@ -48,8 +48,6 @@ public class JwtFilter extends OncePerRequestFilter {
         } catch (RedisConnectionFailureException e) {
             SecurityContextHolder.clearContext();
             throw new BaseException(REDIS_ERROR);
-        } catch (Exception e) {
-            throw new BaseException(INVALID_JWT);
         }
 
         filterChain.doFilter(request, response);
