@@ -1,5 +1,6 @@
 package com.catcher.infrastructure;
 
+import com.catcher.core.database.DBManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
@@ -12,7 +13,7 @@ import static java.util.Optional.*;
 
 @Service
 @RequiredArgsConstructor
-public class RedisManager {
+public class RedisManager implements DBManager {
     private final StringRedisTemplate redisTemplate;
 
     public void putValue(String key, String value, long milliseconds) {
