@@ -29,14 +29,17 @@ public enum BaseResponseStatus {
     INVALID_USER_NAME(false, 2105, "아이디를 확인해주세요"),
     INVALID_USER_PW(false, 2106, "비밀번호를 확인해주세요."),
     INVALID_USER_ID(false, 2107, "유저 ID를 확인해주세요."),
-    USERS_DUPLICATED_USER_EMAIL(false, 2108, "이미 존재하는 아이디 입니다."),
+    USERS_DUPLICATED_USER_EMAIL(false, 2108, "이미 존재하는 이메일 입니다."),
     INVALID_USER_OAUTH_TYPE(false, 2109, "지원하지 않는 소셜로그인 입니다."),
+    USERS_DUPLICATED_USER(false, 2110, "이미 존재하는 회원입니다."),
+    USERS_NOT_EXISTS(false, 2111, "존재하지 않는 유저입니다."),
 
     /**
      * 3000 : Response 오류
      */
     // Common
     RESPONSE_ERROR(false, 3000, "값을 불러오는데 실패하였습니다."),
+    OAUTH_GENERATE_TOKEN_ERROR(false, 3001, "OAuth Access 토큰 발급에 실패했습니다."),
 
     /**
      * 4000 : Database, Server 오류
