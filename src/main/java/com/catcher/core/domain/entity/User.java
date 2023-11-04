@@ -67,7 +67,6 @@ public class User extends BaseTimeEntity {
     public User(String username, String password, String name, String email, String profileImageUrl, String phone, String nickname, UserRole role, LocalDateTime userAgeTerm, LocalDateTime userServiceTerm, LocalDateTime userPrivacyTerm, LocalDateTime userLocationTerm, String introduceContent, LocalDateTime userMarketingTerm){
         this.username = username;
         this.password = password;
-        this.name = name;
         this.email = email;
         this.profileImageUrl = profileImageUrl;
         this.phone = phone;

@@ -18,7 +18,6 @@ public class UserCreateResponse {
 
     public static UserCreateResponse from(User user){
         return UserCreateResponse.builder()
-                .name(user.getName())
                 .username(user.getUsername())
                 .email(user.getEmail())
                 .contact(user.getPhone())
