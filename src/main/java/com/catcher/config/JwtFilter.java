@@ -15,8 +15,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 import java.util.Optional;
 
-import static com.catcher.common.BaseResponseStatus.INVALID_JWT;
-import static com.catcher.common.BaseResponseStatus.RESPONSE_ERROR;
+import static com.catcher.common.BaseResponseStatus.*;
 import static com.catcher.utils.HttpServletUtils.*;
 import static org.apache.http.HttpHeaders.*;
 
@@ -48,7 +47,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } catch (RedisConnectionFailureException e) {
             SecurityContextHolder.clearContext();
-            throw new BaseException(RESPONSE_ERROR);
+            throw new BaseException(REDIS_ERROR);
         } catch (Exception e) {
             throw new BaseException(INVALID_JWT);
         }
