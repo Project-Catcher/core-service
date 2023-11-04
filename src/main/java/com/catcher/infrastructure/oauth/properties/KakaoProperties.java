@@ -20,8 +20,10 @@ public class KakaoProperties implements OAuthProperties{
     private String clientId;
     @Value("${oauth2.client.registration.kakao.client-secret}")
     private String clientSecret;
-    @Value("${oauth2.client.registration.kakao.redirect-uri}")
-    private String redirectUri;
+    @Value("${oauth2.client.registration.kakao.redirect-uri.signup}")
+    private String signupUri;
+    @Value("${oauth2.client.registration.kakao.redirect-uri.login}")
+    private String loginUri;
     @Value("${oauth2.client.registration.kakao.authorization-grant-type}")
     private String grantType;
     @Value("${oauth2.client.provider.kakao.token-uri}")
@@ -35,11 +37,23 @@ public class KakaoProperties implements OAuthProperties{
     }
 
     @Override
-    public MultiValueMap<String, String> getJsonBody(Map params) {
+    public MultiValueMap<String, String> getSignUpJsonBody(Map params) {
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("code", params.get("code").toString());
         multiValueMap.add("grant_type", grantType);
-        multiValueMap.add("redirect_uri", redirectUri);
+        multiValueMap.add("redirect_uri", signupUri);
+        multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
+        multiValueMap.add("client_id", kmsService.decrypt(clientId));
+
+        return multiValueMap;
+    }
+
+    @Override
+    public MultiValueMap<String, String> getLoginJsonBody(Map params) {
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("code", params.get("code").toString());
+        multiValueMap.add("grant_type", grantType);
+        multiValueMap.add("redirect_uri", loginUri);
         multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
         multiValueMap.add("client_id", kmsService.decrypt(clientId));
 

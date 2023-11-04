@@ -18,8 +18,10 @@ public class NaverProperties implements OAuthProperties{
     private String clientId;
     @Value("${oauth2.client.registration.naver.client-secret}")
     private String clientSecret;
-    @Value("${oauth2.client.registration.naver.redirect-uri}")
-    private String redirectUri;
+    @Value("${oauth2.client.registration.naver.redirect-uri.signup}")
+    private String signUpUri;
+    @Value("${oauth2.client.registration.naver.redirect-uri.login}")
+    private String loginUri;
     @Value("${oauth2.client.registration.naver.authorization-grant-type}")
     private String grantType;
     @Value("${oauth2.client.provider.naver.token_uri}")
@@ -33,11 +35,24 @@ public class NaverProperties implements OAuthProperties{
     }
 
     @Override
-    public MultiValueMap<String, String> getJsonBody(Map params) {
+    public MultiValueMap<String, String> getSignUpJsonBody(Map params) {
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("code", params.get("code").toString());
         multiValueMap.add("grant_type", grantType);
-        multiValueMap.add("redirect_uri", redirectUri);
+        multiValueMap.add("redirect_uri", signUpUri);
+        multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
+        multiValueMap.add("client_id", kmsService.decrypt(clientId));
+        multiValueMap.add("state", params.get("state").toString());
+
+        return multiValueMap;
+    }
+
+    @Override
+    public MultiValueMap<String, String> getLoginJsonBody(Map params) {
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("code", params.get("code").toString());
+        multiValueMap.add("grant_type", grantType);
+        multiValueMap.add("redirect_uri", loginUri);
         multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
         multiValueMap.add("client_id", kmsService.decrypt(clientId));
         multiValueMap.add("state", params.get("state").toString());

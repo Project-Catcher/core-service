@@ -7,7 +7,8 @@ import java.util.Map;
 
 public interface OAuthProperties {
     boolean support(UserProvider userProvider);
-    MultiValueMap<String, String> getJsonBody(Map params);
+    MultiValueMap<String, String> getSignUpJsonBody(Map params);
+    MultiValueMap<String, String> getLoginJsonBody(Map params);
     String getUserInfoUri();
     String getTokenUri();
     UserProvider getProvider();
