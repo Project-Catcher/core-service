@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
+import java.net.URI;
 import java.util.Map;
 
 @Component
@@ -61,13 +62,13 @@ public class NaverProperties implements OAuthProperties{
     }
 
     @Override
-    public String getUserInfoUri() {
-        return userInfoUri;
+    public URI getUserInfoUri() {
+        return URI.create(userInfoUri);
     }
 
     @Override
-    public String getTokenUri() {
-        return tokenUri;
+    public URI getTokenUri() {
+        return URI.create(tokenUri);
     }
 
     @Override
