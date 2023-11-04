@@ -40,6 +40,7 @@ public enum BaseResponseStatus {
     /**
      * 4000 : Database, Server 오류
      */
+    DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
     REDIS_ERROR(false, 4002, "redis 연결에 실패하였습니다.");
 
     private final boolean isSuccess;
