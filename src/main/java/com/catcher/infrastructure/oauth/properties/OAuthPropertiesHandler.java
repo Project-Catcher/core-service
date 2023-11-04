@@ -1,6 +1,5 @@
 package com.catcher.infrastructure.oauth.properties;
 
-import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.enums.UserProvider;
 import jakarta.annotation.PostConstruct;
@@ -15,7 +14,7 @@ import static com.catcher.common.BaseResponseStatus.*;
 
 @Component
 @RequiredArgsConstructor
-public class OAuthPropertiedHandler {
+public class OAuthPropertiesHandler {
     private List<OAuthProperties> oAuthProperties;
     private final ApplicationContext applicationContext;
 
