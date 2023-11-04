@@ -2,6 +2,8 @@ package com.catcher.core.service;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
+import com.catcher.core.domain.entity.enums.UserProvider;
+import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserCreateResponse;
@@ -23,6 +25,8 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.*;
+import static com.catcher.core.domain.entity.enums.UserProvider.*;
+import static com.catcher.core.domain.entity.enums.UserRole.*;
 import static com.catcher.utils.JwtUtils.*;
 
 @RequiredArgsConstructor
@@ -52,6 +56,8 @@ public class UserService {
                 .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
                 .userLocationTerm(userCreateRequest.getLocationTerm())
                 .userMarketingTerm(userCreateRequest.getMarketingTerm())
+                .role(USER)
+                .userProvider(CATCHER)
                 .build();
 
         userRepository.save(user);
