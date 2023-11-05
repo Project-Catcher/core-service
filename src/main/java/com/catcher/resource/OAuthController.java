@@ -9,6 +9,7 @@ import com.catcher.core.service.OAuthService;
 import com.catcher.infrastructure.KmsService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +59,7 @@ public class OAuthController {
     }
 
     @PostMapping(value = {"/kakao", "/naver"})
-    public BaseResponse<UserCreateResponse> signUp(HttpServletRequest request, @RequestBody OAuthCreateRequest oAuthCreateRequest) {
+    public BaseResponse<UserCreateResponse> signUp(HttpServletRequest request, @Valid @RequestBody OAuthCreateRequest oAuthCreateRequest) {
         return new BaseResponse<>(oAuthService.signUp(oAuthCreateRequest, request.getRequestURI()));
     }
 }
