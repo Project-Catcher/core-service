@@ -77,12 +77,14 @@ jobs:
 
       - name: Update Kustomize image
         run: |
-          if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
-            KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
-          else
-            KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
-          fi
+          # PRD/DEV 브랜치 분리되어있지 않으므로 추후 업데이트 예정
+          # if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+          #   KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
+          # else
+          #   KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+          # fi
 
+          KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
           cd $KUSTOMIZE_PATH
           kustomize edit set image core-svc-image="${{ env.ECR_URL }}:${{ github.sha }}"
           kustomize build .
