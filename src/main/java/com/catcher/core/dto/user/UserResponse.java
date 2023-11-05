@@ -15,7 +15,6 @@ public class UserResponse {
     Long id;
     String username;
     String email;
-    String department;
     String contact;
     String profileUrl;
     UserRole role;
