@@ -61,6 +61,4 @@ public class OAuthController {
     public BaseResponse<UserCreateResponse> signUp(HttpServletRequest request, @RequestBody OAuthCreateRequest oAuthCreateRequest) {
         return new BaseResponse<>(oAuthService.signUp(oAuthCreateRequest, request.getRequestURI()));
     }
-
-
 }
