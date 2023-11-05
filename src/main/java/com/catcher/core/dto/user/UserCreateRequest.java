@@ -5,8 +5,9 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,21 +28,26 @@ public class UserCreateRequest {
     private String nickname;
 
     @NotNull(message = "필수 약관 14세 이상 동의해주세요.")
-    private LocalDateTime ageTerm;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZZ")
+    private ZonedDateTime ageTerm;
 
     @NotNull(message = "필수 약관 서비스 이용 동의해주세요.")
-    private LocalDateTime serviceTerm;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZZ")
+    private ZonedDateTime serviceTerm;
 
     @NotNull(message = "필수 약관 개인정보 이용 동의해주세요.")
-    private LocalDateTime privacyTerm;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZZ")
+    private ZonedDateTime privacyTerm;
 
     @NotNull(message = "필수 약관 위치 정보 이용 동의해주세요.")
-    private LocalDateTime locationTerm;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZZ")
+    private ZonedDateTime locationTerm;
 
-    private LocalDateTime marketingTerm;
+    @DateTimeFormat(pattern = "yyyy-MM-dd'T'HH:mm:ssZZ")
+    private ZonedDateTime marketingTerm;
 
     @Builder
-    public UserCreateRequest(String username, String password, String email, String phone, String nickname, LocalDateTime ageTerm, LocalDateTime serviceTerm, LocalDateTime privacyTerm, LocalDateTime locationTerm, LocalDateTime marketingTerm){
+    public UserCreateRequest(String username, String password, String email, String phone, String nickname, ZonedDateTime ageTerm, ZonedDateTime serviceTerm, ZonedDateTime privacyTerm, ZonedDateTime locationTerm, ZonedDateTime marketingTerm){
         this.username = username;
         this.password = password;
         this.email = email;

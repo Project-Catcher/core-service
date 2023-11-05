@@ -12,7 +12,6 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @ComponentScan(basePackages = {"com.catcher.core", "com.catcher.resource", "com.catcher.infrastructure", "com.catcher.datasource", "com.catcher.common", "com.catcher.config", "com.catcher.security"})
 @EnableJpaRepositories(basePackages = {"com.catcher.datasource"})
 @EntityScan(basePackages = {"com.catcher.core.domain.entity"})
-@EnableJpaAuditing
 @EnableFeignClients(basePackages = "com.catcher.resource.external")
 public class AppApplication {
 
