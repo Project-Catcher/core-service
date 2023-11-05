@@ -2,10 +2,7 @@ package com.catcher.resource.external;
 
 import com.catcher.infrastructure.oauth.OAuthTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.Map;
@@ -14,8 +11,11 @@ import java.util.Map;
 public interface OAuthFeignController {
 
     @GetMapping
-    OAuthTokenResponse getWithParams(URI url, @RequestParam Map params);
+    OAuthTokenResponse getWithRequestParams(URI uri, @RequestParam Map params);
 
     @PostMapping
-    Map postWithParams(URI url, @RequestHeader("Authorization") String accessToken);
+    Map postWithAuthorizationHeader(URI uri, @RequestHeader("Authorization") String accessToken);
+
+    @PostMapping
+    Map postWithBody(URI uri, @RequestBody Object body);
 }
