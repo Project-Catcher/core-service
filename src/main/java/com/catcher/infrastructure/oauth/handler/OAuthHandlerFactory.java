@@ -16,20 +16,20 @@ import static com.catcher.common.BaseResponseStatus.INVALID_USER_OAUTH_TYPE;
 @RequiredArgsConstructor
 public class OAuthHandlerFactory {
     private final ApplicationContext applicationContext;
-    private List<RefactorOAuthHandler> oAuthHandlers;
+    private List<OAuthHandler> oAuthHandlers;
 
     @PostConstruct
     void initializeOAuthHandlers() {
         oAuthHandlers = new ArrayList<>();
-        String[] names = applicationContext.getBeanNamesForType(RefactorOAuthHandler.class);
+        String[] names = applicationContext.getBeanNamesForType(OAuthHandler.class);
 
         for (String name : names) {
-            RefactorOAuthHandler bean = (RefactorOAuthHandler) applicationContext.getBean(name);
+            OAuthHandler bean = (OAuthHandler) applicationContext.getBean(name);
             oAuthHandlers.add(bean);
         }
     }
 
-    public RefactorOAuthHandler getOAuthHandler(UserProvider userProvider) {
+    public OAuthHandler getOAuthHandler(UserProvider userProvider) {
         return oAuthHandlers
                 .stream()
                 .filter(handler -> handler.support(userProvider))
