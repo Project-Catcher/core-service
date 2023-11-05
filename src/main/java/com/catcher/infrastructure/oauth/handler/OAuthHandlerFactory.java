@@ -2,7 +2,6 @@ package com.catcher.infrastructure.oauth.handler;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.enums.UserProvider;
-import com.catcher.infrastructure.oauth.OAuthHandler;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.ApplicationContext;
