@@ -64,7 +64,7 @@ public class OAuthService {
 
         OAuthTokenResponse loginToken = oAuthHandler.getLoginToken(oAuthProperties, map);
         OAuthUserInfo oAuthUserInfo = oAuthHandler.getOAuthUserInfo(oAuthProperties, loginToken.getAccessToken());
-
+        oAuthHandler.invalidateToken(oAuthProperties, loginToken.getAccessToken());
         User user = userRepository.findByUsername(oAuthUserInfo.getId()).orElseThrow(
                 () -> new BaseException(USERS_NOT_EXISTS)
         );
@@ -89,7 +89,7 @@ public class OAuthService {
         OAuthProperties oAuthProperties = getOAuthProperties(path);
         String accessToken = oAuthCreateRequest.getAccessToken();
         OAuthUserInfo oAuthUserInfo = oAuthHandler.getOAuthUserInfo(oAuthProperties, accessToken);
-
+        oAuthHandler.invalidateToken(oAuthProperties, accessToken);
         validateExistsUsername(oAuthUserInfo.getId());
         validateExistsEmail(oAuthUserInfo.getEmail());
 

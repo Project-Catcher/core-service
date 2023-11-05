@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.HttpClientErrorException;
 
+import java.net.URI;
 import java.util.Map;
 
 import static com.catcher.common.BaseResponseStatus.OAUTH_GENERATE_TOKEN_ERROR;
@@ -35,8 +36,11 @@ public class OAuthHandler {
     }
 
     public OAuthTokenResponse getLoginToken(OAuthProperties oAuthProperties, Map map) {
+
         try {
-            return oAuthFeignController.getWithParams(oAuthProperties.getTokenUri(), oAuthProperties.getLoginJsonBody(map));
+            OAuthTokenResponse oAuthTokenResponse = oAuthFeignController.getWithParams(oAuthProperties.getTokenUri(), oAuthProperties.getLoginJsonBody(map));
+            String accessToken = oAuthTokenResponse.getAccessToken();
+            return oAuthTokenResponse;
         } catch (HttpClientErrorException e) {
             OAuthTokenResponse oAuthTokenResponse = e.getResponseBodyAs(OAuthTokenResponse.class);
             log.error("OAUTH-{} : error = {}, description = {}",
@@ -50,6 +54,12 @@ public class OAuthHandler {
 
     public OAuthUserInfo getOAuthUserInfo(OAuthProperties oAuthProperties, String accessToken) {
         Map map = oAuthFeignController.postWithParams(oAuthProperties.getUserInfoUri(), "Bearer " + accessToken);
+        log.info("AccessToken = {}", accessToken);
         return OAuthUserInfoFactory.getOAuthUserInfo(oAuthProperties.getProvider(), map);
+    }
+
+    public void invalidateToken(OAuthProperties oAuthProperties, String accessToken) {
+        URI logoutUri = oAuthProperties.getLogoutUri();
+        oAuthFeignController.postWithParams(logoutUri, "Bearer " + accessToken);
     }
 }

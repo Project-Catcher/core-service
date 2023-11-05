@@ -62,12 +62,29 @@ public class NaverProperties implements OAuthProperties{
     }
 
     @Override
+    public MultiValueMap<String, String> getLogoutJsonBody(String accessToken) {
+        MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
+        multiValueMap.add("access_token", accessToken);
+        multiValueMap.add("grant_type", "delete");
+        multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
+        multiValueMap.add("client_id", kmsService.decrypt(clientId));
+        multiValueMap.add("service_provider", "NAVER");
+
+        return multiValueMap;
+    }
+
+    @Override
     public URI getUserInfoUri() {
         return URI.create(userInfoUri);
     }
 
     @Override
     public URI getTokenUri() {
+        return URI.create(tokenUri);
+    }
+
+    @Override
+    public URI getLogoutUri() {
         return URI.create(tokenUri);
     }
 

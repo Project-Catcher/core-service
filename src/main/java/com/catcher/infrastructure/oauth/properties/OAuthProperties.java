@@ -10,7 +10,9 @@ public interface OAuthProperties {
     boolean support(UserProvider userProvider);
     MultiValueMap<String, String> getSignUpJsonBody(Map params);
     MultiValueMap<String, String> getLoginJsonBody(Map params);
+    MultiValueMap<String, String> getLogoutJsonBody(String accessToken);
     URI getUserInfoUri();
     URI getTokenUri();
+    URI getLogoutUri();
     UserProvider getProvider();
 }

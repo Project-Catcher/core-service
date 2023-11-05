@@ -25,6 +25,8 @@ public class KakaoProperties implements OAuthProperties{
     private String signupUri;
     @Value("${oauth2.client.registration.kakao.redirect-uri.login}")
     private String loginUri;
+    @Value("${oauth2.client.registration.kakao.redirect-uri.logout}")
+    private String logoutUri;
     @Value("${oauth2.client.registration.kakao.authorization-grant-type}")
     private String grantType;
     @Value("${oauth2.client.provider.kakao.token-uri}")
@@ -62,6 +64,11 @@ public class KakaoProperties implements OAuthProperties{
     }
 
     @Override
+    public MultiValueMap<String, String> getLogoutJsonBody(String accessToken) {
+        return null;
+    }
+
+    @Override
     public URI getUserInfoUri() {
         return URI.create(userInfoUri);
     }
@@ -69,6 +76,11 @@ public class KakaoProperties implements OAuthProperties{
     @Override
     public URI getTokenUri() {
         return URI.create(tokenUri);
+    }
+
+    @Override
+    public URI getLogoutUri() {
+        return URI.create(logoutUri);
     }
 
     @Override
