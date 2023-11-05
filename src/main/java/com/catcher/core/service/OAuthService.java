@@ -13,7 +13,7 @@ import com.catcher.core.dto.oauth.OAuthHistoryResponse;
 import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.infrastructure.oauth.OAuthTokenResponse;
 import com.catcher.infrastructure.oauth.handler.OAuthHandlerFactory;
-import com.catcher.infrastructure.oauth.handler.RefactorOAuthHandler;
+import com.catcher.infrastructure.oauth.handler.OAuthHandler;
 import com.catcher.infrastructure.oauth.properties.OAuthProperties;
 import com.catcher.infrastructure.oauth.user.OAuthUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -46,7 +46,7 @@ public class OAuthService {
 
     @Transactional(readOnly = true)
     public OAuthHistoryResponse checkSignHistory(Map map, String path) {
-        RefactorOAuthHandler oAuthHandler = getOAuthHandler(path);
+        OAuthHandler oAuthHandler = getOAuthHandler(path);
         try {
             OAuthTokenResponse oAuthTokenResponse = oAuthHandler.handleToken(signUpJsonProperty(oAuthHandler, map));
             OAuthUserInfo oAuthUserInfo = oAuthHandler.handleUserInfo(oAuthTokenResponse.getAccessToken());
@@ -62,7 +62,7 @@ public class OAuthService {
 
     @Transactional(readOnly = true)
     public TokenDto login(Map map, String path) {
-        RefactorOAuthHandler oAuthHandler = getOAuthHandler(path);
+        OAuthHandler oAuthHandler = getOAuthHandler(path);
         try {
             OAuthTokenResponse oAuthTokenResponse = oAuthHandler.handleToken(getLoginProperty(oAuthHandler, map));
             OAuthUserInfo oAuthUserInfo = oAuthHandler.handleUserInfo(oAuthTokenResponse.getAccessToken());
@@ -94,7 +94,7 @@ public class OAuthService {
 
     @Transactional
     public UserCreateResponse signUp(OAuthCreateRequest oAuthCreateRequest, String path) {
-        RefactorOAuthHandler oAuthHandler = getOAuthHandler(path);
+        OAuthHandler oAuthHandler = getOAuthHandler(path);
         String accessToken = oAuthCreateRequest.getAccessToken();
 
         try {
@@ -144,7 +144,7 @@ public class OAuthService {
         }
     }
 
-    private RefactorOAuthHandler getOAuthHandler(String path) {
+    private OAuthHandler getOAuthHandler(String path) {
         UserProvider userProvider = resolveUserProvider(path);
         return oAuthHandlerFactory.getOAuthHandler(userProvider);
     }
@@ -156,14 +156,14 @@ public class OAuthService {
                 .orElseThrow(() -> new BaseException(INVALID_USER_OAUTH_TYPE));
     }
 
-    private Supplier<Map> signUpJsonProperty(RefactorOAuthHandler oAuthHandler, Map map) {
+    private Supplier<Map> signUpJsonProperty(OAuthHandler oAuthHandler, Map map) {
         return () -> {
             OAuthProperties oAuthProperties = oAuthHandler.getOAuthProperties();
             return oAuthProperties.getSignUpJsonBody(map);
         };
     }
 
-    private Supplier<Map> getLoginProperty(RefactorOAuthHandler oAuthHandler, Map map) {
+    private Supplier<Map> getLoginProperty(OAuthHandler oAuthHandler, Map map) {
         return () -> {
             OAuthProperties oAuthProperties = oAuthHandler.getOAuthProperties();
             return oAuthProperties.getLoginJsonBody(map);

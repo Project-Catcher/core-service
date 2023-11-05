@@ -20,7 +20,7 @@ import static com.catcher.common.BaseResponseStatus.OAUTH_GENERATE_TOKEN_ERROR;
 @Slf4j
 @RequiredArgsConstructor
 @Getter
-public abstract class RefactorOAuthHandler {
+public abstract class OAuthHandler {
     private final OAuthFeignController oAuthFeignController;
     private final OAuthProperties oAuthProperties;
 

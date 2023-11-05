@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 
 @Component
-public class KakaoOAuthHandler extends RefactorOAuthHandler{
+public class KakaoOAuthHandler extends OAuthHandler {
     public KakaoOAuthHandler(OAuthFeignController oAuthFeignController,
                              @Qualifier("kakaoProperties") OAuthProperties oAuthProperties) {
         super(oAuthFeignController, oAuthProperties);
