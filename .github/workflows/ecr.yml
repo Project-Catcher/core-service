@@ -11,6 +11,7 @@ env:
   DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
   ECR_URL: ${{ secrets.AWS_ECR_DEV_CORE }}
+  webhook_url: ${{ secrets.WEBHOOK }}
 
 permissions:
   id-token: write
