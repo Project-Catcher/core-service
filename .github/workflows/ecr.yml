@@ -1,40 +1,29 @@
-# This workflow uses actions that are not certified by GitHub.
-# They are provided by a third-party and are governed by
-# separate terms of service, privacy policy, and support
-# documentation.
-# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
-# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
-
 name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - feat/ci-jdb
 
 env:
-  ecr_url: ${{ secrets.ECR_REPO_DEV }}
-  role_arn: ${{ secrets.OIDC_ROLE }}
-  aws_region: ${{ secrets.AWS_REGION }}
-  webhook_url: ${{ secrets.WEBHOOK }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE }}
+  DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+  ECR_URL: ${{ secrets.AWS_ECR_DEV_CORE }}
 
 permissions:
   id-token: write
-  contents: read
+  contents: write
       
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-latest
-
-    permissions:
-      id-token: write   # This is required for requesting the JWT
-      contents: read    # This is required for actions/checkout
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          fetch-depth: 1
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -55,9 +44,9 @@ jobs:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
-          aws-region: ${{ env.aws_region }}
+          aws-region: ${{ env.AWS_REGION }}
           role-session-name: GitHubActions
-          role-to-assume: ${{ env.role_arn }}
+          role-to-assume: ${{ env.OIDC_ROLE_ARN }}
 
       - name: Login to Amazon ECR
         id: login-ecr
@@ -65,11 +54,42 @@ jobs:
 
       - name: Publish Image to ECR(CORE-SERVICE)
         run: |
-          docker tag core-service:latest ${{ env.ecr_url }}:core-service
-          docker push ${{ env.ecr_url }}:core-service
+          docker tag core-service:latest ${{ env.ECR_URL }}:${{ github.sha }}
+          docker push ${{ env.ECR_URL }}:${{ github.sha }}
 
       - name: notification to swit
         uses: roharon/action-swit@v1
         with:
           webhooks_url: ${{ env.webhook_url }}
           MESSAGE: "🏷 ${{ job.status }} 백엔드 ECR 도커파일 업로드 : Core-service - by ${{ github.actor }}"
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+
+      - name: Checkout for Kustomize repository
+        uses: actions/checkout@v2
+        with:
+          repository: Project-Catcher/core-service-kusto
+          ref: main
+          token: ${{ env.GITHUB_TOKEN }}
+          path: core-service-kusto
+
+      - name: Update Kustomize image
+        run: |
+          if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+            KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
+          else
+            KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+          fi
+
+          cd $KUSTOMIZE_PATH
+          kustomize edit set image core-svc-image="${{ env.ECR_URL }}:${{ github.sha }}"
+          kustomize build .
+          
+      - name: Commit minifest files
+        run: |
+          cd core-service-kusto
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git commit -am "Update image tag"
+          git push -u origin main
