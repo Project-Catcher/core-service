@@ -25,8 +25,6 @@ import static com.catcher.utils.JwtUtils.*;
 @RequiredArgsConstructor
 @Slf4j
 public class JwtTokenProvider {
-    private final RedisTemplate<String, String> redisTemplate;
-
     @Value("${spring.jwt.secret}")
     private String secretKey;
 
