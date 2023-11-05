@@ -99,7 +99,6 @@ public class OAuthService {
 
         try {
             OAuthUserInfo oAuthUserInfo = oAuthHandler.handleUserInfo(accessToken);
-            oAuthHandler.invalidateToken(accessToken);
 
             validateExistsUsername(oAuthUserInfo.getId());
             validateExistsEmail(oAuthUserInfo.getEmail());
@@ -107,6 +106,7 @@ public class OAuthService {
             User user = createUser(oAuthCreateRequest, oAuthUserInfo);
 
             userRepository.save(user);
+            oAuthHandler.invalidateToken(accessToken);
 
             return UserCreateResponse.from(user);
         } catch (OAuthException e) {
