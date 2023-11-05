@@ -23,7 +23,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/v3/**", "/users/**", "/access-test", "/oauth/**", "favicon.ico"};
+    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/v3/**", "/users/**", "/access-test", "/oauth/**", "favicon.ico"/ "/health/**"};
 
 
     @Bean

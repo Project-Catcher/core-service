@@ -1,12 +1,10 @@
 package com.catcher.utils;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.Arrays;
 import java.util.Optional;
 
 import static java.util.Optional.*;
