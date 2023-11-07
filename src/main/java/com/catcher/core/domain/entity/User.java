@@ -8,7 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 
 @Entity
@@ -48,23 +48,23 @@ public class User extends BaseTimeEntity {
     private UserRole userRole;
 
     @Column(nullable = false)
-    private LocalDateTime userAgeTerm; // 필수 약관
+    private ZonedDateTime userAgeTerm; // 필수 약관
 
     @Column(nullable = false)
-    private LocalDateTime userServiceTerm; // 필수 약관
+    private ZonedDateTime userServiceTerm; // 필수 약관
 
     @Column(nullable = false)
-    private LocalDateTime userPrivacyTerm; // 필수 약관
+    private ZonedDateTime userPrivacyTerm; // 필수 약관
 
     @Column(nullable = false)
-    private LocalDateTime userLocationTerm; // 필수 약관
+    private ZonedDateTime userLocationTerm; // 필수 약관
 
-    private LocalDateTime userMarketingTerm; // 선택 약관
+    private ZonedDateTime userMarketingTerm; // 선택 약관
 
-    private LocalDateTime deletedAt;
+    private ZonedDateTime deletedAt;
 
     @Builder
-    public User(String username, String password,  String email, String profileImageUrl, String phone, String nickname, UserProvider userProvider, UserRole role, LocalDateTime userAgeTerm, LocalDateTime userServiceTerm, LocalDateTime userPrivacyTerm, LocalDateTime userLocationTerm, String introduceContent, LocalDateTime userMarketingTerm){
+    public User(String username, String password,  String email, String profileImageUrl, String phone, String nickname, UserProvider userProvider, UserRole role, ZonedDateTime userAgeTerm, ZonedDateTime userServiceTerm, ZonedDateTime userPrivacyTerm, ZonedDateTime userLocationTerm, String introduceContent, ZonedDateTime userMarketingTerm){
         this.username = username;
         this.password = password;
         this.email = email;

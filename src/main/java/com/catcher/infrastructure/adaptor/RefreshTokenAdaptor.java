@@ -2,9 +2,9 @@ package com.catcher.infrastructure.adaptor;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
+import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.service.AuthService;
-import com.catcher.infrastructure.RedisManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -16,7 +16,7 @@ import static com.catcher.utils.JwtUtils.*;
 @RequiredArgsConstructor
 public class RefreshTokenAdaptor implements AuthService<TokenDto> {
     private final JwtTokenProvider jwtTokenProvider;
-    private final RedisManager redisManager;
+    private final DBManager dbManager;
 
     @Override
     public TokenDto reissueRefreshToken(String refreshToken) throws BaseException {
@@ -31,14 +31,14 @@ public class RefreshTokenAdaptor implements AuthService<TokenDto> {
         String newAccessToken = jwtTokenProvider.createAccessToken(authentication);
         String newRefreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-        redisManager.deleteKey(refreshToken);
-        redisManager.putValue(authentication.getName(), newRefreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+        dbManager.deleteKey(refreshToken);
+        dbManager.putValue(authentication.getName(), newRefreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
 
         return new TokenDto(newAccessToken, newRefreshToken);
     }
 
     private String getRefreshToken(String name) {
-        return redisManager.getValue(name)
+        return dbManager.getValue(name)
                 .orElseThrow(() -> new BaseException(NOT_EXIST_REFRESH_JWT));
     }
 

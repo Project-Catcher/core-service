@@ -5,6 +5,7 @@ import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.database.UserRepository;
 import lombok.extern.log4j.Log4j2;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -18,7 +19,7 @@ import java.util.Set;
 import static com.catcher.common.BaseResponseStatus.INVALID_USER_NAME;
 
 @Service
-@Log4j2
+@Slf4j
 public class UserDetailServiceImpl implements UserDetailsService {
     @Autowired
     private UserRepository userRepository;
