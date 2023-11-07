@@ -31,7 +31,6 @@ public class JwtTokenProvider {
     @Autowired
     private UserDetailServiceImpl userDetailsService;
 
-
     /**
      * Access 토큰 생성
      */
