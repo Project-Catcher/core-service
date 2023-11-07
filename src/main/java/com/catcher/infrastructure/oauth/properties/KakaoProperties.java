@@ -16,7 +16,6 @@ import java.util.Map;
 public class KakaoProperties implements OAuthProperties{
     private final KmsService kmsService;
 
-
     @Value("${oauth2.client.registration.kakao.client-id}")
     private String clientId;
     @Value("${oauth2.client.registration.kakao.client-secret}")
@@ -33,11 +32,6 @@ public class KakaoProperties implements OAuthProperties{
     private String tokenUri;
     @Value("${oauth2.client.provider.kakao.user-info-uri}")
     private String userInfoUri;
-
-    @Override
-    public boolean support(UserProvider userProvider) {
-        return userProvider.equals(UserProvider.KAKAO);
-    }
 
     @Override
     public MultiValueMap<String, String> getSignUpJsonBody(Map params) {

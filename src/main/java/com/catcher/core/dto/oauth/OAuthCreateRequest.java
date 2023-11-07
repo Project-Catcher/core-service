@@ -6,7 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.ZonedDateTime;
 
-
 @Getter
 public class OAuthCreateRequest {
     @NotNull(message = "휴대폰 번호를 입력하세요.")

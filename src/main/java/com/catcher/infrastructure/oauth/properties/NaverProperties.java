@@ -31,11 +31,6 @@ public class NaverProperties implements OAuthProperties{
     private String userInfoUri;
 
     @Override
-    public boolean support(UserProvider userProvider) {
-        return userProvider.equals(UserProvider.NAVER);
-    }
-
-    @Override
     public MultiValueMap<String, String> getSignUpJsonBody(Map params) {
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("code", params.get("code").toString());
