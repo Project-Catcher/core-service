@@ -27,13 +27,8 @@ import static com.catcher.utils.JwtUtils.*;
 public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
+    private final UserDetailServiceImpl userDetailsService;
 
-    @Autowired
-    private UserDetailServiceImpl userDetailsService;
-
-    /**
-     * Access 토큰 생성
-     */
     public String createAccessToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
@@ -47,9 +42,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /**
-     * Refresh 토큰 생성
-     */
     public String createRefreshToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
@@ -65,9 +57,6 @@ public class JwtTokenProvider {
         return refreshToken;
     }
 
-    /**
-     * 토큰으로부터 클레임을 만들고, 이를 통해 User 객체 생성해 Authentication 객체 반환
-     */
     public Authentication getAuthentication(String token) throws BaseException {
         String userPrincipal = Jwts.parser().
                 setSigningKey(secretKey)
@@ -78,9 +67,6 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    /**
-     * Access 토큰을 검증
-     */
     public boolean validateToken(String token){
         try{
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
