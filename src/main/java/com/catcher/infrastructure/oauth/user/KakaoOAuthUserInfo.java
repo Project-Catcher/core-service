@@ -4,7 +4,7 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 
 import java.util.Map;
 
-public class KakaoOAuthUserInfo extends OAuthUserInfo{
+public class KakaoOAuthUserInfo extends OAuthUserInfo {
     protected KakaoOAuthUserInfo(Map<String, Object> attributes) {
         super(attributes);
     }
@@ -16,7 +16,7 @@ public class KakaoOAuthUserInfo extends OAuthUserInfo{
 
     @Override
     public String getEmail() {
-        return String.valueOf(((Map<String, Object>) attributes.get("kakao_account")).get("email"));
+        return (((Map<String, Object>) attributes.get("kakao_account")).get("email")).toString();
     }
 
     @Override
