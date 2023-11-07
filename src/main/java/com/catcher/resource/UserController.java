@@ -23,7 +23,7 @@ public class UserController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/signup")
-    public BaseResponse<UserCreateResponse> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+    public BaseResponse<TokenDto> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
         return new BaseResponse<>(userService.signUpUser(userCreateRequest));
     }
 
