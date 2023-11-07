@@ -11,7 +11,6 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.oauth.OAuthCreateRequest;
 import com.catcher.core.dto.oauth.OAuthHistoryResponse;
-import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.infrastructure.oauth.OAuthTokenResponse;
 import com.catcher.infrastructure.oauth.handler.OAuthHandlerFactory;
 import com.catcher.infrastructure.oauth.handler.OAuthHandler;

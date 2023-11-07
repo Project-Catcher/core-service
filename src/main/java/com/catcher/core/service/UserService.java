@@ -6,7 +6,6 @@ import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
-import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.database.UserRepository;
