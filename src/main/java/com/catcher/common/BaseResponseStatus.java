@@ -31,7 +31,7 @@ public enum BaseResponseStatus {
     INVALID_USER_ID(false, 2107, "유저 ID를 확인해주세요."),
     USERS_DUPLICATED_USER_EMAIL(false, 2108, "이미 존재하는 이메일 입니다."),
     INVALID_USER_OAUTH_TYPE(false, 2109, "지원하지 않는 소셜로그인 입니다."),
-    USERS_DUPLICATED_USER(false, 2110, "이미 존재하는 회원입니다."),
+    USERS_DUPLICATED_USER(false, 2110, "이미 가입한 이력이 있습니다."),
     USERS_NOT_EXISTS(false, 2111, "존재하지 않는 유저입니다."),
 
     /**
