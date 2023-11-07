@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import java.net.URI;
 import java.util.Map;
 
-@FeignClient(name = "test", url = "runtime")
+@FeignClient(name = "oauth", url = "runtime")
 public interface OAuthFeignController {
 
     @GetMapping
