@@ -28,8 +28,9 @@ public class OAuthController {
     @Value("${oauth2.client.registration.kakao.client-id}")
     private String kakaoClientId;
 
+    //TODO: 삭제 예정, 프론트에서 진행할 부분 - hg
     @GetMapping(value = {"/test/naver/signup", "/test/kakao/signup"})
-    public void testSignUp(HttpServletRequest request, HttpServletResponse response) throws IOException { // 이 부분은 프론트에서 진행 추후 삭제 예정
+    public void testSignUp(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI();
         if (requestURI.contains("kakao")) { // kakao
             response.sendRedirect("https://kauth.kakao.com/oauth/authorize?client_id=" + kmsService.decrypt(kakaoClientId) + "&redirect_uri=http://localhost:8080/oauth/kakao&response_type=code");
@@ -38,8 +39,9 @@ public class OAuthController {
         }
     }
 
+    //TODO: 삭제 예정, 프론트에서 진행할 부분 - hg
     @GetMapping(value = {"/test/naver/login", "/test/kakao/login"})
-    public void testLogin(HttpServletRequest request, HttpServletResponse response) throws IOException { // 이 부분은 프론트에서 진행 추후 삭제 예정
+    public void testLogin(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String requestURI = request.getRequestURI();
         if (requestURI.contains("kakao")) { // kakao
             response.sendRedirect("https://kauth.kakao.com/oauth/authorize?client_id=" + kmsService.decrypt(kakaoClientId) + "&redirect_uri=http://localhost:8080/oauth/kakao/login&response_type=code");
