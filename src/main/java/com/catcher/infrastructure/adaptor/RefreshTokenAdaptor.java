@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
+import java.util.Optional;
+
 import static com.catcher.common.BaseResponseStatus.NOT_EXIST_REFRESH_JWT;
 import static com.catcher.utils.JwtUtils.*;
 
@@ -40,9 +42,12 @@ public class RefreshTokenAdaptor implements AuthService {
     @Override
     public void discardRefreshToken(String refreshToken) {
         jwtTokenProvider.validateToken(refreshToken);
-
         Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
 
+        Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
+        if(refreshTokenOptional.isPresent()) {
+            compareRefreshToken(refreshToken, refreshTokenOptional.get());
+        }
         dbManager.deleteKey(authentication.getName());
     }
 
