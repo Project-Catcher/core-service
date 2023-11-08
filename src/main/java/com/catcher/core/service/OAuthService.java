@@ -91,9 +91,9 @@ public class OAuthService {
             OAuthUserInfo oAuthUserInfo = oAuthHandler.handleUserInfo(accessToken);
 
             checkDuplicateUser(userRepository.findByUsername(oAuthUserInfo.getId()), USERS_DUPLICATED_USER);
-            checkDuplicateUser(userRepository.findByEmail(oAuthUserInfo.getId()), USERS_DUPLICATED_USER_EMAIL);
-            checkDuplicateUser(userRepository.findByNickname(oAuthUserInfo.getId()), USERS_DUPLICATED_NICKNAME);
-            checkDuplicateUser(userRepository.findByPhone(oAuthUserInfo.getId()), USERS_DUPLICATED_PHONE);
+            checkDuplicateUser(userRepository.findByEmail(oAuthUserInfo.getEmail()), USERS_DUPLICATED_USER_EMAIL);
+            checkDuplicateUser(userRepository.findByNickname(oAuthCreateRequest.getNickname()), USERS_DUPLICATED_NICKNAME);
+            checkDuplicateUser(userRepository.findByPhone(oAuthCreateRequest.getPhone()), USERS_DUPLICATED_PHONE);
 
             User user = createUser(oAuthCreateRequest, oAuthUserInfo);
             userRepository.save(user);
