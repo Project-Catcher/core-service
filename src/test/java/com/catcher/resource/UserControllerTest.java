@@ -8,6 +8,7 @@ import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -37,8 +38,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = AppApplication.class)
+@ActiveProfiles("test")
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 @Transactional
 class UserControllerTest {
     @PersistenceContext

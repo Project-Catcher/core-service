@@ -1,14 +1,14 @@
-package com.catcher.datasource.config;
+package com.catcher.testconfiguriation;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
 import redis.embedded.RedisServer;
 
-@Configuration
-@Profile("local")
+@TestConfiguration
 public class EmbeddedRedisConfiguration {
     private RedisServer redisServer;
 

@@ -55,10 +55,10 @@ dependencies {
 	//open feign
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
 	//embedded-redis
-	implementation 'it.ozimov:embedded-redis:0.7.2'
+	testImplementation 'it.ozimov:embedded-redis:0.7.2'
 
 	//h2
-	runtimeOnly 'com.h2database:h2'
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 dependencyManagement {

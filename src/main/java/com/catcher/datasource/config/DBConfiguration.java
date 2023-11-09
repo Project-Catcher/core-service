@@ -14,7 +14,7 @@ import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
-@Profile("!local")
+@Profile("!test")
 public class DBConfiguration {
     private final KmsService kmsService;
     /**

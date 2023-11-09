@@ -2,6 +2,7 @@ package com.catcher.infrastructure;
 
 import com.catcher.app.AppApplication;
 import com.catcher.core.database.DBManager;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,8 +14,8 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = AppApplication.class)
+@ActiveProfiles("test")
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 class RedisManagerTest {
     @Autowired
     DBManager dbManager;

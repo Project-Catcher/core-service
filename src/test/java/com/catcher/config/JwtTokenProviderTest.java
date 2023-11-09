@@ -5,6 +5,7 @@ import com.catcher.common.exception.BaseException;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = AppApplication.class)
+@ActiveProfiles("test")
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 @Transactional
 class JwtTokenProviderTest {
     @Autowired

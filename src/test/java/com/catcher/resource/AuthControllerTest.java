@@ -9,6 +9,7 @@ import com.catcher.core.dto.RefreshTokenDto;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.service.UserService;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
@@ -45,8 +46,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = AppApplication.class)
+@ActiveProfiles("test")
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 @Transactional
 class AuthControllerTest {
 

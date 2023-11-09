@@ -8,6 +8,7 @@ import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -25,8 +26,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = AppApplication.class)
+@ActiveProfiles("test")
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 @Transactional
 class UserServiceTest {
     @Autowired

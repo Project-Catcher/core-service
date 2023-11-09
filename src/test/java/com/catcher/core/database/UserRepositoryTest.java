@@ -3,6 +3,7 @@ package com.catcher.core.database;
 import com.catcher.app.AppApplication;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -20,8 +21,8 @@ import java.util.UUID;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles("local")
-@SpringBootTest(classes = AppApplication.class)
+@ActiveProfiles("test")
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 @Transactional
 class UserRepositoryTest {
     @Autowired

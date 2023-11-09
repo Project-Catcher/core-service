@@ -4,6 +4,7 @@ package com.catcher.resource;
 import com.catcher.app.AppApplication;
 import com.catcher.core.UserCommandExecutor;
 import com.catcher.core.database.UserRepository;
+import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import jakarta.persistence.EntityManagerFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.mockito.Mock;
@@ -16,7 +17,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-@SpringBootTest(classes = AppApplication.class)
+@SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
 @AutoConfigureMockMvc
 public class UserApiControllerTest {
 
