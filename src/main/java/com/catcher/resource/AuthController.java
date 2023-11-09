@@ -7,6 +7,7 @@ import com.catcher.core.service.AuthService;
 import com.catcher.core.dto.TokenDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,7 +23,7 @@ public class AuthController {
 
     @Operation(summary = "토큰 재발행")
     @PostMapping("/reissue")
-    public BaseResponse reissue(RefreshTokenDto refreshTokenDto){
+    public BaseResponse<TokenDto> reissue(@Valid @RequestBody RefreshTokenDto refreshTokenDto){
         return new BaseResponse<>(authService.reissueRefreshToken(refreshTokenDto.getRefreshToken()));
     }
 
