@@ -1,0 +1,101 @@
+package com.catcher.core.service;
+
+import com.catcher.app.AppApplication;
+import com.catcher.common.exception.BaseException;
+import com.catcher.core.database.DBManager;
+import com.catcher.core.dto.TokenDto;
+import com.catcher.core.dto.user.UserCreateRequest;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.ZonedDateTime;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.*;
+
+@ActiveProfiles("local")
+@SpringBootTest(classes = AppApplication.class)
+@Transactional
+class AuthServiceTest {
+    @Autowired
+    AuthService authService;
+    @Autowired
+    UserService userService;
+    @PersistenceContext
+    EntityManager em;
+    @Autowired
+    DBManager dbManager;
+
+    @DisplayName("정상 refresh 토큰으로 재발급 시, 새로운 Access Token과 Refresh 토큰이 반환된다.")
+    @Test
+    void valid_reissue_token() throws InterruptedException {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
+        TokenDto preTokenDto = userService.signUpUser(userCreateRequest);
+
+        //when
+        Thread.sleep(1000); // jwt 값 변화를 위해 sleep TODO : 왜 sleep 값을 작게 주거나 안주면 같은 토큰을 반환할까? - hg
+        TokenDto newTokenDto = authService.reissueRefreshToken(preTokenDto.getRefreshToken());
+
+        //then
+        assertThat(newTokenDto.getRefreshToken()).isNotEqualTo(preTokenDto.getRefreshToken());
+        assertThat(newTokenDto.getAccessToken()).isNotEqualTo(preTokenDto.getAccessToken());
+        assertThat(dbManager.getValue(preTokenDto.getRefreshToken())).isEmpty();
+    }
+
+    @DisplayName("유효하지 않은 refresh 토큰으로 재발급 시, 에러 반환")
+    @Test
+    void invalid_refresh_token_reissue_token() {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
+        TokenDto tokenDto = userService.signUpUser(userCreateRequest);
+
+        //when
+
+        //then
+        assertThatThrownBy(() -> authService.reissueRefreshToken(tokenDto.getRefreshToken() + "1"))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @DisplayName("토큰 폐기 후, 재발급 시, 에러 반환")
+    @Test
+    void discard_token_then_reissue_token() {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
+        TokenDto preTokenDto = userService.signUpUser(userCreateRequest);
+
+        //when
+        authService.discardRefreshToken(preTokenDto.getRefreshToken());
+
+        //then
+        assertThatThrownBy(() -> authService.reissueRefreshToken(preTokenDto.getRefreshToken()))
+                .isInstanceOf(BaseException.class);
+    }
+
+    private UserCreateRequest userCreateRequest(String username, String email, String nickname, String phone) {
+        return UserCreateRequest.builder()
+                .nickname(nickname)
+                .ageTerm(ZonedDateTime.now())
+                .locationTerm(ZonedDateTime.now())
+                .serviceTerm(ZonedDateTime.now())
+                .marketingTerm(ZonedDateTime.now())
+                .privacyTerm(ZonedDateTime.now())
+                .phone(phone)
+                .email(email)
+                .username(username)
+                .password(createRandomUUID())
+                .build();
+    }
+
+    private String createRandomUUID() {
+        return UUID.randomUUID().toString();
+    }
+}
