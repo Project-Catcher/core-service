@@ -47,6 +47,24 @@ class UserRepositoryTest {
         assertThat(userOptional).isPresent();
     }
 
+    @DisplayName("존재하지 않는 이메일로 조회 조회 시 빈값 반환")
+    @Test
+    void invalid_search_by_email() {
+        //given
+        User user = registerStubUser();
+
+        //when
+        Optional<User> userOptionalA = userRepository.findByEmail(createRandomUUID());
+        Optional<User> userOptionalB = userRepository.findByEmail(user.getEmail() + " ");
+        Optional<User> userOptionalC = userRepository.findByEmail(" " + user.getEmail());
+
+
+        //then
+        assertThat(userOptionalA).isEmpty();
+        assertThat(userOptionalB).isEmpty();
+        assertThat(userOptionalC).isEmpty();
+    }
+
     @DisplayName("닉네임으로 조회")
     @Test
     void search_by_nickname() {
@@ -58,6 +76,23 @@ class UserRepositoryTest {
 
         //then
         assertThat(userOptional).isPresent();
+    }
+
+    @DisplayName("존재하지 않는 닉네임으로 조회 시 빈값 반환")
+    @Test
+    void invalid_search_by_nickname() {
+        //given
+        User user = registerStubUser();
+
+        //when
+        Optional<User> userOptionalA = userRepository.findByNickname(createRandomUUID());
+        Optional<User> userOptionalB = userRepository.findByNickname(user.getNickname() + " ");
+        Optional<User> userOptionalC = userRepository.findByNickname(" " + user.getNickname());
+
+        //then
+        assertThat(userOptionalA).isEmpty();
+        assertThat(userOptionalB).isEmpty();
+        assertThat(userOptionalC).isEmpty();
     }
 
     @DisplayName("유저 PK로 조회")
@@ -73,6 +108,21 @@ class UserRepositoryTest {
         assertThat(userOptional).isPresent();
     }
 
+    @DisplayName("존재하지 않는 유저 PK로 조회 시 빈값 반환")
+    @Test
+    void invalid_search_by_id() {
+        //given
+        User user = registerStubUser();
+
+        //when
+        Optional<User> userOptionalA = userRepository.findById(user.getId() + 1L);
+        Optional<User> userOptionalB = userRepository.findById(user.getId() - 1L);
+
+        //then
+        assertThat(userOptionalA).isEmpty();
+        assertThat(userOptionalB).isEmpty();
+    }
+
     @DisplayName("핸드폰으로 조회")
     @Test
     void search_by_phone() {
@@ -86,6 +136,23 @@ class UserRepositoryTest {
         assertThat(userOptional).isPresent();
     }
 
+    @DisplayName("존재하지 않는 핸드폰으로 조회 시 빈값 반환")
+    @Test
+    void invalid_search_by_phone() {
+        //given
+        User user = registerStubUser();
+
+        //when
+        Optional<User> userOptionalA = userRepository.findByPhone(createRandomUUID());
+        Optional<User> userOptionalB = userRepository.findByPhone(user.getPhone() +" ");
+        Optional<User> userOptionalC = userRepository.findByPhone(" " + user.getPhone());
+
+        //then
+        assertThat(userOptionalA).isEmpty();
+        assertThat(userOptionalB).isEmpty();
+        assertThat(userOptionalC).isEmpty();
+    }
+
     @DisplayName("유저아이디로 조회")
     @Test
     void search_by_username() {
@@ -97,6 +164,23 @@ class UserRepositoryTest {
 
         //then
         assertThat(userOptional).isPresent();
+    }
+
+    @DisplayName("존재하지 않는 유저아이디로 조회시 예외발생")
+    @Test
+    void invalid_search_by_username() {
+        //given
+        User user = registerStubUser();
+
+        //when
+        Optional<User> userOptionalA = userRepository.findByUsername(createRandomUUID());
+        Optional<User> userOptionalB = userRepository.findByUsername(user.getUsername() + " ");
+        Optional<User> userOptionalC = userRepository.findByUsername(" " + user.getUsername());
+
+        //then
+        assertThat(userOptionalA).isEmpty();
+        assertThat(userOptionalB).isEmpty();
+        assertThat(userOptionalC).isEmpty();
     }
 
     private User registerStubUser() {

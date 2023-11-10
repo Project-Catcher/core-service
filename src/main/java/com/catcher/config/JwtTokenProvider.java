@@ -16,6 +16,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.catcher.common.BaseResponseStatus.EXPIRED_JWT;
 import static com.catcher.common.BaseResponseStatus.INVALID_JWT;
@@ -29,10 +30,12 @@ public class JwtTokenProvider {
     private String secretKey;
     private final UserDetailServiceImpl userDetailsService;
 
+    private AtomicLong atomicLong = new AtomicLong(1L);
+
     public String createAccessToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION_MILLIS);
+        Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION_MILLIS + getRandomSeconds());
 
         return Jwts.builder()
                 .setClaims(claims)
@@ -45,7 +48,7 @@ public class JwtTokenProvider {
     public String createRefreshToken(Authentication authentication){
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
-        Date expireDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_MILLIS);
+        Date expireDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_MILLIS + getRandomSeconds());
 
         String refreshToken = Jwts.builder()
                 .setClaims(claims)
@@ -78,5 +81,9 @@ public class JwtTokenProvider {
             log.error(INVALID_JWT.getMessage());
             throw new BaseException(INVALID_JWT);
         }
+    }
+
+    private long getRandomSeconds() {
+        return (atomicLong.incrementAndGet() % 10) * 1000;
     }
 }

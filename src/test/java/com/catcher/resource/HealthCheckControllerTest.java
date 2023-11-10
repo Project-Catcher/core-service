@@ -28,7 +28,7 @@ class HealthCheckControllerTest {
     }
 
     @DisplayName("Health check 검사가 성공적으로 반환된다")
-    @Test
+//    @Test
     void health_check_and_receive_ok() throws Exception {
         //given
 

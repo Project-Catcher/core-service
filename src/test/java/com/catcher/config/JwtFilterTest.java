@@ -65,6 +65,7 @@ class JwtFilterTest {
         //when
         Mockito.when(request.getHeader("Authorization")).thenReturn(null);
 
+        //then
         jwtFilter.doFilterInternal(request, response, filterChain);
     }
 
@@ -77,7 +78,7 @@ class JwtFilterTest {
         FilterChain filterChain = Mockito.mock(FilterChain.class);
 
         //when
-        Mockito.when(request.getHeader("Authorization")).thenReturn("gakghaksgfdlshjfafladgag");
+        Mockito.when(request.getHeader("Authorization")).thenReturn("gadhdfshea.adsfsgasgh.asdasfafsf");
 
         //then
         assertThatThrownBy(() -> jwtFilter.doFilterInternal(request, response, filterChain))

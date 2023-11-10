@@ -74,7 +74,6 @@ class AuthControllerTest {
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .build();
         this.refreshTokenDto = createRefreshToken();
-        sleep(1000);
     }
 
     @DisplayName("정상 리프레쉬 토큰으로 발급 시, 새로운 토큰 발행")
@@ -96,7 +95,7 @@ class AuthControllerTest {
         assertThat(responseTokenDto.getRefreshToken()).isNotEqualTo(refreshTokenDto.getRefreshToken());
     }
 
-    @DisplayName("정상 리프레쉬 토큰으로 페기 시, 정상 응답")
+    @DisplayName("정상 리프레쉬 토큰으로 폐기 시, 정상 응답")
     @Test
     void discard_token() throws Exception {
         //given
@@ -131,7 +130,7 @@ class AuthControllerTest {
                 )).isInstanceOf(ServletException.class);
     }
 
-    @DisplayName("비정상 리프레쉬 토큰으로 폐 시, 예외발생")
+    @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외발생")
     @Test
     void invalid_reissue_token() throws Exception {
         //given

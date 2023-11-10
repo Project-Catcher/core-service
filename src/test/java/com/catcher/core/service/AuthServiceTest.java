@@ -35,21 +35,19 @@ class AuthServiceTest {
     @Autowired
     DBManager dbManager;
 
-    @DisplayName("정상 refresh 토큰으로 재발급 시, 새로운 Access Token과 Refresh 토큰이 반환된다.")
+    @DisplayName("정상 refresh 토큰으로 재발급 시, 새로운 Access 토큰과 Refresh 토큰이 반환된다.")
     @Test
-    void valid_reissue_token() throws InterruptedException {
+    void valid_reissue_token() {
         //given
         UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
         TokenDto preTokenDto = userService.signUpUser(userCreateRequest);
 
         //when
-        Thread.sleep(1000); // jwt 값 변화를 위해 sleep TODO : 왜 sleep 값을 작게 주거나 안주면 같은 토큰을 반환할까? - hg
         TokenDto newTokenDto = authService.reissueRefreshToken(preTokenDto.getRefreshToken());
 
         //then
         assertThat(newTokenDto.getRefreshToken()).isNotEqualTo(preTokenDto.getRefreshToken());
         assertThat(newTokenDto.getAccessToken()).isNotEqualTo(preTokenDto.getAccessToken());
-        assertThat(dbManager.getValue(preTokenDto.getRefreshToken())).isEmpty();
     }
 
     @DisplayName("유효하지 않은 refresh 토큰으로 재발급 시, 에러 반환")

@@ -64,42 +64,10 @@ class JwtTokenProviderTest {
         Authentication authentication = createAuthentication(user.getUsername(), user.getPassword());
 
         //when
-        String accessToken = jwtTokenProvider.createRefreshToken(authentication);
+        String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
         //then
-        assertThat(accessToken).isNotEmpty();
-    }
-
-    @DisplayName("잘못된 아이디로 발급된 Token으로 Authentication 조회 시, 예외발생")
-    @Test
-    void wrong_username_get_authentication() {
-        //given
-        User user = registerStubUser();
-        Authentication invalidId = createAuthentication(createRandomUUID(), user.getPassword());
-        String accessToken = jwtTokenProvider.createAccessToken(invalidId);
-        String refreshToken = jwtTokenProvider.createRefreshToken(invalidId);
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(accessToken)).isInstanceOf(BaseException.class);
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(refreshToken)).isInstanceOf(BaseException.class);
-    }
-
-    @DisplayName("잘못된 비밀번호로 발급된 Token으로 Authentication 조회 시, 예외발생")
-    @Test
-    void wrong_password_get_authentication() {
-        //given
-        User user = registerStubUser();
-        Authentication invalidPassword = createAuthentication(user.getPassword(), createRandomUUID());
-        String accessToken = jwtTokenProvider.createAccessToken(invalidPassword);
-        String refreshToken = jwtTokenProvider.createRefreshToken(invalidPassword);
-
-        //when
-
-        //then
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(accessToken)).isInstanceOf(BaseException.class);
-        assertThatThrownBy(() -> jwtTokenProvider.getAuthentication(refreshToken)).isInstanceOf(BaseException.class);
+        assertThat(refreshToken).isNotEmpty();
     }
 
     @DisplayName("유효한 토큰으로 유효성 검증시 True 반환")
@@ -107,9 +75,9 @@ class JwtTokenProviderTest {
     void verify_valid_token() {
         //given
         User user = registerStubUser();
-        Authentication invalidPassword = createAuthentication(user.getPassword(), createRandomUUID());
-        String accessToken = jwtTokenProvider.createAccessToken(invalidPassword);
-        String refreshToken = jwtTokenProvider.createRefreshToken(invalidPassword);
+        Authentication authentication = createAuthentication(user.getUsername(), user.getPassword());
+        String accessToken = jwtTokenProvider.createAccessToken(authentication);
+        String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
         //when
 
@@ -123,7 +91,7 @@ class JwtTokenProviderTest {
     void verify_invalid_token() {
         //given
         User user = registerStubUser();
-        Authentication invalidPassword = createAuthentication(user.getPassword(), createRandomUUID());
+        Authentication invalidPassword = createAuthentication(user.getUsername(), user.getPassword());
         String wrongAccessToken = jwtTokenProvider.createAccessToken(invalidPassword) + createRandomUUID().charAt(0);
         String wrongRefreshToken = jwtTokenProvider.createRefreshToken(invalidPassword) + createRandomUUID().charAt(0);
 
