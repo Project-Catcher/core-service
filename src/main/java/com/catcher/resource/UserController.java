@@ -1,10 +1,8 @@
 package com.catcher.resource;
 
-import com.catcher.common.exception.BaseException;
 import com.catcher.common.response.BaseResponse;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserCreateResponse;
-import com.catcher.core.dto.user.UserResponse;
 import com.catcher.core.service.UserService;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserLoginRequest;
