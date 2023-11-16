@@ -1,6 +1,8 @@
 package com.catcher.resource;
 
 import com.catcher.app.AppApplication;
+import com.catcher.common.BaseResponseStatus;
+import com.catcher.common.CatcherControllerAdvice;
 import com.catcher.common.response.BaseResponse;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
@@ -13,7 +15,6 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +37,6 @@ import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 @ActiveProfiles("test")
@@ -65,13 +66,14 @@ class UserControllerTest {
     void beforeEach() {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(userController)
+                .setControllerAdvice(new CatcherControllerAdvice())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .build();
         user = userRepository.save(createUser());
         flushAndClearPersistence();
     }
 
-    @DisplayName("동일한 아이디로 회원가입시 예외발생")
+    @DisplayName("동일한 아이디로 회원가입시 예외 응답")
     @Test
     void invalid_username_signup() throws Exception {
         //given
@@ -83,16 +85,20 @@ class UserControllerTest {
         );
 
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userCreateRequest))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getMessage());
     }
 
-    @DisplayName("동일한 이메일로 회원가입시 예외발생")
+    @DisplayName("동일한 이메일로 회원가입시 예외 응답")
     @Test
     void invalid_email_signup() throws Exception {
         //given
@@ -104,16 +110,20 @@ class UserControllerTest {
         );
 
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userCreateRequest))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_EMAIL.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_EMAIL.getMessage());
     }
 
-    @DisplayName("동일한 핸드폰으로 회원가입시 예외발생")
+    @DisplayName("동일한 핸드폰으로 회원가입시 예외 응답")
     @Test
     void invalid_phone_signup() throws Exception {
         //given
@@ -125,16 +135,20 @@ class UserControllerTest {
         );
 
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userCreateRequest))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getMessage());
     }
 
-    @DisplayName("동일한 닉네임 회원가입시 예외발생")
+    @DisplayName("동일한 닉네임 회원가입시 예외 응답")
     @Test
     void invalid_nickname_signup() throws Exception {
         //given
@@ -146,13 +160,17 @@ class UserControllerTest {
         );
 
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/users/signup")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userCreateRequest))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
     }
 
     @DisplayName("정상 회원가입 시 토큰 발행")
@@ -178,36 +196,44 @@ class UserControllerTest {
         assertThat(tokenDto.getAccessToken()).isNotNull();
     }
 
-    @DisplayName("유효하지 않은 아이디로 로그인시 예외 발생")
+    @DisplayName("유효하지 않은 아이디로 로그인시 예외 응답")
     @Test
     void invalid_username_login() throws Exception {
         //given
         UserLoginRequest userLoginRequest = new UserLoginRequest(createRandomUUID(), rawPassword);
 
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userLoginRequest))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_USER_NAME.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_USER_NAME.getMessage());
     }
 
-    @DisplayName("유효하지 않은 비밀번호로 로그인시 예외 발생")
+    @DisplayName("유효하지 않은 비밀번호로 로그인시 예외 응답")
     @Test
     void invalid_password_login() throws Exception {
         //given
         UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), createRandomUUID());
 
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/users/login")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(userLoginRequest))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_USER_PW.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_USER_PW.getMessage());
     }
 
     @DisplayName("올바른 아이디, 비밀번호로 로그인시 토큰 반환")
@@ -277,4 +303,5 @@ class UserControllerTest {
     private String createRandomUUID() {
         return UUID.randomUUID().toString();
     }
+
 }

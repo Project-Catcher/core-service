@@ -4,14 +4,13 @@ import com.catcher.common.exception.BaseException;
 import com.catcher.common.response.BaseResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import static com.catcher.common.BaseResponseStatus.*;
+import static com.catcher.common.BaseResponseStatus.RESPONSE_ERROR;
 
 @Slf4j
-@RestControllerAdvice
+@RestControllerAdvice({"com.catcher.infrastructure", "com.catcher.resource"})
 public class CatcherControllerAdvice {
 
     @ExceptionHandler(BaseException.class)

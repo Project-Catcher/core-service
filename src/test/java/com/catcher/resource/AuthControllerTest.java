@@ -2,21 +2,17 @@ package com.catcher.resource;
 
 import com.catcher.app.AppApplication;
 import com.catcher.common.BaseResponseStatus;
+import com.catcher.common.CatcherControllerAdvice;
 import com.catcher.common.response.BaseResponse;
-import com.catcher.core.domain.entity.User;
-import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.RefreshTokenDto;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.service.UserService;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.servlet.ServletException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -30,20 +26,16 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import static com.catcher.common.BaseResponseStatus.*;
-import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
-import static java.lang.Thread.*;
-import static org.assertj.core.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static com.catcher.common.BaseResponseStatus.SUCCESS;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ActiveProfiles("test")
@@ -71,12 +63,13 @@ class AuthControllerTest {
     void beforeEach() throws Exception {
         mockMvc = MockMvcBuilders
                 .standaloneSetup(authController)
+                .setControllerAdvice(new CatcherControllerAdvice())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .build();
         this.refreshTokenDto = createRefreshToken();
     }
 
-    @DisplayName("정상 리프레쉬 토큰으로 발급 시, 새로운 토큰 발행")
+    @DisplayName("정상 리프레쉬 토큰으로 요청 시, 새로운 토큰 발행")
     @Test
     void reissue_token() throws Exception {
         //given
@@ -115,34 +108,44 @@ class AuthControllerTest {
         assertThat(baseResponse.getIsSuccess()).isEqualTo(true);
     }
 
-    @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외발생")
+    @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외 응답")
     @Test
     void invalid_discard_token() throws Exception {
         //given
         RefreshTokenDto invalidRefreshToken = new RefreshTokenDto(refreshTokenDto.getRefreshToken() + "1");
+
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/auth/discard")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRefreshToken))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/auth/discard")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRefreshToken))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_JWT.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
     }
 
-    @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외발생")
+    @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외 응답")
     @Test
     void invalid_reissue_token() throws Exception {
         //given
         RefreshTokenDto invalidRefreshToken = new RefreshTokenDto(refreshTokenDto.getRefreshToken() + "1");
+
         //when
+        MvcResult mvcResult = mockMvc.perform(post("/auth/reissue")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(invalidRefreshToken))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
 
         //then
-        assertThatThrownBy(() ->
-                mockMvc.perform(post("/auth/reissue")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(invalidRefreshToken))
-                )).isInstanceOf(ServletException.class);
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_JWT.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
     }
 
     private <T> T getResponseObject(MockHttpServletResponse response, Class<T> type) throws IOException {

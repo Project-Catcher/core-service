@@ -20,7 +20,6 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
@@ -35,7 +34,7 @@ class AuthServiceTest {
     @Autowired
     DBManager dbManager;
 
-    @DisplayName("정상 refresh 토큰으로 재발급 시, 새로운 Access 토큰과 Refresh 토큰이 반환된다.")
+    @DisplayName("토큰 재발급시 기존 토큰값과 다른 값을 가진다.")
     @Test
     void valid_reissue_token() {
         //given
