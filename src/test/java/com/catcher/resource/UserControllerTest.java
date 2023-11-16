@@ -78,10 +78,10 @@ class UserControllerTest {
     void invalid_username_signup() throws Exception {
         //given
         UserCreateRequest userCreateRequest = userCreateRequest(
+                user.getUsername(),
                 createRandomUUID(),
                 createRandomUUID(),
-                createRandomUUID(),
-                user.getUsername()
+                createRandomUUID()
         );
 
         //when
@@ -105,8 +105,8 @@ class UserControllerTest {
         UserCreateRequest userCreateRequest = userCreateRequest(
                 createRandomUUID(),
                 createRandomUUID(),
-                user.getEmail(),
-                createRandomUUID()
+                createRandomUUID(),
+                user.getEmail()
         );
 
         //when
@@ -129,8 +129,8 @@ class UserControllerTest {
         //given
         UserCreateRequest userCreateRequest = userCreateRequest(
                 createRandomUUID(),
-                user.getPhone(),
                 createRandomUUID(),
+                user.getPhone(),
                 createRandomUUID()
         );
 
@@ -153,8 +153,8 @@ class UserControllerTest {
     void invalid_nickname_signup() throws Exception {
         //given
         UserCreateRequest userCreateRequest = userCreateRequest(
-                user.getNickname(),
                 createRandomUUID(),
+                user.getNickname(),
                 createRandomUUID(),
                 createRandomUUID()
         );
@@ -171,6 +171,81 @@ class UserControllerTest {
         assertThat(baseResponse.getResult()).isNull();
         assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
         assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
+    }
+
+    @DisplayName("동일한 아이디와 닉네임으로 회원가입시 중복 아이디 예외 응답")
+    @Test
+    void invalid_username_nickname_signup() throws Exception {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(
+                user.getUsername(),
+                user.getNickname(),
+                createRandomUUID(),
+                createRandomUUID()
+        );
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        //then
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getMessage());
+    }
+
+    @DisplayName("동일한 닉네임과 핸드폰으로 회원가입시 중복 닉네임 예외 응답")
+    @Test
+    void invalid_nickname_phone_signup() throws Exception {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(
+                createRandomUUID(),
+                user.getNickname(),
+                user.getPhone(),
+                createRandomUUID()
+        );
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        //then
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
+    }
+
+    @DisplayName("동일한 핸드폰과 이메일로 회원가입시 중복 핸드폰 예외 응답")
+    @Test
+    void invalid_phone_email_signup() throws Exception {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(
+                createRandomUUID(),
+                createRandomUUID(),
+                user.getPhone(),
+                user.getEmail()
+        );
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(post("/users/signup")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userCreateRequest))
+        ).andReturn();
+        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        //then
+        assertThat(baseResponse.getIsSuccess()).isFalse();
+        assertThat(baseResponse.getResult()).isNull();
+        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getCode());
+        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getMessage());
     }
 
     @DisplayName("정상 회원가입 시 토큰 발행")
@@ -260,7 +335,7 @@ class UserControllerTest {
         return result.getResult();
     }
 
-    private UserCreateRequest userCreateRequest(String nickname, String phone, String email, String username) {
+    private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
         return UserCreateRequest.builder()
                 .nickname(nickname)
                 .ageTerm(ZonedDateTime.now())
