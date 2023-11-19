@@ -1,10 +1,9 @@
 package com.catcher.resource;
 
-import com.catcher.common.BaseResponseStatus;
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import com.catcher.core.dto.RefreshTokenDto;
-import com.catcher.core.service.AuthService;
 import com.catcher.core.dto.TokenDto;
+import com.catcher.core.service.AuthService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -23,14 +22,14 @@ public class AuthController {
 
     @Operation(summary = "토큰 재발행")
     @PostMapping("/reissue")
-    public BaseResponse<TokenDto> reissue(@Valid @RequestBody RefreshTokenDto refreshTokenDto){
-        return new BaseResponse<>(authService.reissueRefreshToken(refreshTokenDto.getRefreshToken()));
+    public CommonResponse<TokenDto> reissue(@Valid @RequestBody RefreshTokenDto refreshTokenDto){
+        return CommonResponse.success(authService.reissueRefreshToken(refreshTokenDto.getRefreshToken()));
     }
 
     @Operation(summary = "토큰 폐기")
     @PostMapping(value = "/discard")
-    public BaseResponse discard(@RequestBody RefreshTokenDto refreshTokenDto) {
+    public CommonResponse discard(@RequestBody RefreshTokenDto refreshTokenDto) {
         authService.discardRefreshToken(refreshTokenDto.getRefreshToken());
-        return new BaseResponse(BaseResponseStatus.SUCCESS);
+        return CommonResponse.success();
     }
 }

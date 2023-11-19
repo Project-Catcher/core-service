@@ -1,6 +1,6 @@
 package com.catcher.resource;
 
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.service.UserService;
 import com.catcher.core.dto.TokenDto;
@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 
+import static com.catcher.common.response.CommonResponse.*;
+
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/users")
@@ -20,13 +22,13 @@ public class UserController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/signup")
-    public BaseResponse<TokenDto> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
-        return new BaseResponse<>(userService.signUpUser(userCreateRequest));
+    public CommonResponse<TokenDto> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+        return success(userService.signUpUser(userCreateRequest));
     }
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public BaseResponse<TokenDto> login(@Valid @RequestBody UserLoginRequest userLoginReqDto) {
-        return new BaseResponse<>(userService.login(userLoginReqDto));
+    public CommonResponse<TokenDto> login(@Valid @RequestBody UserLoginRequest userLoginReqDto) {
+        return success(userService.login(userLoginReqDto));
     }
 }
