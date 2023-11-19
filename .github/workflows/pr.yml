@@ -3,20 +3,19 @@ name: CI Test
 on:
   pull_request:
     branches: [ main ]
+    types: [opened, synchronize, reopened]
 
 env:
-  ecr_url: ${{ secrets.ECR_REPO_DEV }}
-  role_arn: ${{ secrets.OIDC_ROLE }}
-  aws_region: ${{ secrets.AWS_REGION }}
-  aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  default_output: ${{ secrets.AWS_DEFAULT_OUTPUT }}
-  webhook_url: ${{ secrets.WEBHOOK }}
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  AWS_ACCESS_KEY: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  AWS_SECRET_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  DEFAULT_OUTPUT: ${{ secrets.AWS_DEFAULT_OUTPUT }}
+  WEBHOOK_URL: ${{ secrets.WEBHOOK }}
 
 permissions: write-all
 
 jobs:
-  build:
+  test_pr:
     name: Build and Test
     runs-on: ubuntu-latest
       
@@ -31,10 +30,10 @@ jobs:
 
       - name: Configure AWS credentials
         run: |
-          aws configure set aws_access_key_id ${{ env.aws_access_key }}
-          aws configure set aws_secret_access_key ${{ env.aws_secret_key }}
-          aws configure set default.region ${{ env.aws_region }}
-          aws configure set default.output ${{ env.default_output }}
+          aws configure set aws_access_key_id ${{ env.AWS_ACCESS_KEY }}
+          aws configure set aws_secret_access_key ${{ env.AWS_SECRET_KEY }}
+          aws configure set default.region ${{ env.AWS_REGION }}
+          aws configure set default.output ${{ env.DEFAULT_OUTPUT }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -55,8 +54,12 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: build/test-results/**/*.xml
 
-      - name: notification to swit
-        uses: roharon/action-swit@v1
-        with:
-          webhooks_url: ${{ env.webhook_url }}
-          MESSAGE: "🏷 ${{ job.status }} 백엔드 Unit Test : Core-service - by ${{ github.actor }}"
+      - name: Send Notification
+        if: ${{ always() }}
+        run: |
+          if [[ ${{ job.status }} == "success" ]]; then
+            MESSAGE="✅ ${{ job.status }} 백엔드 Unit Test 성공: core-service - by ${{ github.actor }}"
+          else
+            MESSAGE="❌ ${{ job.status }} 백엔드 Unit Test 실패: core-service - by ${{ github.actor }}"
+          fi
+          curl -X POST -H "Content-Type: application/json" --data "{\"text\":\"${MESSAGE}\"}" ${{ env.WEBHOOK_URL }}

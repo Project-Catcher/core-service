@@ -1,0 +1,98 @@
+name: Deploy to Kubernetes
+
+on:
+  workflow_run:
+    workflows: ["Java CI with Gradle"]
+    branches: [main]
+    types:
+      - completed
+
+  push:
+    branches:
+      - kustomize
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  EKS_CLUSTER_NAME: ${{ secrets.EKS_CLUSTER_NAME }}
+  OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE }}
+  WEBHOOK_URL: ${{ secrets.WEBHOOK }}
+  DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  kustomize_upadte:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Configure AWS Credentials
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-region: ${{ env.AWS_REGION }}
+        role-session-name: GitHubActions
+        role-to-assume: ${{ env.OIDC_ROLE_ARN }}
+
+    - name: Login to Amazon ECR
+      id: login-ecr
+      uses: aws-actions/amazon-ecr-login@v1
+
+      # kustomize 명령을 가져온다.
+    - name: Setup Kustomize
+      uses: imranismail/setup-kustomize@v1
+
+    - name: Checkout for Kustomize repository
+      uses: actions/checkout@v2
+      with:
+        repository: Project-Catcher/core-service-kusto
+        ref: main
+        token: ${{ env.GITHUB_TOKEN }}
+        path: core-service-kusto
+
+    - name: Update Kustomize image
+      run: |
+        if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+          KUSTOMIZE_PATH="core-service-kusto/overlays/production"
+          FILE_NAME="production-patch.yaml"
+        else
+          KUSTOMIZE_PATH="core-service-kusto/overlays/development"
+          FILE_NAME="deployment-patch.yaml"
+        fi
+
+        # Docker 이미지 URL 설정
+        cd $KUSTOMIZE_PATH
+        kustomize edit set image core-service="${{ steps.login-ecr.outputs.registry }}/catcher-dev-ecr-back-core:${{ github.sha }}"
+        cat kustomization.yaml
+
+    - name: Check for changes
+      id: git-check
+      run: |
+        cd core-service-kusto
+        git status
+        git diff-index --quiet HEAD || echo "::set-output name=changes_exist::true"
+
+    # 수정된 파일 commit & push
+    - name: Commit manifest files
+      if: steps.git-check.outputs.changes_exist == 'true'
+      run: |
+        cd core-service-kusto
+        git config --global user.email "github-actions@github.com"
+        git config --global user.name "github-actions"
+        git commit -am "Update image tag"
+        git push -u origin main
+        
+    - name: Send Notification
+      if: ${{ always() }}
+      run: |
+        if [[ '${{ steps.git-check.outputs.changes_exist }}' == 'true' && ${{ job.status }} == 'success' ]]; then
+          MESSAGE="✅ ${{ job.status }} Kustomize Update 성공: core-service-kusto - by ${{ github.actor }}"
+        elif [[ '${{ steps.git-check.outputs.changes_exist }}' != 'true' && ${{ job.status }} == 'success' ]]; then
+          MESSAGE="ℹ️ ${{ job.status }} Kustomize : 수정 사항 없음 - core-service-kusto - by ${{ github.actor }}"
+        else
+          MESSAGE="❌ ${{ job.status }} Kustomize Update 실패: core-service-kusto - by ${{ github.actor }}"
+        fi
+        curl -X POST -H "Content-Type: application/json" --data "{\"text\":\"${MESSAGE}\"}" ${{ env.WEBHOOK_URL }}
