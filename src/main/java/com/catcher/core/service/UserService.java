@@ -9,13 +9,13 @@ import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.database.UserRepository;
+import com.catcher.security.CatcherUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,9 +58,12 @@ public class UserService {
 
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
         try {
-            Authentication authentication = authenticationManager.authenticate(
+            CatcherUser authentication = (CatcherUser) authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(username, password)
             );
+
+            User user = (User) authentication.getCredentials();
+            checkOAuthUser(user);
 
             String accessToken = jwtTokenProvider.createAccessToken(authentication);
             String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
@@ -97,5 +100,11 @@ public class UserService {
                 .role(USER)
                 .userProvider(CATCHER)
                 .build();
+    }
+
+    private void checkOAuthUser(User user) {
+        if(!user.getUserProvider().equals(CATCHER)) {
+            throw new BaseException(INVALID_USER_INFO);
+        }
     }
 }
