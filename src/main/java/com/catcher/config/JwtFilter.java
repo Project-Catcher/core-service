@@ -1,23 +1,20 @@
 package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
-import com.catcher.utils.HttpServletUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.http.HttpHeaders;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Optional;
 
-import static com.catcher.common.BaseResponseStatus.*;
-import static com.catcher.utils.HttpServletUtils.*;
-import static org.apache.http.HttpHeaders.*;
+import static com.catcher.common.BaseResponseStatus.REDIS_ERROR;
+import static com.catcher.utils.HttpServletUtils.getHeader;
+import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 /**
  * 헤더(Authorization)에 있는 토큰을 꺼내 이상이 없는 경우 SecurityContext에 저장

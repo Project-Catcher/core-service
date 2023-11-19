@@ -1,6 +1,5 @@
 package com.catcher.infrastructure.oauth.user;
 
-import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.enums.UserProvider;
 import lombok.AccessLevel;
