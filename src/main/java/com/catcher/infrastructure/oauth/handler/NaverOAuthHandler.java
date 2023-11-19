@@ -1,6 +1,5 @@
 package com.catcher.infrastructure.oauth.handler;
 
-
 import com.catcher.infrastructure.oauth.properties.OAuthProperties;
 import com.catcher.resource.external.OAuthFeignController;
 import org.springframework.beans.factory.annotation.Qualifier;
