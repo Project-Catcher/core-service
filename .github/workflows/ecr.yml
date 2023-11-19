@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 env:
-  ECR_URL: ${{ secrets.AWS_ECR_DEV_CORE }}
+  ECR_URL: ${{ secrets.ECR_REPO_DEV }}
   ROLE_ARN: ${{ secrets.OIDC_ROLE }}
   AWS_REGION: ${{ secrets.AWS_REGION }}
   WEBHOOK_URL: ${{ secrets.WEBHOOK }}
@@ -56,7 +56,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Publish Image to ECR(CORE-SERVICE)
+      - name: Publish Image to ECR(core-SERVICE)
         run: |
           docker tag core-service:latest ${{ env.ECR_URL }}:core-service
           docker push ${{ env.ECR_URL }}:core-service
@@ -70,3 +70,5 @@ jobs:
             MESSAGE="❌ ${{ job.status }} 백엔드 ECR 도커파일 업로드 실패: core-service - by ${{ github.actor }}"
           fi
           curl -X POST -H "Content-Type: application/json" --data "{\"text\":\"${MESSAGE}\"}" ${{ env.WEBHOOK_URL }}
+
+    
