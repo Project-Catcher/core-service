@@ -1,18 +1,14 @@
 package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
-import com.catcher.security.UserDetailServiceImpl;
-import com.catcher.utils.JwtUtils;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -20,7 +16,8 @@ import java.util.concurrent.atomic.AtomicLong;
 
 import static com.catcher.common.BaseResponseStatus.EXPIRED_JWT;
 import static com.catcher.common.BaseResponseStatus.INVALID_JWT;
-import static com.catcher.utils.JwtUtils.*;
+import static com.catcher.utils.JwtUtils.ACCESS_TOKEN_EXPIRATION_MILLIS;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
 
 @Component
 @RequiredArgsConstructor
@@ -28,7 +25,7 @@ import static com.catcher.utils.JwtUtils.*;
 public class JwtTokenProvider {
     @Value("${spring.jwt.secret}")
     private String secretKey;
-    private final UserDetailServiceImpl userDetailsService;
+    private final UserDetailsService userDetailsService;
 
     private AtomicLong atomicLong = new AtomicLong(1L);
 

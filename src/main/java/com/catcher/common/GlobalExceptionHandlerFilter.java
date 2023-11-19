@@ -8,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -25,16 +24,14 @@ public class GlobalExceptionHandlerFilter extends OncePerRequestFilter {
         try {
             filterChain.doFilter(request, response);
         } catch (BaseException e) {
-            //토큰의 유효기간 만료
             setErrorResponse(response, e);
         }
     }
 
-    @SneakyThrows
     private void setErrorResponse(
             HttpServletResponse response,
             BaseException baseException
-    ) {
+    ) throws IOException {
         response.setStatus(SC_BAD_REQUEST);
         response.setContentType(APPLICATION_JSON_VALUE);
         response.getWriter().write(objectMapper.writeValueAsString(new BaseResponse(baseException.getStatus())));
