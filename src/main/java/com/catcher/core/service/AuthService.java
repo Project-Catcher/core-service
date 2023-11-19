@@ -1,6 +1,10 @@
 package com.catcher.core.service;
 
 
-public interface AuthService<T> {
-    T reissueRefreshToken(String refreshToken);
+import com.catcher.core.dto.TokenDto;
+
+public interface AuthService {
+    TokenDto reissueRefreshToken(String refreshToken);
+
+    void discardRefreshToken(String refreshToken);
 }

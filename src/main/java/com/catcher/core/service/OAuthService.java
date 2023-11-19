@@ -1,5 +1,6 @@
 package com.catcher.core.service;
 
+import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.common.exception.OAuthException;
 import com.catcher.config.JwtTokenProvider;
@@ -10,7 +11,6 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.oauth.OAuthCreateRequest;
 import com.catcher.core.dto.oauth.OAuthHistoryResponse;
-import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.infrastructure.oauth.OAuthTokenResponse;
 import com.catcher.infrastructure.oauth.handler.OAuthHandlerFactory;
 import com.catcher.infrastructure.oauth.handler.OAuthHandler;
@@ -19,6 +19,8 @@ import com.catcher.infrastructure.oauth.user.OAuthUserInfo;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -27,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.catcher.common.BaseResponseStatus.*;
@@ -50,9 +53,12 @@ public class OAuthService {
         try {
             OAuthTokenResponse oAuthTokenResponse = oAuthHandler.handleToken(signUpJsonProperty(oAuthHandler, map));
             OAuthUserInfo oAuthUserInfo = oAuthHandler.handleUserInfo(oAuthTokenResponse.getAccessToken());
+
             String id = oAuthUserInfo.getId();
-            validateExistsUsername(id);
-            validateExistsEmail(oAuthUserInfo.getEmail());
+
+            checkDuplicateUser(userRepository.findByUsername(id), USERS_DUPLICATED_USER);
+            checkDuplicateUser(userRepository.findByEmail(id), USERS_DUPLICATED_USER_EMAIL);
+
             return new OAuthHistoryResponse(oAuthTokenResponse.getAccessToken(), oAuthUserInfo.getEmail());
         } catch (OAuthException e) {
             oAuthHandler.invalidateToken(e.getAccessToken());
@@ -69,23 +75,7 @@ public class OAuthService {
 
             oAuthHandler.invalidateToken(oAuthTokenResponse.getAccessToken());
 
-            User user = userRepository.findByUsername(oAuthUserInfo.getId()).orElseThrow(
-                    () -> new BaseException(USERS_NOT_EXISTS)
-            );
-
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            user.getUsername(),
-                            "NO-PASS"
-                    )
-            );
-
-            String accessToken = jwtTokenProvider.createAccessToken(authentication);
-            String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
-
-            dbManager.putValue(authentication.getName(), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
-
-            return new TokenDto(accessToken, refreshToken);
+            return checkAuthenticationAndGetTokenDto(oAuthUserInfo.getId());
         } catch (OAuthException e) {
             oAuthHandler.invalidateToken(e.getAccessToken());
             throw e;
@@ -93,22 +83,24 @@ public class OAuthService {
     }
 
     @Transactional
-    public UserCreateResponse signUp(OAuthCreateRequest oAuthCreateRequest, String path) {
+    public TokenDto signUp(OAuthCreateRequest oAuthCreateRequest, String path) {
         OAuthHandler oAuthHandler = getOAuthHandler(path);
         String accessToken = oAuthCreateRequest.getAccessToken();
 
         try {
             OAuthUserInfo oAuthUserInfo = oAuthHandler.handleUserInfo(accessToken);
 
-            validateExistsUsername(oAuthUserInfo.getId());
-            validateExistsEmail(oAuthUserInfo.getEmail());
+            checkDuplicateUser(userRepository.findByUsername(oAuthUserInfo.getId()), USERS_DUPLICATED_USER);
+            checkDuplicateUser(userRepository.findByEmail(oAuthUserInfo.getEmail()), USERS_DUPLICATED_USER_EMAIL);
+            checkDuplicateUser(userRepository.findByNickname(oAuthCreateRequest.getNickname()), USERS_DUPLICATED_NICKNAME);
+            checkDuplicateUser(userRepository.findByPhone(oAuthCreateRequest.getPhone()), USERS_DUPLICATED_PHONE);
 
             User user = createUser(oAuthCreateRequest, oAuthUserInfo);
-
             userRepository.save(user);
+
             oAuthHandler.invalidateToken(accessToken);
 
-            return UserCreateResponse.from(user);
+            return checkAuthenticationAndGetTokenDto(user.getUsername());
         } catch (OAuthException e) {
             oAuthHandler.invalidateToken(accessToken);
             throw e;
@@ -132,15 +124,23 @@ public class OAuthService {
                 .build();
     }
 
-    private void validateExistsUsername(String username) {
-        if (userRepository.findByUsername(username).isPresent()) {
-            throw new BaseException(USERS_DUPLICATED_USER);
-        }
-    }
+    private TokenDto checkAuthenticationAndGetTokenDto(String username) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, "NO-PASS")
+            );
 
-    private void validateExistsEmail(String email) {
-        if (userRepository.findByEmail(email).isPresent()) {
-            throw new BaseException(USERS_DUPLICATED_USER_EMAIL);
+            String accessToken = jwtTokenProvider.createAccessToken(authentication);
+            String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+
+            dbManager.putValue(username, refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+
+            return new TokenDto(accessToken, refreshToken);
+        } catch (BadCredentialsException e) {
+            log.error(INVALID_USER_PW.getMessage());
+            throw new BaseException(INVALID_USER_PW);
+        } catch (InternalAuthenticationServiceException e) {
+            throw new BaseException(INVALID_USER_NAME);
         }
     }
 
@@ -154,6 +154,12 @@ public class OAuthService {
                 .filter(provider -> path.contains(provider.name().toLowerCase()))
                 .findAny()
                 .orElseThrow(() -> new BaseException(INVALID_USER_OAUTH_TYPE));
+    }
+
+    private void checkDuplicateUser(Optional<User> userOptional, BaseResponseStatus responseStatus) {
+        if(userOptional.isPresent()) {
+            throw new BaseException(responseStatus);
+        }
     }
 
     private Supplier<Map> signUpJsonProperty(OAuthHandler oAuthHandler, Map map) {

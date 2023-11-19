@@ -1,11 +1,11 @@
 package com.catcher.core.service;
 
+import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
-import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.database.UserRepository;
@@ -39,11 +39,51 @@ public class UserService {
     private final DBManager dbManager;
 
     @Transactional
-    public UserCreateResponse signUpUser(UserCreateRequest userCreateRequest) {
-        validateDuplicateUsername(userCreateRequest.getUsername());
-        validateDuplicateEmail(userCreateRequest.getEmail());
+    public TokenDto signUpUser(UserCreateRequest userCreateRequest) {
+        checkDuplicateUser(userRepository.findByUsername(userCreateRequest.getUsername()), USERS_DUPLICATED_USER_NAME);
+        checkDuplicateUser(userRepository.findByNickname(userCreateRequest.getNickname()), USERS_DUPLICATED_NICKNAME);
+        checkDuplicateUser(userRepository.findByPhone(userCreateRequest.getPhone()), USERS_DUPLICATED_PHONE);
+        checkDuplicateUser(userRepository.findByEmail(userCreateRequest.getEmail()), USERS_DUPLICATED_USER_EMAIL);
 
-        User user = User.builder()
+        User user = createUser(userCreateRequest);
+
+        userRepository.save(user);
+
+        return checkAuthenticationAndGetTokenDto(userCreateRequest.getUsername(), userCreateRequest.getPassword());
+    }
+
+    public TokenDto login(UserLoginRequest userLoginReqDto) {
+        return checkAuthenticationAndGetTokenDto(userLoginReqDto.getUsername(), userLoginReqDto.getPassword());
+    }
+
+    private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            String accessToken = jwtTokenProvider.createAccessToken(authentication);
+            String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
+
+            dbManager.putValue(username, refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+
+            return new TokenDto(accessToken, refreshToken);
+        } catch (BadCredentialsException e) {
+            log.error(INVALID_USER_PW.getMessage());
+            throw new BaseException(INVALID_USER_PW);
+        } catch (InternalAuthenticationServiceException e) {
+            throw new BaseException(INVALID_USER_NAME);
+        }
+    }
+
+    private void checkDuplicateUser(Optional<User> optionalUser, BaseResponseStatus responseStatus) {
+        if (optionalUser.isPresent()) {
+            throw new BaseException(responseStatus);
+        }
+    }
+
+    private User createUser(UserCreateRequest userCreateRequest) {
+        return User.builder()
                 .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .username(userCreateRequest.getUsername())
                 .email(userCreateRequest.getEmail())
@@ -57,48 +97,5 @@ public class UserService {
                 .role(USER)
                 .userProvider(CATCHER)
                 .build();
-
-        userRepository.save(user);
-
-        return UserCreateResponse.from(user);
-    }
-
-    // 유저 중복 확인
-    private void validateDuplicateUsername(String username) {
-        Optional<User> userOptional = userRepository.findByUsername(username);
-        if (userOptional.isPresent()) {
-            throw new BaseException(USERS_DUPLICATED_USER_NAME);
-        }
-    }
-
-    private void validateDuplicateEmail(String email) {
-        Optional<User> userOptional = userRepository.findByEmail(email);
-        if (userOptional.isPresent()) {
-            throw new BaseException(USERS_DUPLICATED_USER_EMAIL);
-        }
-    }
-
-    @Transactional
-    public TokenDto login(UserLoginRequest userLoginReqDto) {
-        try {
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            userLoginReqDto.getUsername(),
-                            userLoginReqDto.getPassword()
-                    )
-            );
-
-            String accessToken = jwtTokenProvider.createAccessToken(authentication);
-            String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
-
-            dbManager.putValue(authentication.getName(), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
-
-            return new TokenDto(accessToken, refreshToken);
-        } catch (BadCredentialsException e) {
-            log.error(INVALID_USER_PW.getMessage());
-            throw new BaseException(INVALID_USER_PW);
-        } catch (InternalAuthenticationServiceException e) {
-            throw new BaseException(INVALID_USER_NAME);
-        }
     }
 }

@@ -1,8 +1,10 @@
 package com.catcher.security;
 
+import com.catcher.common.GlobalExceptionHandlerFilter;
 import com.catcher.config.JwtAccessDeniedHandler;
 import com.catcher.config.JwtAuthenticationEntryPoint;
 import com.catcher.config.JwtTokenProvider;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,21 +17,26 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
-@RequiredArgsConstructor
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
+    private final ObjectMapper objectMapper;
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/v3/**", "/users/**", "/access-test", "/oauth/**", "favicon.ico", "/health/**"};
-
+    private final String[] allowedUrls = {
+            "/", "/swagger-ui/**", "/users/**", "favicon.ico",
+            "/health/**", "/auth/**", "/oauth/**", "/v3/api-docs/**"
+    };
 
     @Bean
     public PasswordEncoder getPasswordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
     @Bean
     public AuthenticationManager authenticationManager(
             AuthenticationConfiguration authenticationConfiguration
@@ -38,15 +45,13 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
-
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
                 .csrf((csrf) -> csrf.disable())
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers.frameOptions(Customizer.withDefaults()))
-                .authorizeHttpRequests(authorizeHttpRequests ->
-                        authorizeHttpRequests
-                                .requestMatchers(allowedUrls).permitAll()
+                .authorizeHttpRequests(request ->
+                        request.requestMatchers(allowedUrls).permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
@@ -57,7 +62,9 @@ public class SecurityConfig {
                                 exceptionHandling
                                         .accessDeniedHandler(jwtAccessDeniedHandler)
                                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                ).apply(new JwtSecurityConfig(jwtTokenProvider));
+                )
+                .addFilterBefore(new GlobalExceptionHandlerFilter(objectMapper), UsernamePasswordAuthenticationFilter.class)
+                .apply(new JwtSecurityConfig(jwtTokenProvider));
 
         return httpSecurity.build();
     }

@@ -54,6 +54,11 @@ dependencies {
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 	//open feign
 	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	//embedded-redis
+	testImplementation 'it.ozimov:embedded-redis:0.7.2'
+
+	//h2
+	testRuntimeOnly 'com.h2database:h2'
 }
 
 dependencyManagement {

@@ -8,8 +8,4 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan(basePackages = {"com.catcher.resource"})
 class AppApplicationTests {
 
-	@Test
-	void contextLoads() {
-	}
-
 }

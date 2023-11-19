@@ -2,7 +2,6 @@ package com.catcher.resource;
 
 import com.catcher.common.response.BaseResponse;
 import com.catcher.core.dto.user.UserCreateRequest;
-import com.catcher.core.dto.user.UserCreateResponse;
 import com.catcher.core.service.UserService;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserLoginRequest;
@@ -21,7 +20,7 @@ public class UserController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/signup")
-    public BaseResponse<UserCreateResponse> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
+    public BaseResponse<TokenDto> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
         return new BaseResponse<>(userService.signUpUser(userCreateRequest));
     }
 

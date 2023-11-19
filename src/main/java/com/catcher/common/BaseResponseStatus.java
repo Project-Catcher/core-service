@@ -33,6 +33,8 @@ public enum BaseResponseStatus {
     INVALID_USER_OAUTH_TYPE(false, 2109, "지원하지 않는 소셜로그인 입니다."),
     USERS_DUPLICATED_USER(false, 2110, "이미 가입한 이력이 있습니다."),
     USERS_NOT_EXISTS(false, 2111, "존재하지 않는 유저입니다."),
+    USERS_DUPLICATED_NICKNAME(false, 2112, "이미 사용중인 닉네임입니다."),
+    USERS_DUPLICATED_PHONE(false, 2113, "이미 사용중인 핸드폰입니다."),
 
     /**
      * 3000 : Response 오류
