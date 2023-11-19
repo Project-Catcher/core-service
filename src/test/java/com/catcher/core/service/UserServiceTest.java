@@ -15,16 +15,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
-import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
+import static com.catcher.core.domain.entity.enums.UserProvider.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
@@ -34,6 +34,8 @@ class UserServiceTest {
     UserRepository userRepository;
     @Autowired
     UserService userService;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
     @PersistenceContext
     EntityManager em;
@@ -132,6 +134,72 @@ class UserServiceTest {
         //then
         assertThat(tokenDto.getAccessToken()).isNotEmpty();
         assertThat(tokenDto.getRefreshToken()).isNotEmpty();
+    }
+
+    @DisplayName("카카오로 회원가입한 계정으로 로그인 시도 시 예외 발생")
+    @Test
+    void invalid_login_by_kakao_account() {
+        //given
+        String username = createRandomUUID();
+        String password = createRandomUUID();
+        User oAuthUser = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .phone(createRandomUUID())
+                .email(createRandomUUID())
+                .profileImageUrl(null)
+                .introduceContent(null)
+                .nickname(createRandomUUID())
+                .userProvider(KAKAO)
+                .role(UserRole.USER)
+                .userAgeTerm(ZonedDateTime.now())
+                .userServiceTerm(ZonedDateTime.now())
+                .userPrivacyTerm(ZonedDateTime.now())
+                .userLocationTerm(ZonedDateTime.now())
+                .userMarketingTerm(ZonedDateTime.now())
+                .build();
+        userRepository.save(oAuthUser);
+        flushAndClearPersistence();
+
+        //when
+        UserLoginRequest userLoginRequest = userLoginRequest(username, password);
+
+        //then
+        assertThatThrownBy(() -> userService.login(userLoginRequest))
+                .isInstanceOf(BaseException.class);
+    }
+
+    @DisplayName("네이버로 회원가입한 계정으로 로그인 시도 시 예외 발생")
+    @Test
+    void invalid_login_by_naver_account() {
+        //given
+        String username = createRandomUUID();
+        String password = createRandomUUID();
+        User oAuthUser = User.builder()
+                .username(username)
+                .password(passwordEncoder.encode(password))
+                .phone(createRandomUUID())
+                .email(createRandomUUID())
+                .profileImageUrl(null)
+                .introduceContent(null)
+                .nickname(createRandomUUID())
+                .userProvider(NAVER)
+                .role(UserRole.USER)
+                .userAgeTerm(ZonedDateTime.now())
+                .userServiceTerm(ZonedDateTime.now())
+                .userPrivacyTerm(ZonedDateTime.now())
+                .userLocationTerm(ZonedDateTime.now())
+                .userMarketingTerm(ZonedDateTime.now())
+                .build();
+        userRepository.save(oAuthUser);
+        flushAndClearPersistence();
+
+        //when
+        UserLoginRequest userLoginRequest = userLoginRequest(username, password);
+
+        //then
+        assertThatThrownBy(() -> userService.login(userLoginRequest))
+                .isInstanceOf(BaseException.class);
     }
 
     @DisplayName("유효하지 않은 아이디로 로그인 시, 예외 발생")
