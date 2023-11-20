@@ -3,7 +3,7 @@ package com.catcher.resource;
 import com.catcher.app.AppApplication;
 import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.CatcherControllerAdvice;
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import com.catcher.core.dto.RefreshTokenDto;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
@@ -101,11 +101,12 @@ class AuthControllerTest {
 
         //then
         resultActions.andExpect(status().isOk());
-        BaseResponse baseResponse = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), BaseResponse.class);
+        CommonResponse commonResponse = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class);
 
-        assertThat(baseResponse.getMessage()).isEqualTo(SUCCESS.getMessage());
-        assertThat(baseResponse.getCode()).isEqualTo(SUCCESS.getCode());
-        assertThat(baseResponse.getIsSuccess()).isEqualTo(true);
+
+        assertThat(commonResponse.isSuccess()).isTrue();
+        assertThat(commonResponse.getCode()).isEqualTo(SUCCESS.getCode());
+        assertThat(commonResponse.getResult()).isNull();
     }
 
     @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외 응답")
@@ -119,13 +120,13 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRefreshToken))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_JWT.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_JWT.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
     }
 
     @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외 응답")
@@ -139,18 +140,18 @@ class AuthControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(invalidRefreshToken))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_JWT.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_JWT.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
     }
 
     private <T> T getResponseObject(MockHttpServletResponse response, Class<T> type) throws IOException {
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(BaseResponse.class, type);
-        BaseResponse<T> result = objectMapper.readValue(response.getContentAsString(), javaType);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(CommonResponse.class, type);
+        CommonResponse<T> result = objectMapper.readValue(response.getContentAsString(), javaType);
         return result.getResult();
     }
 

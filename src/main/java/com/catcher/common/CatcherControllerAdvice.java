@@ -1,12 +1,13 @@
 package com.catcher.common;
 
 import com.catcher.common.exception.BaseException;
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
 import static com.catcher.common.BaseResponseStatus.RESPONSE_ERROR;
 
 @Slf4j
@@ -14,20 +15,21 @@ import static com.catcher.common.BaseResponseStatus.RESPONSE_ERROR;
 public class CatcherControllerAdvice {
 
     @ExceptionHandler(BaseException.class)
-    public BaseResponse handle(BaseException e) {
-        return new BaseResponse(e.getStatus());
+    public CommonResponse handle(BaseException e) {
+        BaseResponseStatus status = e.getStatus();
+        return CommonResponse.failure(status.getCode(), status.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public BaseResponse handle(MethodArgumentNotValidException e) {
+    public CommonResponse handle(MethodArgumentNotValidException e) {
         String defaultMessage = e.getAllErrors().get(0).getDefaultMessage();
         log.error(defaultMessage);
-        return new BaseResponse(defaultMessage);
+        return CommonResponse.failure(REQUEST_ERROR.getCode(), e.getAllErrors().get(0).getDefaultMessage());
     }
 
     @ExceptionHandler(Exception.class)
-    public BaseResponse handle(Exception e) {
+    public CommonResponse handle(Exception e) {
         log.error("", e);
-        return new BaseResponse(RESPONSE_ERROR);
+        return CommonResponse.failure(RESPONSE_ERROR.getCode(), RESPONSE_ERROR.getMessage());
     }
 }

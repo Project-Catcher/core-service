@@ -3,7 +3,7 @@ package com.catcher.resource;
 import com.catcher.app.AppApplication;
 import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.CatcherControllerAdvice;
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
@@ -89,13 +89,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getMessage());
     }
 
     @DisplayName("동일한 이메일로 회원가입시 예외 응답")
@@ -114,13 +114,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_EMAIL.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_EMAIL.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_EMAIL.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_EMAIL.getMessage());
     }
 
     @DisplayName("동일한 핸드폰으로 회원가입시 예외 응답")
@@ -139,13 +139,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getMessage());
     }
 
     @DisplayName("동일한 닉네임 회원가입시 예외 응답")
@@ -164,13 +164,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
     }
 
     @DisplayName("동일한 아이디와 닉네임으로 회원가입시 중복 아이디 예외 응답")
@@ -189,13 +189,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_USER_NAME.getMessage());
     }
 
     @DisplayName("동일한 닉네임과 핸드폰으로 회원가입시 중복 닉네임 예외 응답")
@@ -214,13 +214,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_NICKNAME.getMessage());
     }
 
     @DisplayName("동일한 핸드폰과 이메일로 회원가입시 중복 핸드폰 예외 응답")
@@ -239,13 +239,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.USERS_DUPLICATED_PHONE.getMessage());
     }
 
     @DisplayName("정상 회원가입 시 토큰 발행")
@@ -282,13 +282,12 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userLoginRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_USER_NAME.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_USER_NAME.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_USER_NAME.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.INVALID_USER_NAME.getMessage());
     }
 
     @DisplayName("유효하지 않은 비밀번호로 로그인시 예외 응답")
@@ -302,13 +301,12 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userLoginRequest))
         ).andReturn();
-        BaseResponse baseResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), BaseResponse.class);
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        assertThat(baseResponse.getIsSuccess()).isFalse();
-        assertThat(baseResponse.getResult()).isNull();
-        assertThat(baseResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_USER_PW.getCode());
-        assertThat(baseResponse.getMessage()).isEqualTo(BaseResponseStatus.INVALID_USER_PW.getMessage());
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(BaseResponseStatus.INVALID_USER_PW.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.INVALID_USER_PW.getMessage());
     }
 
     @DisplayName("올바른 아이디, 비밀번호로 로그인시 토큰 반환")
@@ -330,8 +328,8 @@ class UserControllerTest {
     }
 
     private <T> T getResponseObject(MockHttpServletResponse response, Class<T> type) throws IOException {
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(BaseResponse.class, type);
-        BaseResponse<T> result = objectMapper.readValue(response.getContentAsString(), javaType);
+        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(CommonResponse.class, type);
+        CommonResponse<T> result = objectMapper.readValue(response.getContentAsString(), javaType);
         return result.getResult();
     }
 

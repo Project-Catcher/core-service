@@ -1,7 +1,7 @@
 package com.catcher.common;
 
 import com.catcher.common.exception.BaseException;
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +12,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+import static com.catcher.common.response.CommonResponse.*;
 import static jakarta.servlet.http.HttpServletResponse.SC_BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -34,6 +35,9 @@ public class GlobalExceptionHandlerFilter extends OncePerRequestFilter {
     ) throws IOException {
         response.setStatus(SC_BAD_REQUEST);
         response.setContentType(APPLICATION_JSON_VALUE);
-        response.getWriter().write(objectMapper.writeValueAsString(new BaseResponse(baseException.getStatus())));
+
+        BaseResponseStatus status = baseException.getStatus();
+        CommonResponse<String> failure = failure(status.getCode(), status.getMessage());
+        response.getWriter().write(objectMapper.writeValueAsString(failure));
     }
 }

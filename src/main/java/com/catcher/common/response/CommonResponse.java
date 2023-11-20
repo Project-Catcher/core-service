@@ -19,7 +19,15 @@ public class CommonResponse<T> {
         this.result = result;
     }
 
-    public static <T> CommonResponse<T> success(int code, T result) {
-        return new CommonResponse<>(code, true, result);
+    public static <T> CommonResponse<T> success() {
+        return new CommonResponse<>(200, true, null);
+    }
+
+    public static <T> CommonResponse<T> success(T result) {
+        return new CommonResponse<>(200, true, result);
+    }
+
+    public static <T> CommonResponse<T> failure(int code, T result) {
+        return new CommonResponse<>(code, false, result);
     }
 }

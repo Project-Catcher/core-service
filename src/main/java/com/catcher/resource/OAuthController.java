@@ -1,6 +1,6 @@
 package com.catcher.resource;
 
-import com.catcher.common.response.BaseResponse;
+import com.catcher.common.response.CommonResponse;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.oauth.OAuthCreateRequest;
 import com.catcher.core.dto.oauth.OAuthHistoryResponse;
@@ -50,17 +50,17 @@ public class OAuthController {
     }
 
     @GetMapping(value = {"/kakao", "/naver"})
-    public BaseResponse<OAuthHistoryResponse> checkHistory(HttpServletRequest request, @RequestParam Map params) {
-        return new BaseResponse<>(oAuthService.checkSignHistory(params, request.getRequestURI()));
+    public CommonResponse<OAuthHistoryResponse> checkHistory(HttpServletRequest request, @RequestParam Map params) {
+        return CommonResponse.success(oAuthService.checkSignHistory(params, request.getRequestURI()));
     }
 
     @GetMapping(value = {"/kakao/login", "/naver/login"})
-    public BaseResponse<TokenDto> login(HttpServletRequest request, @RequestParam Map map) {
-        return new BaseResponse<>(oAuthService.login(map, request.getRequestURI()));
+    public CommonResponse<TokenDto> login(HttpServletRequest request, @RequestParam Map map) {
+        return CommonResponse.success(oAuthService.login(map, request.getRequestURI()));
     }
 
     @PostMapping(value = {"/kakao", "/naver"})
-    public BaseResponse<TokenDto> signUp(HttpServletRequest request, @Valid @RequestBody OAuthCreateRequest oAuthCreateRequest) {
-        return new BaseResponse<>(oAuthService.signUp(oAuthCreateRequest, request.getRequestURI()));
+    public CommonResponse<TokenDto> signUp(HttpServletRequest request, @Valid @RequestBody OAuthCreateRequest oAuthCreateRequest) {
+        return CommonResponse.success(oAuthService.signUp(oAuthCreateRequest, request.getRequestURI()));
     }
 }
