@@ -1,0 +1,98 @@
+name: Java CI with Gradle
+
+on:
+  push:
+    branches: [ "main" ]
+
+env:
+  AWS_REGION: ${{ secrets.AWS_REGION }}
+  OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE }}
+  DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
+  GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
+  ECR_URL: ${{ secrets.AWS_ECR_DEV_CORE }}
+  webhook_url: ${{ secrets.WEBHOOK }}
+
+permissions:
+  id-token: write
+  contents: write
+      
+jobs:
+  build:
+    name: Build
+    # runs-on: self-hosted
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'gradle'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build with Gradle
+        run: ./gradlew bootJar
+        
+      - name: Docker build
+        run: docker build -t core-service .
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_REGION }}
+          role-session-name: GitHubActions
+          role-to-assume: ${{ env.OIDC_ROLE_ARN }}
+
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Publish Image to ECR(CORE-SERVICE)
+        run: |
+          docker tag core-service:latest ${{ env.ECR_URL }}:${{ github.sha }}
+          docker push ${{ env.ECR_URL }}:${{ github.sha }}
+
+      - name: notification to swit
+        uses: roharon/action-swit@v1
+        with:
+          webhooks_url: ${{ env.webhook_url }}
+          MESSAGE: "🏷 ${{ job.status }} 백엔드 ECR 도커파일 업로드 : Core-service - by ${{ github.actor }}"
+
+      - name: Setup Kustomize
+        uses: imranismail/setup-kustomize@v1
+
+      - name: Checkout for Kustomize repository
+        uses: actions/checkout@v2
+        with:
+          repository: Project-Catcher/core-service-kusto
+          ref: main
+          token: ${{ env.GITHUB_TOKEN }}
+          path: core-service-kusto
+
+      - name: Update Kustomize image
+        run: |
+          # PRD/DEV 브랜치 분리되어있지 않으므로 추후 업데이트 예정
+          # if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+          #   KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
+          # else
+          #   KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+          # fi
+
+          KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+          cd $KUSTOMIZE_PATH
+          kustomize edit set image core-svc-image="${{ env.ECR_URL }}:${{ github.sha }}"
+          kustomize build .
+          
+      - name: Commit minifest files
+        run: |
+          cd core-service-kusto
+          git config --global user.email "github-actions@github.com"
+          git config --global user.name "github-actions"
+          git commit -am "Update image tag"
+          git push -u origin main

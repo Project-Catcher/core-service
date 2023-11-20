@@ -1,6 +1,6 @@
 package com.catcher.core;
 
-import com.catcher.datasource.UserRepository;
+import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.command.Command;
 import com.catcher.core.domain.command.UserByUserIdCommand;
 import com.catcher.core.domain.entity.User;
@@ -27,7 +27,7 @@ public class UserCommandExecutor implements CommandExecutor<User>{
 
         final UserByUserIdCommand userByUserIdCommand = (UserByUserIdCommand) command;
         return userRepository
-                .findByUserId(userByUserIdCommand.getUserId())
+                .findByUsername(userByUserIdCommand.getUserId())
                 .orElseThrow(); // TODO: fill custom Exception
     }
 }

@@ -32,6 +32,39 @@ dependencies {
 	annotationProcessor 'org.projectlombok:lombok:1.18.26'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test:3.1.0'
 	testImplementation 'org.springframework.security:spring-security-test:6.0.2'
+
+	//kms
+	implementation 'com.amazonaws:aws-java-sdk-kms:1.12.429'
+	implementation 'org.zalando:spring-cloud-config-aws-kms:5.1.2'
+	implementation 'com.amazonaws:aws-java-sdk-kms:1.12.429'
+	implementation 'com.amazonaws:jmespath-java:1.12.468'
+
+	//ssh
+	implementation 'com.jcraft:jsch:0.1.55'
+
+	//jwt
+	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+
+	//redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+	//open feign
+	implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+	//embedded-redis
+	testImplementation 'it.ozimov:embedded-redis:0.7.2'
+
+	//h2
+	testRuntimeOnly 'com.h2database:h2'
+}
+
+dependencyManagement {
+	imports {
+		mavenBom "org.springframework.cloud:spring-cloud-dependencies:2022.0.3"
+	}
 }
 
 tasks.named('test') {
