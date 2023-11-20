@@ -41,7 +41,7 @@ public class SecurityConfig {
     public AuthenticationManager authenticationManager(
             UserDetailServiceImpl userDetailService, PasswordEncoder passwordEncoder
     ) throws Exception {
-        return new AuthenticationProxy(userDetailService, passwordEncoder);
+        return new CatcherAuthenticationManager(userDetailService, passwordEncoder);
     }
 
     @Bean

@@ -9,7 +9,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 @RequiredArgsConstructor
-public class AuthenticationProxy implements AuthenticationManager {
+public class CatcherAuthenticationManager implements AuthenticationManager {
     private final UserDetailsService userDetailsService;
     private final PasswordEncoder passwordEncoder;
 
