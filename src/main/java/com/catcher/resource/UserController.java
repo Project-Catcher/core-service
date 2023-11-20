@@ -35,6 +35,6 @@ public class UserController {
     //TODO: 삭제예정
     @PostMapping("/test")
     public void test(@CurrentUser User user) {
-        System.out.println("user = " + user);
+        log.info("user = {}", user);
     }
 }
