@@ -18,9 +18,7 @@ public class AuthenticationProxy implements AuthenticationManager {
         CatcherUser catcherUser = (CatcherUser) userDetailsService.loadUserByUsername((String) authentication.getPrincipal());
 
         String rawPassword =(String) authentication.getCredentials();
-        String encodedPassword = catcherUser.getPassword();
-        System.out.println(passwordEncoder.matches(rawPassword, encodedPassword));
-        System.out.println(passwordEncoder.matches(encodedPassword,rawPassword));
+
         if(!passwordEncoder.matches(rawPassword, catcherUser.getPassword())) {
             throw new BadCredentialsException("자격 증명에 실패하였습니다.");
         }
