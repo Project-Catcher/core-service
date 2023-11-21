@@ -94,3 +94,11 @@ jobs:
           git config --global user.name "github-actions"
           git commit -am "Update image tag"
           git push -u origin main
+
+      - name: Sync ArgoCD Application
+        uses: omegion/argocd-actions@v1
+        with:
+          address: "argocd.dev-alltimecatcher.com"
+          token: ${{ secrets.ARGOCD_TOKEN }}
+          action: sync
+          appName: "dev-app-core"
