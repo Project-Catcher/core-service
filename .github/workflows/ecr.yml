@@ -2,7 +2,7 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "dev" ]
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
@@ -19,8 +19,7 @@ permissions:
 jobs:
   build:
     name: Build
-    # runs-on: self-hosted
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
 
     steps:
       - name: Checkout
@@ -77,12 +76,11 @@ jobs:
 
       - name: Update Kustomize image
         run: |
-          # PRD/DEV 브랜치 분리되어있지 않으므로 추후 업데이트 예정
-          # if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
-          #   KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
-          # else
-          #   KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
-          # fi
+          if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+            KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
+          else
+            KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+          fi
 
           KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
           cd $KUSTOMIZE_PATH
@@ -96,3 +94,11 @@ jobs:
           git config --global user.name "github-actions"
           git commit -am "Update image tag"
           git push -u origin main
+
+      - name: Sync ArgoCD Application
+        uses: omegion/argocd-actions@v1
+        with:
+          address: "argocd.dev-alltimecatcher.com"
+          token: ${{ secrets.ARGOCD_TOKEN }}
+          action: sync
+          appName: "dev-app-core"
