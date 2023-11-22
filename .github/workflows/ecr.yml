@@ -96,9 +96,7 @@ jobs:
           git push -u origin main
 
       - name: Sync ArgoCD Application
-        uses: omegion/argocd-actions@v1
-        with:
-          address: "argocd.dev-alltimecatcher.com"
-          token: ${{ secrets.ARGOCD_TOKEN }}
-          action: sync
-          appName: "dev-app-core"
+        run: |
+          argocd app sync dev-app-core \
+          --server argocd.dev-alltimecatcher.com \
+          --auth-token ${{ secrets.ARGOCD_TOKEN }} --insecure
