@@ -1,10 +1,12 @@
 package com.catcher.resource;
 
 import com.catcher.common.response.CommonResponse;
+import com.catcher.core.domain.entity.User;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.service.UserService;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.security.annotation.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -30,5 +32,11 @@ public class UserController {
     @PostMapping("/login")
     public CommonResponse<TokenDto> login(@Valid @RequestBody UserLoginRequest userLoginReqDto) {
         return success(userService.login(userLoginReqDto));
+    }
+
+    //TODO: 삭제예정
+    @PostMapping("/test")
+    public void test(@CurrentUser User user) {
+        log.info("user = {}", user);
     }
 }
