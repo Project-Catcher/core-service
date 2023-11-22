@@ -151,12 +151,12 @@ class UserServiceTest {
                 .introduceContent(null)
                 .nickname(createRandomUUID())
                 .userProvider(KAKAO)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
         userRepository.save(oAuthUser);
         flushAndClearPersistence();
@@ -184,12 +184,12 @@ class UserServiceTest {
                 .introduceContent(null)
                 .nickname(createRandomUUID())
                 .userProvider(NAVER)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
         userRepository.save(oAuthUser);
         flushAndClearPersistence();
@@ -260,7 +260,6 @@ class UserServiceTest {
         return UserCreateRequest.builder()
                 .nickname(nickname)
                 .ageTerm(ZonedDateTime.now())
-                .locationTerm(ZonedDateTime.now())
                 .serviceTerm(ZonedDateTime.now())
                 .marketingTerm(ZonedDateTime.now())
                 .privacyTerm(ZonedDateTime.now())
@@ -281,12 +280,12 @@ class UserServiceTest {
                 .introduceContent(null)
                 .nickname(nickname)
                 .userProvider(CATCHER)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
     }
 

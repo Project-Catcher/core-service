@@ -12,8 +12,8 @@ import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.oauth.OAuthCreateRequest;
 import com.catcher.core.dto.oauth.OAuthHistoryResponse;
 import com.catcher.infrastructure.oauth.OAuthTokenResponse;
-import com.catcher.infrastructure.oauth.handler.OAuthHandlerFactory;
 import com.catcher.infrastructure.oauth.handler.OAuthHandler;
+import com.catcher.infrastructure.oauth.handler.OAuthHandlerFactory;
 import com.catcher.infrastructure.oauth.properties.OAuthProperties;
 import com.catcher.infrastructure.oauth.user.OAuthUserInfo;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,6 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 import static com.catcher.common.BaseResponseStatus.*;
-import static com.catcher.core.domain.entity.enums.UserRole.USER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
 
 @Service
@@ -113,14 +112,13 @@ public class OAuthService {
                 .password(passwordEncoder.encode("NO-PASS"))
                 .phone(oAuthCreateRequest.getPhone())
                 .email(oAuthUserInfo.getEmail())
-                .nickname(oAuthUserInfo.getProvider().name() + "_" + oAuthUserInfo.getId())
+                .nickname(oAuthCreateRequest.getNickname())
                 .userProvider(oAuthUserInfo.getProvider())
-                .role(USER)
                 .userAgeTerm(oAuthCreateRequest.getAgeTerm())
                 .userServiceTerm(oAuthCreateRequest.getServiceTerm())
                 .userPrivacyTerm(oAuthCreateRequest.getPrivacyTerm())
-                .userLocationTerm(oAuthCreateRequest.getLocationTerm())
-                .userMarketingTerm(oAuthCreateRequest.getMarketingTerm())
+                .emailMarketingTerm(oAuthCreateRequest.getMarketingTerm())
+                .phoneMarketingTerm(oAuthCreateRequest.getMarketingTerm())
                 .build();
     }
 

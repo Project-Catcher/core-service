@@ -87,18 +87,18 @@ public class UserService {
 
     private User createUser(UserCreateRequest userCreateRequest) {
         return User.builder()
-                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .username(userCreateRequest.getUsername())
-                .email(userCreateRequest.getEmail())
+                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .phone(userCreateRequest.getPhone())
+                .email(userCreateRequest.getEmail())
                 .nickname(userCreateRequest.getNickname())
+                .userProvider(CATCHER)
+                .userRole(USER)
                 .userAgeTerm(userCreateRequest.getAgeTerm())
                 .userServiceTerm(userCreateRequest.getServiceTerm())
                 .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
-                .userLocationTerm(userCreateRequest.getLocationTerm())
-                .userMarketingTerm(userCreateRequest.getMarketingTerm())
-                .role(USER)
-                .userProvider(CATCHER)
+                .emailMarketingTerm(userCreateRequest.getMarketingTerm())
+                .phoneMarketingTerm(userCreateRequest.getMarketingTerm())
                 .build();
     }
 

@@ -193,12 +193,12 @@ class UserRepositoryTest {
                 .introduceContent(null)
                 .nickname(createRandomUUID())
                 .userProvider(CATCHER)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
 
         userRepository.save(user);

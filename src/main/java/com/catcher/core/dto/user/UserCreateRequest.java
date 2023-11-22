@@ -1,16 +1,15 @@
 package com.catcher.core.dto.user;
 
 import jakarta.validation.constraints.NotNull;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.ZonedDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class UserCreateRequest {
     @NotNull(message = "아이디를 입력하세요.")
     private String username;
@@ -39,25 +38,7 @@ public class UserCreateRequest {
     @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
     private ZonedDateTime privacyTerm;
 
-    @NotNull(message = "필수 약관 위치 정보 이용 동의해주세요.")
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
-    private ZonedDateTime locationTerm;
-
     @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
     private ZonedDateTime marketingTerm;
-
-    @Builder
-    public UserCreateRequest(String username, String password, String email, String phone, String nickname, ZonedDateTime ageTerm, ZonedDateTime serviceTerm, ZonedDateTime privacyTerm, ZonedDateTime locationTerm, ZonedDateTime marketingTerm){
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.phone = phone;
-        this.nickname = nickname;
-        this.ageTerm = ageTerm;
-        this.serviceTerm = serviceTerm;
-        this.privacyTerm = privacyTerm;
-        this.locationTerm = locationTerm;
-        this.marketingTerm = marketingTerm;
-    }
 }
 
