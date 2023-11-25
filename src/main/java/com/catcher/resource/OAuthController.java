@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.*;
 import java.io.IOException;
 import java.util.Map;
 
+import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/oauth")
@@ -55,12 +57,16 @@ public class OAuthController {
     }
 
     @GetMapping(value = {"/kakao/login", "/naver/login"})
-    public CommonResponse<TokenDto> login(HttpServletRequest request, @RequestParam Map map) {
-        return CommonResponse.success(oAuthService.login(map, request.getRequestURI()));
+    public CommonResponse<String> login(HttpServletRequest request, @RequestParam Map map, HttpServletResponse response) {
+        TokenDto tokenDto = oAuthService.login(map, request.getRequestURI());
+        setRefreshCookie(response, tokenDto.getRefreshToken());
+        return CommonResponse.success(tokenDto.getAccessToken());
     }
 
     @PostMapping(value = {"/kakao", "/naver"})
-    public CommonResponse<TokenDto> signUp(HttpServletRequest request, @Valid @RequestBody OAuthCreateRequest oAuthCreateRequest) {
-        return CommonResponse.success(oAuthService.signUp(oAuthCreateRequest, request.getRequestURI()));
+    public CommonResponse<String> signUp(HttpServletRequest request, @Valid @RequestBody OAuthCreateRequest oAuthCreateRequest, HttpServletResponse response) {
+        TokenDto tokenDto = oAuthService.signUp(oAuthCreateRequest, request.getRequestURI());
+        setRefreshCookie(response, tokenDto.getRefreshToken());
+        return CommonResponse.success(tokenDto.getAccessToken());
     }
 }
