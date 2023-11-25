@@ -32,7 +32,6 @@ import java.util.UUID;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
@@ -125,12 +124,12 @@ class JwtFilterTest {
                 .introduceContent(null)
                 .nickname(createRandomUUID())
                 .userProvider(CATCHER)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
 
         userRepository.save(user);

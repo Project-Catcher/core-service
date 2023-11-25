@@ -4,11 +4,11 @@ import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.database.DBManager;
+import com.catcher.core.database.UserRepository;
+import com.catcher.core.domain.entity.User;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
-import com.catcher.core.domain.entity.User;
-import com.catcher.core.database.UserRepository;
 import com.catcher.security.CatcherUser;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +20,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.*;
-import static com.catcher.core.domain.entity.enums.UserProvider.*;
-import static com.catcher.core.domain.entity.enums.UserRole.*;
-import static com.catcher.utils.JwtUtils.*;
+import static com.catcher.core.domain.entity.BaseTimeEntity.zoneId;
+import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
+import static com.catcher.core.domain.entity.enums.UserRole.USER;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -87,18 +89,19 @@ public class UserService {
 
     private User createUser(UserCreateRequest userCreateRequest) {
         return User.builder()
-                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .username(userCreateRequest.getUsername())
-                .email(userCreateRequest.getEmail())
+                .password(passwordEncoder.encode(userCreateRequest.getPassword()))
                 .phone(userCreateRequest.getPhone())
+                .email(userCreateRequest.getEmail())
                 .nickname(userCreateRequest.getNickname())
+                .userProvider(CATCHER)
+                .userRole(USER)
+                .phoneAuthentication(ZonedDateTime.now(zoneId))
                 .userAgeTerm(userCreateRequest.getAgeTerm())
                 .userServiceTerm(userCreateRequest.getServiceTerm())
                 .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
-                .userLocationTerm(userCreateRequest.getLocationTerm())
-                .userMarketingTerm(userCreateRequest.getMarketingTerm())
-                .role(USER)
-                .userProvider(CATCHER)
+                .emailMarketingTerm(userCreateRequest.getMarketingTerm())
+                .phoneMarketingTerm(userCreateRequest.getMarketingTerm())
                 .build();
     }
 

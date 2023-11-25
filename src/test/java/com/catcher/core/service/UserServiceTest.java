@@ -151,12 +151,12 @@ class UserServiceTest {
                 .introduceContent(null)
                 .nickname(createRandomUUID())
                 .userProvider(KAKAO)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
         userRepository.save(oAuthUser);
         flushAndClearPersistence();
@@ -184,12 +184,12 @@ class UserServiceTest {
                 .introduceContent(null)
                 .nickname(createRandomUUID())
                 .userProvider(NAVER)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
         userRepository.save(oAuthUser);
         flushAndClearPersistence();
@@ -250,6 +250,20 @@ class UserServiceTest {
                 .isInstanceOf(BaseException.class);
     }
 
+    @DisplayName("캐쳐 회원가입 시, 핸드폰 인증이 완료되어있어야 한다.")
+    @Test
+    void sign_up_need_phone_authentication() {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
+        //when
+        userService.signUpUser(userCreateRequest);
+        flushAndClearPersistence();
+
+        //then
+        User user = userRepository.findByEmail(userCreateRequest.getEmail()).orElseThrow();
+        assertThat(user.getUserProvider()).isEqualTo(CATCHER);
+        assertThat(user.getPhoneAuthentication()).isNotNull();
+    }
 
     //region PRIVATE METHOD
     private UserLoginRequest userLoginRequest(String username,String password) {
@@ -260,7 +274,6 @@ class UserServiceTest {
         return UserCreateRequest.builder()
                 .nickname(nickname)
                 .ageTerm(ZonedDateTime.now())
-                .locationTerm(ZonedDateTime.now())
                 .serviceTerm(ZonedDateTime.now())
                 .marketingTerm(ZonedDateTime.now())
                 .privacyTerm(ZonedDateTime.now())
@@ -281,12 +294,12 @@ class UserServiceTest {
                 .introduceContent(null)
                 .nickname(nickname)
                 .userProvider(CATCHER)
-                .role(UserRole.USER)
+                .userRole(UserRole.USER)
                 .userAgeTerm(ZonedDateTime.now())
                 .userServiceTerm(ZonedDateTime.now())
                 .userPrivacyTerm(ZonedDateTime.now())
-                .userLocationTerm(ZonedDateTime.now())
-                .userMarketingTerm(ZonedDateTime.now())
+                .emailMarketingTerm(ZonedDateTime.now())
+                .phoneMarketingTerm(ZonedDateTime.now())
                 .build();
     }
 
