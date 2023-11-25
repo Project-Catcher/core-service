@@ -114,6 +114,7 @@ public class OAuthService {
                 .email(oAuthUserInfo.getEmail())
                 .nickname(oAuthCreateRequest.getNickname())
                 .userProvider(oAuthUserInfo.getProvider())
+                .phoneAuthentication(null)
                 .userAgeTerm(oAuthCreateRequest.getAgeTerm())
                 .userServiceTerm(oAuthCreateRequest.getServiceTerm())
                 .userPrivacyTerm(oAuthCreateRequest.getPrivacyTerm())

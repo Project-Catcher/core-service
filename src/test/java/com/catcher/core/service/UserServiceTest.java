@@ -250,6 +250,20 @@ class UserServiceTest {
                 .isInstanceOf(BaseException.class);
     }
 
+    @DisplayName("캐쳐 회원가입 시, 핸드폰 인증이 완료되어있어야 한다.")
+    @Test
+    void sign_up_need_phone_authentication() {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
+        //when
+        userService.signUpUser(userCreateRequest);
+        flushAndClearPersistence();
+
+        //then
+        User user = userRepository.findByEmail(userCreateRequest.getEmail()).orElseThrow();
+        assertThat(user.getUserProvider()).isEqualTo(CATCHER);
+        assertThat(user.getPhoneAuthentication()).isNotNull();
+    }
 
     //region PRIVATE METHOD
     private UserLoginRequest userLoginRequest(String username,String password) {

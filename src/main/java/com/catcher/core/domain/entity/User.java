@@ -44,6 +44,8 @@ public class User extends BaseTimeEntity {
     @Enumerated(value = EnumType.STRING)
     private UserRole userRole;
 
+    private ZonedDateTime phoneAuthentication;
+
     @Column(nullable = false)
     private ZonedDateTime userAgeTerm; // 필수 약관
 
