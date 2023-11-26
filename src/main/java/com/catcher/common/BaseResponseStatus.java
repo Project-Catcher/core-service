@@ -35,6 +35,7 @@ public enum BaseResponseStatus {
     USERS_NOT_EXISTS(2111, "존재하지 않는 유저입니다."),
     USERS_DUPLICATED_NICKNAME(2112, "이미 사용중인 닉네임입니다."),
     USERS_DUPLICATED_PHONE(2113, "이미 사용중인 핸드폰입니다."),
+    AUTH_CODE_NOT_FOUND(2114, "해당 유저의 인증번호가 저장되지 않았습니다."),
 
     /**
      * 3000 : Response 오류
@@ -42,6 +43,7 @@ public enum BaseResponseStatus {
     // Common
     RESPONSE_ERROR(3000, "요청을 처리하는데 실패했습니다."),
     OAUTH_GENERATE_TOKEN_ERROR(3001, "OAuth Access 토큰 발급에 실패했습니다."),
+    EMAIL_SEND_ERROR(3002, "이메일 발송에 실패했습니다."),
 
     /**
      * 4000 : Database, Server 오류
