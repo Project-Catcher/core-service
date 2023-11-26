@@ -57,6 +57,9 @@ dependencies {
 	//embedded-redis
 	testImplementation 'it.ozimov:embedded-redis:0.7.2'
 
+	//email
+	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.5'
+
 	//h2
 	testRuntimeOnly 'com.h2database:h2'
 }
