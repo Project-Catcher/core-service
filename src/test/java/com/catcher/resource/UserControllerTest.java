@@ -7,7 +7,6 @@ import com.catcher.common.response.CommonResponse;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
-import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
@@ -36,6 +35,7 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
@@ -264,11 +264,12 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userCreateRequest))
         );
+        CommonResponse commonResponse = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        TokenDto tokenDto = getResponseObject(resultActions.andReturn().getResponse(), TokenDto.class);
-        assertThat(tokenDto.getRefreshToken()).isNotNull();
-        assertThat(tokenDto.getAccessToken()).isNotNull();
+        assertThat(commonResponse.isSuccess()).isTrue();
+        assertThat(commonResponse.getResult()).isNotNull();
+        assertThat(resultActions.andReturn().getResponse().getCookie(REFRESH_TOKEN_NAME)).isNotNull();
     }
 
     @DisplayName("유효하지 않은 아이디로 로그인시 예외 응답")
@@ -320,11 +321,13 @@ class UserControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(userLoginRequest))
         );
+        CommonResponse commonResponse = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        TokenDto tokenDto = getResponseObject(resultActions.andReturn().getResponse(), TokenDto.class);
-        assertThat(tokenDto.getRefreshToken()).isNotNull();
-        assertThat(tokenDto.getAccessToken()).isNotNull();
+
+        assertThat(commonResponse.isSuccess()).isTrue();
+        assertThat(commonResponse.getResult()).isNotNull();
+        assertThat(resultActions.andReturn().getResponse().getCookie(REFRESH_TOKEN_NAME)).isNotNull();
     }
 
     private <T> T getResponseObject(MockHttpServletResponse response, Class<T> type) throws IOException {

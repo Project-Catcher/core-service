@@ -1,7 +1,11 @@
 package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
+import com.catcher.utils.HttpServletUtils;
 import io.jsonwebtoken.*;
+import io.micrometer.common.util.StringUtils;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,10 +18,9 @@ import org.springframework.stereotype.Component;
 import java.util.Date;
 import java.util.concurrent.atomic.AtomicLong;
 
-import static com.catcher.common.BaseResponseStatus.EXPIRED_JWT;
-import static com.catcher.common.BaseResponseStatus.INVALID_JWT;
-import static com.catcher.utils.JwtUtils.ACCESS_TOKEN_EXPIRATION_MILLIS;
-import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
+import static com.catcher.common.BaseResponseStatus.*;
+import static com.catcher.utils.HttpServletUtils.addCookie;
+import static com.catcher.utils.JwtUtils.*;
 
 @Component
 @RequiredArgsConstructor
@@ -29,7 +32,7 @@ public class JwtTokenProvider {
 
     private AtomicLong atomicLong = new AtomicLong(1L);
 
-    public String createAccessToken(Authentication authentication){
+    public String createAccessToken(Authentication authentication) {
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + ACCESS_TOKEN_EXPIRATION_MILLIS + getRandomSeconds());
@@ -42,7 +45,7 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    public String createRefreshToken(Authentication authentication){
+    public String createRefreshToken(Authentication authentication) {
         Claims claims = Jwts.claims().setSubject(authentication.getName());
         Date now = new Date();
         Date expireDate = new Date(now.getTime() + REFRESH_TOKEN_EXPIRATION_MILLIS + getRandomSeconds());
@@ -67,17 +70,33 @@ public class JwtTokenProvider {
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
 
-    public boolean validateToken(String token){
-        try{
+    public boolean validateToken(String token) {
+
+        try {
+            checkToken(token);
             Jwts.parser().setSigningKey(secretKey).parseClaimsJws(token);
             return true;
-        } catch(ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             log.error(EXPIRED_JWT.getMessage());
             throw new BaseException(EXPIRED_JWT);
-        } catch(JwtException e) {
+        } catch (JwtException e) {
             log.error(INVALID_JWT.getMessage());
             throw new BaseException(INVALID_JWT);
         }
+    }
+
+    private void checkToken(String token) {
+        if(StringUtils.isBlank(token)) {
+            throw new BaseException(NOT_EXIST_REFRESH_JWT);
+        }
+    }
+
+    public static void setRefreshCookie(HttpServletResponse response, String refreshToken) {
+        addCookie(response, REFRESH_TOKEN_NAME, refreshToken, (int) REFRESH_TOKEN_EXPIRATION_MILLIS);
+    }
+
+    public static void removeCookie(HttpServletRequest request, HttpServletResponse response) {
+        HttpServletUtils.deleteCookie(request, response, REFRESH_TOKEN_NAME);
     }
 
     private long getRandomSeconds() {
