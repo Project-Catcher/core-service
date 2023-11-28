@@ -27,16 +27,21 @@ public class AuthCodeService {
     public String generateAndSaveRandomKey(final String email) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
         final var generatedKey = String.valueOf(generateSixDigitsRandomCode());
-        keyValueDataStorePort.saveValidationCodeWithUserId(String.valueOf(user.getId()), generatedKey);
+        final var generatedDataStoreKey = generateDataStoreKey(user.getId());
+        keyValueDataStorePort.saveValidationCodeWithUserId(generatedDataStoreKey, generatedKey);
 
         return generatedKey;
     }
 
     public boolean verifyAuthCode(final String email, String authCode) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
-        final String storedAuthCode = keyValueDataStorePort.retrieveValidationCodeWithKey(String.valueOf(user.getId()));
+        final var generatedDataStoreKey = generateDataStoreKey(user.getId());
+        final String storedAuthCode = keyValueDataStorePort.retrieveValidationCodeWithKey(generatedDataStoreKey);
 
         return authCode.equals(storedAuthCode);
+    }
+    private String generateDataStoreKey(final Long userId) {
+        return String.format("%s_%s", userId, "AUTHCODE");
     }
 
 }
