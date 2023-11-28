@@ -2,7 +2,6 @@ package com.catcher.resource;
 
 import cn.apiclub.captcha.Captcha;
 import com.catcher.common.response.CommonResponse;
-import com.catcher.core.domain.entity.User;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
@@ -16,19 +15,22 @@ import com.catcher.resource.request.CaptchaGenerateRequest;
 import com.catcher.resource.request.CaptchaValidateRequest;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.CaptchaValidateResponse;
-import com.catcher.security.annotation.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import static com.catcher.common.response.CommonResponse.success;
+import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
 
 @RequiredArgsConstructor
 @RestController
@@ -42,20 +44,18 @@ public class UserController {
 
     @Operation(summary = "회원 가입")
     @PostMapping("/signup")
-    public CommonResponse<TokenDto> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest) {
-        return success(userService.signUpUser(userCreateRequest));
+    public CommonResponse<String> signUp(@Valid @RequestBody UserCreateRequest userCreateRequest, HttpServletResponse response) {
+        TokenDto tokenDto = userService.signUpUser(userCreateRequest);
+        setRefreshCookie(response, tokenDto.getRefreshToken());
+        return success(tokenDto.getAccessToken());
     }
 
     @Operation(summary = "로그인")
     @PostMapping("/login")
-    public CommonResponse<TokenDto> login(@Valid @RequestBody UserLoginRequest userLoginReqDto) {
-        return success(userService.login(userLoginReqDto));
-    }
-
-    //TODO: 삭제예정
-    @PostMapping("/test")
-    public void test(@CurrentUser User user) {
-        log.info("user = {}", user);
+    public CommonResponse<String> login(@Valid @RequestBody UserLoginRequest userLoginReqDto, HttpServletResponse response) {
+        TokenDto tokenDto = userService.login(userLoginReqDto);
+        setRefreshCookie(response, tokenDto.getRefreshToken());
+        return success(tokenDto.getAccessToken());
     }
 
 
@@ -71,7 +71,7 @@ public class UserController {
 
     // TODO: 응답 타입은 따로 생각해보기
     @Operation(summary = "인증 코드가 맞는지 검증")
-    @GetMapping("/check-authcode/email")
+    @PostMapping("/check-authcode/email")
     public CommonResponse<AuthCodeVerifyResponse> verifyAuthCode(final AuthCodeVerifyRequest authCodeVerifyRequest) {
         final boolean isVerified = authCodeService.verifyAuthCode(authCodeVerifyRequest.getEmail(), authCodeVerifyRequest.getAuthCode());
 
