@@ -60,6 +60,9 @@ dependencies {
 	//email
 	implementation 'org.springframework.boot:spring-boot-starter-mail:3.0.5'
 
+	//captcha
+	implementation 'cn.apiclub.tool:simplecaptcha:1.2.2'
+
 	//h2
 	testRuntimeOnly 'com.h2database:h2'
 }

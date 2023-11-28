@@ -27,14 +27,14 @@ public class AuthCodeService {
     public String generateAndSaveRandomKey(final String email) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
         final var generatedKey = String.valueOf(generateSixDigitsRandomCode());
-        keyValueDataStorePort.saveAuthCodeWithUserId(String.valueOf(user.getId()), generatedKey);
+        keyValueDataStorePort.saveValidationCodeWithUserId(String.valueOf(user.getId()), generatedKey);
 
         return generatedKey;
     }
 
     public boolean verifyAuthCode(final String email, String authCode) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
-        final String storedAuthCode = keyValueDataStorePort.retrieveAuthCodeWithUserId(String.valueOf(user.getId()));
+        final String storedAuthCode = keyValueDataStorePort.retrieveValidationCodeWithKey(String.valueOf(user.getId()));
 
         return authCode.equals(storedAuthCode);
     }
