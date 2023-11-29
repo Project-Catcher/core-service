@@ -45,7 +45,7 @@ public class CaptchaService {
     public boolean validateCaptcha(String userEmail, String userAnswer) {
         final var user = userRepository.findByEmail(userEmail).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
 
-        final String generatedUserKEy = generateCaptchaUserKey(user.getId());
+        final String generatedUserKey = generateCaptchaUserKey(user.getId());
         final String answer = keyValueDataStorePort.retrieveValidationCodeWithKey(generatedUserKEy);
 
         return Objects.equals(answer, userAnswer);
