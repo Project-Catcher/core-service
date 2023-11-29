@@ -4,7 +4,6 @@ import com.catcher.app.AppApplication;
 import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.CatcherControllerAdvice;
 import com.catcher.common.response.CommonResponse;
-import com.catcher.core.dto.RefreshTokenDto;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.service.UserService;
@@ -13,6 +12,7 @@ import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,6 +33,8 @@ import java.time.ZonedDateTime;
 import java.util.UUID;
 
 import static com.catcher.common.BaseResponseStatus.SUCCESS;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -57,7 +59,8 @@ class AuthControllerTest {
     @PersistenceContext
     EntityManager em;
 
-    RefreshTokenDto refreshTokenDto;
+    String previousRefreshToken;
+    String previousAccessToken;
 
     @BeforeEach
     void beforeEach() throws Exception {
@@ -66,61 +69,65 @@ class AuthControllerTest {
                 .setControllerAdvice(new CatcherControllerAdvice())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
                 .build();
-        this.refreshTokenDto = createRefreshToken();
+        TokenDto tokenDto = createRefreshToken();
+        this.previousRefreshToken = tokenDto.getRefreshToken();
+        this.previousAccessToken = tokenDto.getAccessToken();
     }
 
-    @DisplayName("정상 리프레쉬 토큰으로 요청 시, 새로운 토큰 발행")
+    @DisplayName("정상 리프레쉬 토큰으로 요청 시, 새로운 토큰 발행되어야 한다.")
     @Test
     void reissue_token() throws Exception {
         //given
+        Cookie cookie = generateCookie(REFRESH_TOKEN_NAME, previousRefreshToken);
 
         //when
         ResultActions resultActions = mockMvc.perform(post("/auth/reissue")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshTokenDto))
-        );
+                .content(objectMapper.writeValueAsString(previousRefreshToken))
+                .cookie(cookie)
+        ).andExpect(status().isOk());
+        CommonResponse commonResponse = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class);
 
         //then
-        resultActions.andExpect(status().isOk());
-        TokenDto responseTokenDto = getResponseObject(resultActions.andReturn().getResponse(), TokenDto.class);
-
-        assertThat(responseTokenDto.getAccessToken()).isNotNull();
-        assertThat(responseTokenDto.getRefreshToken()).isNotEqualTo(refreshTokenDto.getRefreshToken());
+        assertThat(commonResponse.isSuccess()).isTrue();
+        assertThat(commonResponse.getResult()).isNotNull();
+        assertThat(commonResponse.getResult()).isNotEqualTo(previousAccessToken);
+        assertThat(resultActions.andReturn().getResponse().getCookie(REFRESH_TOKEN_NAME)).isNotNull();
+        assertThat(resultActions.andReturn().getResponse().getCookie(REFRESH_TOKEN_NAME).getValue()).isNotEqualTo(previousRefreshToken);
     }
 
-    @DisplayName("정상 리프레쉬 토큰으로 폐기 시, 정상 응답")
+    @DisplayName("정상 리프레쉬 토큰으로 폐기 시, 정상 응답 및 토큰이 없어야 한다.")
     @Test
     void discard_token() throws Exception {
         //given
+        Cookie cookie = generateCookie(REFRESH_TOKEN_NAME, previousRefreshToken);
 
         //when
         ResultActions resultActions = mockMvc.perform(post("/auth/discard")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(refreshTokenDto))
-        );
-
-        //then
-        resultActions.andExpect(status().isOk());
+                .content(objectMapper.writeValueAsString(previousRefreshToken))
+                .cookie(cookie)
+        ).andExpect(status().isOk());
         CommonResponse commonResponse = objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class);
 
-
+        //then
         assertThat(commonResponse.isSuccess()).isTrue();
         assertThat(commonResponse.getCode()).isEqualTo(SUCCESS.getCode());
         assertThat(commonResponse.getResult()).isNull();
+        assertThat(resultActions.andReturn().getResponse().getCookie(REFRESH_TOKEN_NAME).getValue()).isEqualTo("");
     }
 
     @DisplayName("비정상 리프레쉬 토큰으로 폐기 시, 예외 응답")
     @Test
     void invalid_discard_token() throws Exception {
         //given
-        RefreshTokenDto invalidRefreshToken = new RefreshTokenDto(refreshTokenDto.getRefreshToken() + "1");
+        Cookie cookie = generateCookie(REFRESH_TOKEN_NAME, previousRefreshToken + "1");
 
         //when
         MvcResult mvcResult = mockMvc.perform(post("/auth/discard")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRefreshToken))
+                .cookie(cookie)
         ).andReturn();
-
         CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
 
         //then
@@ -133,12 +140,12 @@ class AuthControllerTest {
     @Test
     void invalid_reissue_token() throws Exception {
         //given
-        RefreshTokenDto invalidRefreshToken = new RefreshTokenDto(refreshTokenDto.getRefreshToken() + "1");
+        Cookie cookie = generateCookie(REFRESH_TOKEN_NAME, previousRefreshToken + "1");
 
         //when
         MvcResult mvcResult = mockMvc.perform(post("/auth/reissue")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(invalidRefreshToken))
+                .cookie(cookie)
         ).andReturn();
 
         CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
@@ -149,23 +156,30 @@ class AuthControllerTest {
         assertThat(commonResponse.getResult()).isEqualTo(BaseResponseStatus.INVALID_JWT.getMessage());
     }
 
+    private Cookie generateCookie(String name, String value) {
+        Cookie cookie = new Cookie(name, value);
+        cookie.setHttpOnly(true);
+        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRATION_MILLIS);
+        cookie.setPath("/");
+        return  cookie;
+    }
+
     private <T> T getResponseObject(MockHttpServletResponse response, Class<T> type) throws IOException {
         JavaType javaType = objectMapper.getTypeFactory().constructParametricType(CommonResponse.class, type);
         CommonResponse<T> result = objectMapper.readValue(response.getContentAsString(), javaType);
         return result.getResult();
     }
 
-    private RefreshTokenDto createRefreshToken() {
-        String refreshToken = userService.signUpUser(userCreateRequest()).getRefreshToken();
+    private TokenDto createRefreshToken() {
+        TokenDto tokenDto = userService.signUpUser(userCreateRequest());
         flushAndClearPersistence();
-        return new RefreshTokenDto(refreshToken);
+        return tokenDto;
     }
 
     private UserCreateRequest userCreateRequest() {
         return UserCreateRequest.builder()
                 .nickname(createRandomUUID())
                 .ageTerm(ZonedDateTime.now())
-                .locationTerm(ZonedDateTime.now())
                 .serviceTerm(ZonedDateTime.now())
                 .marketingTerm(ZonedDateTime.now())
                 .privacyTerm(ZonedDateTime.now())

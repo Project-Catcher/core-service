@@ -82,7 +82,6 @@ class AuthServiceTest {
         return UserCreateRequest.builder()
                 .nickname(nickname)
                 .ageTerm(ZonedDateTime.now())
-                .locationTerm(ZonedDateTime.now())
                 .serviceTerm(ZonedDateTime.now())
                 .marketingTerm(ZonedDateTime.now())
                 .privacyTerm(ZonedDateTime.now())
