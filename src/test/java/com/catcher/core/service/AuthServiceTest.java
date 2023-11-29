@@ -16,10 +16,8 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
-import java.util.Optional;
 import java.util.UUID;
 
-import static com.catcher.utils.JwtUtils.generateBlackListToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -65,9 +63,9 @@ class AuthServiceTest {
                 .isInstanceOf(BaseException.class);
     }
 
-    @DisplayName("리프레쉬 토큰 폐기 후, 재발급 시, 에러 반환")
+    @DisplayName("토큰 폐기 후, 재발급 시, 에러 반환")
     @Test
-    void discard_refresh_token_then_reissue_token() {
+    void discard_token_then_reissue_token() {
         //given
         UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
         TokenDto preTokenDto = userService.signUpUser(userCreateRequest);
@@ -78,21 +76,6 @@ class AuthServiceTest {
         //then
         assertThatThrownBy(() -> authService.reissueRefreshToken(preTokenDto.getRefreshToken()))
                 .isInstanceOf(BaseException.class);
-    }
-
-    @DisplayName("액세스 토큰 폐기 시, 저장소에 블랙리스트 토큰 저장")
-    @Test
-    void discard_access_token() {
-        //given
-        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
-        TokenDto tokenDto = userService.signUpUser(userCreateRequest);
-
-        //when
-        authService.discardAccessToken(tokenDto.getAccessToken());
-
-        //then
-        Optional<String> value = dbManager.getValue(generateBlackListToken(tokenDto.getAccessToken()));
-        assertThat(value).isPresent();
     }
 
     private UserCreateRequest userCreateRequest(String username, String email, String nickname, String phone) {

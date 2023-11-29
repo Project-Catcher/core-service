@@ -2,12 +2,9 @@ package com.catcher.config;
 
 import com.catcher.app.AppApplication;
 import com.catcher.common.exception.BaseException;
-import com.catcher.core.database.DBManager;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
-import com.catcher.core.service.AuthService;
-import com.catcher.core.service.UserService;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -48,18 +45,12 @@ class JwtFilterTest {
     EntityManager em;
     @Autowired
     JwtTokenProvider jwtTokenProvider;
-    @Autowired
-    DBManager dbManager;
-    @Autowired
-    UserService userService;
-    @Autowired
-    AuthService authService;
 
     JwtFilter jwtFilter;
 
     @BeforeEach
     void beforeEach() {
-        jwtFilter = new JwtFilter(jwtTokenProvider, dbManager);
+        jwtFilter = new JwtFilter(jwtTokenProvider);
     }
 
     @DisplayName("Access 토큰 없을 시 그냥 통과")
@@ -114,29 +105,6 @@ class JwtFilterTest {
         Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
         assertThat(currentAuthentication).isNotNull();
         assertThat(currentAuthentication.getName()).isEqualTo(user.getUsername());
-    }
-
-    @DisplayName("로그아웃한 Access 토큰이면, Authentication이 설정이 되면 안된다.")
-    @Test
-    @Transactional
-    void invalid_logout_access_token_filter() throws ServletException, IOException {
-        //given
-        HttpServletRequest request = Mockito.mock(HttpServletRequest.class);
-        HttpServletResponse response = Mockito.mock(HttpServletResponse.class);
-        FilterChain filterChain = Mockito.mock(FilterChain.class);
-
-        User user = registerStubUser();
-        Authentication authentication = createAuthentication(user.getUsername(), user.getPassword());
-        String accessToken = jwtTokenProvider.createAccessToken(authentication);
-        authService.discardAccessToken(accessToken);
-
-        //when
-        Mockito.when(request.getHeader("Authorization")).thenReturn("Bearer " + accessToken);
-        jwtFilter.doFilterInternal(request, response,filterChain);
-
-        //then
-        Authentication currentAuthentication = SecurityContextHolder.getContext().getAuthentication();
-        assertThat(currentAuthentication).isNull();
     }
 
     private Authentication createAuthentication(String username, String password) {
