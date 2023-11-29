@@ -5,6 +5,7 @@ import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.service.AuthService;
+import com.catcher.utils.JwtUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.NOT_EXIST_REFRESH_JWT;
-import static com.catcher.utils.JwtUtils.*;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
 
 @Component
 @RequiredArgsConstructor
@@ -41,14 +42,29 @@ public class RefreshTokenAdaptor implements AuthService {
 
     @Override
     public void discardRefreshToken(String refreshToken) {
-        jwtTokenProvider.validateToken(refreshToken);
-        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+        try {
+            jwtTokenProvider.validateToken(refreshToken);
+            Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
 
-        Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
-        if(refreshTokenOptional.isPresent()) {
-            compareRefreshToken(refreshToken, refreshTokenOptional.get());
+            Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
+            if (refreshTokenOptional.isPresent()) {
+                compareRefreshToken(refreshToken, refreshTokenOptional.get());
+            }
+            dbManager.deleteKey(authentication.getName());
+        } catch (BaseException e) {
+
         }
-        dbManager.deleteKey(authentication.getName());
+    }
+
+    @Override
+    public void discardAccessToken(String accessToken) {
+        try {
+            jwtTokenProvider.validateToken(accessToken);
+            String key = JwtUtils.generateBlackListToken(accessToken);
+            dbManager.putValue(key, "", JwtUtils.ACCESS_TOKEN_EXPIRATION_MILLIS);
+        } catch (BaseException e) {
+
+        }
     }
 
     private String getRefreshToken(String name) {
