@@ -6,6 +6,4 @@ public interface AuthService {
     TokenDto reissueRefreshToken(String refreshToken);
 
     void discardRefreshToken(String refreshToken);
-
-    void discardAccessToken(String accessToken);
 }
