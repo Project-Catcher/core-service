@@ -1,13 +1,10 @@
 package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
-import com.catcher.core.database.DBManager;
-import com.catcher.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.redis.RedisConnectionFailureException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -23,10 +20,13 @@ import static org.apache.http.HttpHeaders.AUTHORIZATION;
  * 헤더(Authorization)에 있는 토큰을 꺼내 이상이 없는 경우 SecurityContext에 저장
  * Request 이전에 작동
  */
-@RequiredArgsConstructor
+
 public class JwtFilter extends OncePerRequestFilter {
     private final JwtTokenProvider jwtTokenProvider;
-    private final DBManager dbManager;
+
+    public JwtFilter(JwtTokenProvider jwtTokenProvider) {
+        this.jwtTokenProvider = jwtTokenProvider;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -34,10 +34,11 @@ public class JwtFilter extends OncePerRequestFilter {
             HttpServletResponse response,
             FilterChain filterChain
     ) throws ServletException, IOException {
+
         String accessToken = getAccessToken(request);
 
         try {
-            if (accessToken != null && jwtTokenProvider.validateToken(accessToken) && !isBlackList(accessToken)) {
+            if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
                 Authentication auth = jwtTokenProvider.getAuthentication(accessToken);
                 SecurityContextHolder.getContext().setAuthentication(auth); // 정상 토큰이면 SecurityContext에 저장
             }
@@ -47,11 +48,6 @@ public class JwtFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
-    }
-
-    private boolean isBlackList(String accessToken) {
-        String blackListToken = JwtUtils.generateBlackListToken(accessToken);
-        return dbManager.getValue(blackListToken).isPresent();
     }
 
     private String getAccessToken(HttpServletRequest request) {

@@ -39,7 +39,6 @@ public class UserService {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final DBManager dbManager;
-    private final AuthService authService;
 
     @Transactional
     public TokenDto signUpUser(UserCreateRequest userCreateRequest) {
@@ -57,11 +56,6 @@ public class UserService {
 
     public TokenDto login(UserLoginRequest userLoginReqDto) {
         return checkAuthenticationAndGetTokenDto(userLoginReqDto.getUsername(), userLoginReqDto.getPassword());
-    }
-
-    public void logout(String accessToken, String refreshToken) {
-        authService.discardAccessToken(accessToken);
-        authService.discardRefreshToken(refreshToken);
     }
 
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
