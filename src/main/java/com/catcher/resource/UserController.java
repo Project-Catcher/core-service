@@ -6,17 +6,18 @@ import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import static com.catcher.common.response.CommonResponse.success;
 import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
+import static com.catcher.utils.HttpServletUtils.deleteCookie;
+import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
 @RestController
@@ -39,5 +40,16 @@ public class UserController {
         TokenDto tokenDto = userService.login(userLoginReqDto);
         setRefreshCookie(response, tokenDto.getRefreshToken());
         return success(tokenDto.getAccessToken());
+    }
+
+    @Operation(summary = "로그아웃")
+    @DeleteMapping("/logout")
+    public CommonResponse<Void> logout(HttpServletRequest request,
+                                       HttpServletResponse response,
+                                       @RequestHeader(name = AUTHORIZATION, required = false) String accessToken,
+                                       @CookieValue(name = REFRESH_TOKEN_NAME, required = false) String refreshToken) {
+        userService.logout(accessToken, refreshToken);
+        deleteCookie(request, response, REFRESH_TOKEN_NAME);
+        return success();
     }
 }
