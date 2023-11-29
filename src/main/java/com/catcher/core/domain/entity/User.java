@@ -7,6 +7,7 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.ZonedDateTime;
+import java.util.Date;
 
 
 @Entity
@@ -38,6 +39,8 @@ public class User extends BaseTimeEntity {
 
     @Column(unique = true, nullable = false)
     private String nickname;
+
+    private Date birthDate;
 
     @Enumerated(value = EnumType.STRING)
     private UserGender userGender;
