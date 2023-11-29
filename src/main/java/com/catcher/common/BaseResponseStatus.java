@@ -4,9 +4,7 @@ import lombok.Getter;
 
 @Getter
 public enum BaseResponseStatus {
-    /**
-     * 1000 : 요청 성공
-     */
+
     SUCCESS(200, "요청에 성공하였습니다."),
 
     /**
@@ -47,7 +45,16 @@ public enum BaseResponseStatus {
      * 4000 : Database, Server 오류
      */
     DATABASE_ERROR(4000, "데이터베이스 연결에 실패하였습니다."),
-    REDIS_ERROR(4002, "redis 연결에 실패하였습니다.");
+    REDIS_ERROR(4002, "redis 연결에 실패하였습니다."),
+
+    /**
+     * 5000: AWS Error
+     */
+    S3UPLOAD_ERROR(5000, "파일 업로드를 실패하였습니다."),
+    KMS_ERROR(5001, "암호화 및 복호화 과정에서 실패하였습니다."),
+    AWS_IO_ERROR(5002, "파일의 정보를 가져오는 데 실패했습니다."),
+
+    ;
 
     private final int code;
     private final String message;
