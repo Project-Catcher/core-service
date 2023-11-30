@@ -123,14 +123,4 @@ public class S3UploadServiceTest {
 
         return file;
     }
-
-
-    @Test
-    void test(){
-        String version = System.getProperty("java.version");
-        System.out.println("version = " + version);
-        ObjectMapper objectMapper = new ObjectMapper();
-        System.out.println(objectMapper.version());
-
-    }
 }
