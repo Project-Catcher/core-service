@@ -41,14 +41,36 @@ public class RefreshTokenAdaptor implements AuthService {
 
     @Override
     public void discardRefreshToken(String refreshToken) {
-        jwtTokenProvider.validateToken(refreshToken);
-        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+        try {
+            jwtTokenProvider.validateToken(refreshToken);
+            Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+            Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
+            if (refreshTokenOptional.isPresent()) {
+                compareRefreshToken(refreshToken, refreshTokenOptional.get());
+            }
+            dbManager.deleteKey(authentication.getName());
+        } catch (BaseException e) {
 
-        Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
-        if(refreshTokenOptional.isPresent()) {
-            compareRefreshToken(refreshToken, refreshTokenOptional.get());
         }
-        dbManager.deleteKey(authentication.getName());
+    }
+
+    @Override
+    public void discardAccessToken(String accessToken) {
+        try {
+            accessToken = getAccessToken(accessToken);
+            jwtTokenProvider.validateToken(accessToken);
+            String key = generateBlackListToken(accessToken);
+            dbManager.putValue(key, "", ACCESS_TOKEN_EXPIRATION_MILLIS);
+        } catch (BaseException e) {
+
+        }
+    }
+
+    private String getAccessToken(String accessToken) {
+       if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+        return accessToken;
     }
 
     private String getRefreshToken(String name) {
