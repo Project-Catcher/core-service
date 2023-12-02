@@ -86,8 +86,8 @@ public class UserController {
         BufferedImage image = captchaService.getImage(captcha);
         response.setHeader("Cache-Control", "no-store");
         response.setHeader("Pragma", "no-cache");
-        response.setContentType("image/jpeg");
-        ImageIO.write(image, "jpeg", response.getOutputStream());
+        response.setContentType("image/png");
+        ImageIO.write(image, "png", response.getOutputStream());
     }
 
     @Operation(summary = "캡챠 이미지 정답 검증")
