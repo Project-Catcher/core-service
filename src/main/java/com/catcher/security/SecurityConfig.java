@@ -4,6 +4,7 @@ import com.catcher.common.GlobalExceptionHandlerFilter;
 import com.catcher.config.JwtAccessDeniedHandler;
 import com.catcher.config.JwtAuthenticationEntryPoint;
 import com.catcher.config.JwtTokenProvider;
+import com.catcher.core.database.DBManager;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -27,6 +28,7 @@ public class SecurityConfig {
     private final JwtTokenProvider jwtTokenProvider;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
+    private final DBManager dbManager;
     private final String[] allowedUrls = {
             "/", "/swagger-ui/**", "/users/**", "favicon.ico",
             "/health/**", "/auth/**", "/oauth/**", "/v3/api-docs/**"
@@ -64,7 +66,7 @@ public class SecurityConfig {
                                         .authenticationEntryPoint(jwtAuthenticationEntryPoint)
                 )
                 .addFilterBefore(new GlobalExceptionHandlerFilter(objectMapper), UsernamePasswordAuthenticationFilter.class)
-                .apply(new JwtSecurityConfig(jwtTokenProvider));
+                .apply(new JwtSecurityConfig(jwtTokenProvider, dbManager));
 
         return httpSecurity.build();
     }

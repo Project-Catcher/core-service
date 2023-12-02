@@ -2,6 +2,7 @@ package com.catcher.core.service;
 
 import com.catcher.app.AppApplication;
 import com.catcher.common.exception.BaseException;
+import com.catcher.core.database.DBManager;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
@@ -20,9 +21,11 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.ZonedDateTime;
+import java.util.Optional;
 import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.*;
+import static com.catcher.utils.JwtUtils.generateBlackListToken;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -36,7 +39,8 @@ class UserServiceTest {
     UserService userService;
     @Autowired
     PasswordEncoder passwordEncoder;
-
+    @Autowired
+    DBManager dbManager;
     @PersistenceContext
     EntityManager em;
 
@@ -263,6 +267,20 @@ class UserServiceTest {
         User user = userRepository.findByEmail(userCreateRequest.getEmail()).orElseThrow();
         assertThat(user.getUserProvider()).isEqualTo(CATCHER);
         assertThat(user.getPhoneAuthentication()).isNotNull();
+    }
+
+    @DisplayName("정상 로그아웃 시, 블랙리스트 토큰에 저장되어야 한다.")
+    @Test
+    void valid_logout() {
+        //given
+        UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
+        TokenDto tokenDto = userService.signUpUser(userCreateRequest);
+        flushAndClearPersistence();
+        //when
+        userService.logout("Bearer " + tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+        //then
+        Optional<String> value = dbManager.getValue(generateBlackListToken(tokenDto.getAccessToken()));
+        assertThat(value).isPresent();
     }
 
     //region PRIVATE METHOD

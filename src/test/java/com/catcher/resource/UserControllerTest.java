@@ -4,13 +4,13 @@ import com.catcher.app.AppApplication;
 import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.CatcherControllerAdvice;
 import com.catcher.common.response.CommonResponse;
+import com.catcher.core.database.DBManager;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -19,8 +19,9 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
@@ -30,14 +31,17 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
-import java.io.IOException;
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
+import static com.catcher.utils.JwtUtils.generateBlackListToken;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
 @SpringBootTest(classes = {AppApplication.class, EmbeddedRedisConfiguration.class})
@@ -49,12 +53,12 @@ class UserControllerTest {
     UserRepository userRepository;
     @Autowired
     PasswordEncoder passwordEncoder;
-
     @Autowired
     UserController userController;
-
     @Autowired
     ObjectMapper objectMapper;
+    @Autowired
+    DBManager dbManager;
 
     User user;
 
@@ -330,10 +334,41 @@ class UserControllerTest {
         assertThat(resultActions.andReturn().getResponse().getCookie(REFRESH_TOKEN_NAME)).isNotNull();
     }
 
-    private <T> T getResponseObject(MockHttpServletResponse response, Class<T> type) throws IOException {
-        JavaType javaType = objectMapper.getTypeFactory().constructParametricType(CommonResponse.class, type);
-        CommonResponse<T> result = objectMapper.readValue(response.getContentAsString(), javaType);
-        return result.getResult();
+    @DisplayName("정상 토큰으로 로그아웃 시, 블랙리스트 토큰 저장")
+    @Test
+    void valid_logout() throws Exception {
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        //when
+        ResultActions resultActions = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        );
+        String accessToken = (String) objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class).getResult();
+        ResultActions logoutResult = mockMvc.perform(delete("/users/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andExpect(status().isOk());
+        Set keys = redisTemplate.keys("*");
+        //then
+        assertThat(dbManager.getValue(generateBlackListToken(accessToken))).isPresent();
+    }
+    @Autowired
+    RedisTemplate redisTemplate;
+    
+    @DisplayName("비정상 토큰으로 로그아웃 시, 200 정상 응답")
+    @Test
+    void invalid_logout() throws Exception {
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        String invalidAccessToken = "gadsklgasg.fadsfklalsfjks.fadsklfsa";
+        //when
+        ResultActions logoutResult = mockMvc.perform(delete("/users/logout")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, invalidAccessToken)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andExpect(status().isOk());
+        //then
+        assertThat(dbManager.getValue(generateBlackListToken(invalidAccessToken))).isEmpty();
     }
 
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {

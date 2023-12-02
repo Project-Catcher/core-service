@@ -6,6 +6,7 @@ import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.service.AuthService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
@@ -14,6 +15,7 @@ import java.util.Optional;
 import static com.catcher.common.BaseResponseStatus.NOT_EXIST_REFRESH_JWT;
 import static com.catcher.utils.JwtUtils.*;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class RefreshTokenAdaptor implements AuthService {
@@ -41,14 +43,36 @@ public class RefreshTokenAdaptor implements AuthService {
 
     @Override
     public void discardRefreshToken(String refreshToken) {
-        jwtTokenProvider.validateToken(refreshToken);
-        Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
-
-        Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
-        if(refreshTokenOptional.isPresent()) {
-            compareRefreshToken(refreshToken, refreshTokenOptional.get());
+        try {
+            jwtTokenProvider.validateToken(refreshToken);
+            Authentication authentication = jwtTokenProvider.getAuthentication(refreshToken);
+            Optional<String> refreshTokenOptional = dbManager.getValue(refreshToken);
+            if (refreshTokenOptional.isPresent()) {
+                compareRefreshToken(refreshToken, refreshTokenOptional.get());
+            }
+            dbManager.deleteKey(authentication.getName());
+        } catch (BaseException e) {
+            log.warn("ErrorCode = {}, Message = {}", e.getStatus().getCode(), e.getStatus().getMessage());
         }
-        dbManager.deleteKey(authentication.getName());
+    }
+
+    @Override
+    public void discardAccessToken(String accessToken) {
+        try {
+            accessToken = getAccessToken(accessToken);
+            jwtTokenProvider.validateToken(accessToken);
+            String key = generateBlackListToken(accessToken);
+            dbManager.putValue(key, "", ACCESS_TOKEN_EXPIRATION_MILLIS);
+        } catch (BaseException e) {
+            log.warn("ErrorCode = {}, Message = {}", e.getStatus().getCode(), e.getStatus().getMessage());
+        }
+    }
+
+    private String getAccessToken(String accessToken) {
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            return accessToken.substring(7);
+        }
+        return null;
     }
 
     private String getRefreshToken(String name) {
