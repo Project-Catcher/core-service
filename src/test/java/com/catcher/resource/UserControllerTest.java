@@ -19,6 +19,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -31,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.time.ZonedDateTime;
+import java.util.Set;
 import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
@@ -344,12 +346,15 @@ class UserControllerTest {
         String accessToken = (String) objectMapper.readValue(resultActions.andReturn().getResponse().getContentAsString(), CommonResponse.class).getResult();
         ResultActions logoutResult = mockMvc.perform(delete("/users/logout")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, accessToken)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .content(objectMapper.writeValueAsString(userLoginRequest))
         ).andExpect(status().isOk());
+        Set keys = redisTemplate.keys("*");
         //then
         assertThat(dbManager.getValue(generateBlackListToken(accessToken))).isPresent();
     }
+    @Autowired
+    RedisTemplate redisTemplate;
     
     @DisplayName("비정상 토큰으로 로그아웃 시, 200 정상 응답")
     @Test

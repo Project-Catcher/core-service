@@ -277,7 +277,7 @@ class UserServiceTest {
         TokenDto tokenDto = userService.signUpUser(userCreateRequest);
         flushAndClearPersistence();
         //when
-        userService.logout(tokenDto.getAccessToken(), tokenDto.getRefreshToken());
+        userService.logout("Bearer " + tokenDto.getAccessToken(), tokenDto.getRefreshToken());
         //then
         Optional<String> value = dbManager.getValue(generateBlackListToken(tokenDto.getAccessToken()));
         assertThat(value).isPresent();

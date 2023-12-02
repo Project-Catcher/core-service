@@ -127,7 +127,7 @@ class JwtFilterTest {
         User user = registerStubUser();
         Authentication authentication = createAuthentication(user.getUsername(), user.getPassword());
         String accessToken = jwtTokenProvider.createAccessToken(authentication);
-        authService.discardAccessToken(accessToken);
+        authService.discardAccessToken("Bearer " + accessToken);
         //when
         Mockito.when(request.getHeader("Authorization")).thenReturn("Bearer " + accessToken);
         jwtFilter.doFilterInternal(request, response,filterChain);

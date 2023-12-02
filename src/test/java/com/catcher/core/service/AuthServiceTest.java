@@ -87,7 +87,7 @@ class AuthServiceTest {
         UserCreateRequest userCreateRequest = userCreateRequest(createRandomUUID(), createRandomUUID(), createRandomUUID(), createRandomUUID());
         TokenDto tokenDto = userService.signUpUser(userCreateRequest);
         //when
-        authService.discardAccessToken(tokenDto.getAccessToken());
+        authService.discardAccessToken("Bearer " + tokenDto.getAccessToken());
         //then
         Optional<String> value = dbManager.getValue(generateBlackListToken(tokenDto.getAccessToken()));
         assertThat(value).isPresent();
