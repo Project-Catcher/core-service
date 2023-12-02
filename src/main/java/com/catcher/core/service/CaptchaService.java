@@ -26,16 +26,21 @@ public class CaptchaService {
 
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
 
-        Captcha captcha = new Captcha.Builder(WIDTH, HEIGHT)
-                .addText()
-                .addNoise()
-                .addBackground()
-                .build();
+        Captcha captcha = generateCaptcha();
 
         final String generatedUserKey = generateCaptchaUserKey(user.getId());
         keyValueDataStorePort.saveValidationCodeWithUserId(generatedUserKey, captcha.getAnswer());
 
         return captcha;
+    }
+
+    private Captcha generateCaptcha() {
+        return new Captcha.Builder(200, 50)
+                .addText()
+                .addNoise()
+                .addBackground()
+                .addBorder()
+                .build();
     }
 
     public BufferedImage getImage(Captcha captcha) {
