@@ -35,7 +35,7 @@ public class CaptchaService {
     }
 
     private Captcha generateCaptcha() {
-        return new Captcha.Builder(200, 50)
+        return new Captcha.Builder(WIDTH, HEIGHT)
                 .addText()
                 .addNoise()
                 .addBackground()
