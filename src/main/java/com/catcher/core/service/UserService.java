@@ -10,6 +10,7 @@ import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.security.CatcherUser;
+import com.catcher.utils.KeyGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -28,6 +29,7 @@ import static com.catcher.core.domain.entity.BaseTimeEntity.zoneId;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.core.domain.entity.enums.UserRole.USER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
+import static com.catcher.utils.KeyGenerator.AuthType.*;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -76,7 +78,7 @@ public class UserService {
             String accessToken = jwtTokenProvider.createAccessToken(authentication);
             String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-            dbManager.putValue(username, refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+            dbManager.putValue(KeyGenerator.generateKey(username, REFRESH_TOKEN), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
 
             return new TokenDto(accessToken, refreshToken);
         } catch (BadCredentialsException e) {

@@ -31,6 +31,7 @@ import static com.catcher.common.response.CommonResponse.success;
 import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
 import static com.catcher.utils.HttpServletUtils.deleteCookie;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
+import static com.catcher.utils.KeyGenerator.AuthType.FIND_ID;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 
 @RequiredArgsConstructor
@@ -70,29 +71,28 @@ public class UserController {
         return success();
     }
 
-    // TODO: 제목 교체
-    @Operation(summary = "이메일 인증코드 발송")
+    @Operation(summary = "ID 찾기 이메일 인증코드 발송")
     @PostMapping("/create-authcode/email")
     public CommonResponse<Void> sendEmailWithAuthCode(final AuthCodeSendRequest authCodeSendRequest) {
-
-        final var key = authCodeService.generateAndSaveRandomKey(authCodeSendRequest.getEmail());
+        final var key = authCodeService.generateAndSaveRandomKey(authCodeSendRequest.getEmail(), FIND_ID);
         emailService.sendEmail(authCodeSendRequest.getEmail(), "title", key);
+
         return success();
     }
 
     // TODO: 응답 타입은 따로 생각해보기
-    @Operation(summary = "인증 코드가 맞는지 검증")
+    @Operation(summary = "ID 찾기 인증 코드가 맞는지 검증")
     @PostMapping("/check-authcode/email")
     public CommonResponse<AuthCodeVerifyResponse> verifyAuthCode(final AuthCodeVerifyRequest authCodeVerifyRequest) {
-        final boolean isVerified = authCodeService.verifyAuthCode(authCodeVerifyRequest.getEmail(), authCodeVerifyRequest.getAuthCode());
+        final boolean isVerified = authCodeService.verifyAuthCode(authCodeVerifyRequest.getEmail(), authCodeVerifyRequest.getAuthCode(), FIND_ID);
 
         return success(new AuthCodeVerifyResponse(isVerified));
     }
 
-    @Operation(summary = "캡챠 이미지 생성 및 정답 임시 저장")
+    @Operation(summary = "ID 찾기 캡챠 이미지 생성 및 정답 임시 저장")
     @PostMapping("/captcha/email")
     public void captchaGenerate(final CaptchaGenerateRequest captchaGenerateRequest, HttpServletResponse response) throws IOException {
-        Captcha captcha = captchaService.generateCaptchaAndSaveAnswer(captchaGenerateRequest.getEmail());
+        Captcha captcha = captchaService.generateCaptchaAndSaveAnswer(captchaGenerateRequest.getEmail(), FIND_ID);
 
         BufferedImage image = captchaService.getImage(captcha);
         response.setHeader("Cache-Control", "no-store");
@@ -101,10 +101,10 @@ public class UserController {
         ImageIO.write(image, "png", response.getOutputStream());
     }
 
-    @Operation(summary = "캡챠 이미지 정답 검증")
+    @Operation(summary = "ID 찾기 캡챠 이미지 정답 검증")
     @PostMapping("/captcha/validate/email")
     public CommonResponse<CaptchaValidateResponse> validateCaptcha(final CaptchaValidateRequest captchaValidateRequest) {
-        final boolean isValidated = captchaService.validateCaptcha(captchaValidateRequest.getEmail(), captchaValidateRequest.getUserAnswer());
+        final boolean isValidated = captchaService.validateCaptcha(captchaValidateRequest.getEmail(), captchaValidateRequest.getUserAnswer(), FIND_ID);
 
         return success(new CaptchaValidateResponse(isValidated));
 

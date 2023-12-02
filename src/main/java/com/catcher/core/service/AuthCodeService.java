@@ -9,6 +9,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.Random;
 
+import static com.catcher.utils.KeyGenerator.AuthType;
+import static com.catcher.utils.KeyGenerator.generateKey;
+
 @Service
 @RequiredArgsConstructor
 public class AuthCodeService {
@@ -24,24 +27,26 @@ public class AuthCodeService {
         return random.nextInt(max - min + 1) + min;
     }
 
-    public String generateAndSaveRandomKey(final String email) {
+    public String generateAndSaveRandomKey(final String email, final AuthType authType) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
         final var generatedKey = String.valueOf(generateSixDigitsRandomCode());
-        final var generatedDataStoreKey = generateDataStoreKey(user.getId());
+        final var generatedDataStoreKey = generateKey(user.getId(), authType);
         keyValueDataStorePort.saveValidationCodeWithUserId(generatedDataStoreKey, generatedKey);
 
         return generatedKey;
     }
 
-    public boolean verifyAuthCode(final String email, String authCode) {
+    public boolean verifyAuthCode(final String email, String authCode, AuthType authType) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
-        final var generatedDataStoreKey = generateDataStoreKey(user.getId());
+        final var generatedDataStoreKey = generateKey(user.getId(), authType);
         final String storedAuthCode = keyValueDataStorePort.findValidationCodeWithKey(generatedDataStoreKey);
 
-        return authCode.equals(storedAuthCode);
-    }
-    private String generateDataStoreKey(final Long userId) {
-        return String.format("%s_%s", userId, "AUTHCODE");
-    }
+        boolean isSuccess = authCode.equals(storedAuthCode);
 
+        if(isSuccess) {
+            keyValueDataStorePort.deleteKey(generatedDataStoreKey);
+        }
+
+        return isSuccess;
+    }
 }
