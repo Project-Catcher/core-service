@@ -11,6 +11,7 @@ import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
+import com.catcher.utils.KeyGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -37,7 +38,7 @@ import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
-import static com.catcher.utils.JwtUtils.generateBlackListToken;
+import static com.catcher.utils.KeyGenerator.AuthType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -351,7 +352,7 @@ class UserControllerTest {
         ).andExpect(status().isOk());
         Set keys = redisTemplate.keys("*");
         //then
-        assertThat(dbManager.getValue(generateBlackListToken(accessToken))).isPresent();
+        assertThat(dbManager.getValue(KeyGenerator.generateKey(accessToken, BLACK_LIST_ACCESS_TOKEN))).isPresent();
     }
     @Autowired
     RedisTemplate redisTemplate;
@@ -368,7 +369,7 @@ class UserControllerTest {
                 .content(objectMapper.writeValueAsString(userLoginRequest))
         ).andExpect(status().isOk());
         //then
-        assertThat(dbManager.getValue(generateBlackListToken(invalidAccessToken))).isEmpty();
+        assertThat(dbManager.getValue(KeyGenerator.generateKey(invalidAccessToken, BLACK_LIST_ACCESS_TOKEN))).isEmpty();
     }
 
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
