@@ -61,7 +61,7 @@ public class UserService {
 
     public void logout(String accessToken, String refreshToken) {
         authService.discardAccessToken(accessToken);
-        authService.discardAccessToken(refreshToken);
+        authService.discardRefreshToken(refreshToken);
     }
 
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
