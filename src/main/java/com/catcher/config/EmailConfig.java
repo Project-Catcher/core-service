@@ -1,6 +1,6 @@
 package com.catcher.config;
 
-import com.catcher.infrastructure.KmsService;
+import com.catcher.infrastructure.utils.KmsUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -44,15 +44,15 @@ public class EmailConfig {
     @Value("${spring.mail.properties.mail.smtp.writetimeout}")
     private int writeTimeout;
 
-    private final KmsService kmsService;
+    private final KmsUtils kmsUtils;
 
     @Bean
     public JavaMailSender javaMailSender() {
         JavaMailSenderImpl mailSender = new JavaMailSenderImpl();
         mailSender.setHost(host);
         mailSender.setPort(port);
-        mailSender.setUsername(kmsService.decrypt(username));
-        mailSender.setPassword(kmsService.decrypt(password));
+        mailSender.setUsername(kmsUtils.decrypt(username));
+        mailSender.setPassword(kmsUtils.decrypt(password));
         mailSender.setDefaultEncoding("UTF-8");
         mailSender.setJavaMailProperties(getMailProperties());
 

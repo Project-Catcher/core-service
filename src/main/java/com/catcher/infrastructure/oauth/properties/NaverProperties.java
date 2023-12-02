@@ -1,7 +1,7 @@
 package com.catcher.infrastructure.oauth.properties;
 
 import com.catcher.core.domain.entity.enums.UserProvider;
-import com.catcher.infrastructure.KmsService;
+import com.catcher.infrastructure.utils.KmsUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -14,7 +14,7 @@ import java.util.Map;
 @Component
 @RequiredArgsConstructor
 public class NaverProperties implements OAuthProperties{
-    private final KmsService kmsService;
+    private final KmsUtils kmsUtils;
     @Value("${oauth2.client.registration.naver.client-id}")
     private String clientId;
     @Value("${oauth2.client.registration.naver.client-secret}")
@@ -36,8 +36,8 @@ public class NaverProperties implements OAuthProperties{
         multiValueMap.add("code", params.get("code").toString());
         multiValueMap.add("grant_type", grantType);
         multiValueMap.add("redirect_uri", signUpUri);
-        multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
-        multiValueMap.add("client_id", kmsService.decrypt(clientId));
+        multiValueMap.add("client_secret", kmsUtils.decrypt(clientSecret));
+        multiValueMap.add("client_id", kmsUtils.decrypt(clientId));
         multiValueMap.add("state", params.get("state").toString());
 
         return multiValueMap;
@@ -49,8 +49,8 @@ public class NaverProperties implements OAuthProperties{
         multiValueMap.add("code", params.get("code").toString());
         multiValueMap.add("grant_type", grantType);
         multiValueMap.add("redirect_uri", loginUri);
-        multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
-        multiValueMap.add("client_id", kmsService.decrypt(clientId));
+        multiValueMap.add("client_secret", kmsUtils.decrypt(clientSecret));
+        multiValueMap.add("client_id", kmsUtils.decrypt(clientId));
         multiValueMap.add("state", params.get("state").toString());
 
         return multiValueMap;
@@ -61,8 +61,8 @@ public class NaverProperties implements OAuthProperties{
         MultiValueMap<String, String> multiValueMap = new LinkedMultiValueMap<>();
         multiValueMap.add("access_token", accessToken);
         multiValueMap.add("grant_type", "delete");
-        multiValueMap.add("client_secret", kmsService.decrypt(clientSecret));
-        multiValueMap.add("client_id", kmsService.decrypt(clientId));
+        multiValueMap.add("client_secret", kmsUtils.decrypt(clientSecret));
+        multiValueMap.add("client_id", kmsUtils.decrypt(clientId));
         multiValueMap.add("service_provider", "NAVER");
 
         return multiValueMap;

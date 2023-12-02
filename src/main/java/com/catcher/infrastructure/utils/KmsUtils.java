@@ -18,12 +18,8 @@ import java.nio.charset.StandardCharsets;
 @Slf4j
 @Service
 public class KmsUtils {
-
     @Value("${aws.kms.keyId}")
     private static String KEY_ID;
-
-//    @Value("${spring.profiles.active}") TODO: defaultCredential 변경으로 적용되면 추후 삭제 예정
-//    private static String PROFILE;
 
     public String encrypt(String text) {
         AWSKMS kmsClient = AWSKMSClientBuilder.standard()

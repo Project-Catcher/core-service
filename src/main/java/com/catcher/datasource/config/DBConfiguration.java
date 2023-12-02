@@ -1,6 +1,6 @@
 package com.catcher.datasource.config;
 
-import com.catcher.infrastructure.KmsService;
+import com.catcher.infrastructure.utils.KmsUtils;
 import com.jcraft.jsch.JSch;
 import com.jcraft.jsch.Session;
 import lombok.RequiredArgsConstructor;
@@ -16,7 +16,7 @@ import javax.sql.DataSource;
 @RequiredArgsConstructor
 @Profile("!test")
 public class DBConfiguration {
-    private final KmsService kmsService;
+    private final KmsUtils kmsUtils;
     /**
      * DB
      */
@@ -58,23 +58,23 @@ public class DBConfiguration {
 
         JSch jsch = new JSch();
         Session session = jsch.getSession(
-                kmsService.decrypt(sshUsername),
-                kmsService.decrypt(sshHost),
+                kmsUtils.decrypt(sshUsername),
+                kmsUtils.decrypt(sshHost),
                 sshPort
         );
-        session.setPassword(kmsService.decrypt(sshPassword));
+        session.setPassword(kmsUtils.decrypt(sshPassword));
         session.setConfig("StrictHostKeyChecking", "no");
         session.connect();
 
         int assignedPort = session.setPortForwardingL(0,
-                kmsService.decrypt(originUrl),
+                kmsUtils.decrypt(originUrl),
                 localPort
         );
 
         return DataSourceBuilder.create()
-                .url(kmsService.decrypt(databaseUrl).replace(Integer.toString(localPort), Integer.toString(assignedPort)))
-                .username(kmsService.decrypt(databaseUsername))
-                .password(kmsService.decrypt(databasePassword))
+                .url(kmsUtils.decrypt(databaseUrl).replace(Integer.toString(localPort), Integer.toString(assignedPort)))
+                .username(kmsUtils.decrypt(databaseUsername))
+                .password(kmsUtils.decrypt(databasePassword))
                 .build();
     }
 }
