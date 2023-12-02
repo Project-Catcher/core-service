@@ -36,7 +36,7 @@ public class AuthCodeService {
     public boolean verifyAuthCode(final String email, String authCode) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
         final var generatedDataStoreKey = generateDataStoreKey(user.getId());
-        final String storedAuthCode = keyValueDataStorePort.retrieveValidationCodeWithKey(generatedDataStoreKey);
+        final String storedAuthCode = keyValueDataStorePort.findValidationCodeWithKey(generatedDataStoreKey);
 
         return authCode.equals(storedAuthCode);
     }

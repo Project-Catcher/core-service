@@ -15,8 +15,8 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class CaptchaService {
 
-    private static final int WIDTH = 200;
-    private static final int HEIGHT = 50;
+    private static final int WIDTH = 345;
+    private static final int HEIGHT = 71;
 
     private final UserRepository userRepository;
 
@@ -46,7 +46,7 @@ public class CaptchaService {
         final var user = userRepository.findByEmail(userEmail).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
 
         final String generatedUserKEy = generateCaptchaUserKey(user.getId());
-        final String answer = keyValueDataStorePort.retrieveValidationCodeWithKey(generatedUserKEy);
+        final String answer = keyValueDataStorePort.findValidationCodeWithKey(generatedUserKEy);
 
         return Objects.equals(answer, userAnswer);
     }

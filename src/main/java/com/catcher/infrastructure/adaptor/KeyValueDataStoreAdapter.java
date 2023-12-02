@@ -21,7 +21,7 @@ public class KeyValueDataStoreAdapter implements KeyValueDataStorePort {
     }
 
     @Override
-    public String retrieveValidationCodeWithKey(final String key) {
+    public String findValidationCodeWithKey(final String key) {
         return redisManager.getValue(key).orElseThrow(() -> new BaseException(BaseResponseStatus.AUTH_CODE_NOT_FOUND));
     }
 
