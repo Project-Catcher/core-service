@@ -33,12 +33,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.time.ZonedDateTime;
-import java.util.Set;
 import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
-import static com.catcher.utils.KeyGenerator.AuthType.*;
+import static com.catcher.utils.KeyGenerator.AuthType.BLACK_LIST_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -350,7 +349,7 @@ class UserControllerTest {
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
                 .content(objectMapper.writeValueAsString(userLoginRequest))
         ).andExpect(status().isOk());
-        Set keys = redisTemplate.keys("*");
+
         //then
         assertThat(dbManager.getValue(KeyGenerator.generateKey(accessToken, BLACK_LIST_ACCESS_TOKEN))).isPresent();
     }
