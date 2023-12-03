@@ -84,7 +84,7 @@ jobs:
 
           KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
           cd $KUSTOMIZE_PATH
-          kustomize edit set image core-svc-image="${{ env.ECR_URL }}:${{ github.sha }}"
+          kustomize edit set image app-core-img="${{ env.ECR_URL }}:${{ github.sha }}"
           kustomize build .
           
       - name: Commit minifest files
