@@ -31,7 +31,7 @@ public class SecurityConfig {
     private final DBManager dbManager;
     private final String[] allowedUrls = {
             "/", "/swagger-ui/**", "/users/**", "favicon.ico",
-            "/health/**", "/auth/**", "/oauth/**", "/v3/api-docs/**"
+            "/health/**", "/auth/**", "/oauth/**", "/v3/api-docs/**", "/core/v3/api-docs/**"
     };
 
     @Bean
