@@ -31,7 +31,7 @@ public class CaptchaService {
         Captcha captcha = generateCaptcha();
 
         final String generatedUserKey = generateKey(user.getId(), authType);
-        keyValueDataStorePort.saveValidationCodeWithUserId(generatedUserKey, captcha.getAnswer());
+        keyValueDataStorePort.saveValidationCodeWithKey(generatedUserKey, captcha.getAnswer());
 
         return captcha;
     }

@@ -18,6 +18,5 @@ public final class KeyGenerator {
         FIND_PASSWORD_SUCCESS,
         CAPTCHA_ID,
         CAPTCHA_PASSWORD,
-
     }
 }

@@ -16,7 +16,7 @@ public class KeyValueDataStoreAdapter implements KeyValueDataStorePort {
     private static final long THREE_MINUTES_AS_MILLISECONDS = 180000L;
 
     @Override
-    public void saveValidationCodeWithUserId(final String key, final String authCode) {
+    public void saveValidationCodeWithKey(final String key, final String authCode) {
         redisManager.putValue(key, authCode, THREE_MINUTES_AS_MILLISECONDS);
     }
 

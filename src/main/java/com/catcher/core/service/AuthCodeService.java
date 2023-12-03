@@ -31,7 +31,7 @@ public class AuthCodeService {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
         final var generatedKey = String.valueOf(generateSixDigitsRandomCode());
         final var generatedDataStoreKey = generateKey(user.getId(), authType);
-        keyValueDataStorePort.saveValidationCodeWithUserId(generatedDataStoreKey, generatedKey);
+        keyValueDataStorePort.saveValidationCodeWithKey(generatedDataStoreKey, generatedKey);
 
         return generatedKey;
     }
