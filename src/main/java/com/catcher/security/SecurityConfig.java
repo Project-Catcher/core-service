@@ -53,7 +53,7 @@ public class SecurityConfig {
                 .cors(Customizer.withDefaults())
                 .headers(headers -> headers.frameOptions(Customizer.withDefaults()))
                 .authorizeHttpRequests(request ->
-                        request.requestMatchers("*").permitAll()
+                        request.requestMatchers("/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .sessionManagement(sessionManagement ->
