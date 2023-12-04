@@ -6,14 +6,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.data.redis.connection.RedisClusterConfiguration;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
-
-import java.util.List;
 
 @Profile({"dev", "prod"})
 @Configuration
@@ -21,11 +19,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class RedisConfig {
 
-    @Value("${spring.data.redis.cluster.nodes}")
-    private List<String> nodes;
+    @Value("${spring.data.redis.host}")
+    private String host;
 
-    @Value("${spring.data.redis.username}")
-    private String userName;
 
     @Value("${spring.data.redis.password}")
     private String password;
@@ -34,10 +30,9 @@ public class RedisConfig {
 
     @Bean
     public RedisConnectionFactory redisConnectionFactory() {
-        RedisClusterConfiguration redisClusterConfigurations = new RedisClusterConfiguration(nodes);
-        redisClusterConfigurations.setUsername(kmsUtils.decrypt(userName));
-        redisClusterConfigurations.setPassword(kmsUtils.decrypt(password));
-        return new LettuceConnectionFactory(redisClusterConfigurations);
+        RedisStandaloneConfiguration redisStandaloneConfiguration = new RedisStandaloneConfiguration(host);
+        redisStandaloneConfiguration.setPassword(kmsUtils.decrypt(password));
+        return new LettuceConnectionFactory(redisStandaloneConfiguration);
     }
 
     @Bean
