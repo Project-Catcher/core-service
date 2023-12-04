@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
+import static com.catcher.common.BaseResponseStatus.CODE_NOT_MATCH;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.generateKey;
 
@@ -49,7 +50,7 @@ public class CaptchaService {
         return captcha.getImage();
     }
 
-    public boolean validateCaptcha(String userEmail, String userAnswer, AuthType authType) {
+    public void validateCaptcha(String userEmail, String userAnswer, AuthType authType) {
         final var user = userRepository.findByEmail(userEmail).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
 
         final String generatedUserKey = generateKey(user.getId(), authType);
@@ -57,11 +58,10 @@ public class CaptchaService {
 
         boolean isSuccess = Objects.equals(answer, userAnswer);
 
-        if(isSuccess) {
-            keyValueDataStorePort.deleteKey(generatedUserKey);
+        if (!isSuccess) {
+            throw new BaseException(CODE_NOT_MATCH);
         }
-
-        return isSuccess;
+        keyValueDataStorePort.deleteKey(generatedUserKey);
     }
 
 }
