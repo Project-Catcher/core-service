@@ -159,9 +159,9 @@ public class UserController {
     private AuthType getAuthType(HttpServletRequest request) {
         String uri = request.getRequestURI();
         AuthType authType = null;
-        if (uri.contains("/find-id")) {
+        if (uri.contains(FIND_ID_URL)) {
             authType = FIND_ID;
-        } else if (uri.contains("/find-pw")) {
+        } else if (uri.contains(FIND_PW_URL)) {
             authType = FIND_PASSWORD;
         }
 
