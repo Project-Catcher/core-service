@@ -15,7 +15,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.util.List;
 
-@Profile({"local", "dev", "prod"})
+@Profile({"dev", "prod"})
 @Configuration
 @EnableRedisRepositories
 @RequiredArgsConstructor
