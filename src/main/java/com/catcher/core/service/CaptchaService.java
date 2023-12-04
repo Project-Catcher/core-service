@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.awt.image.BufferedImage;
 import java.util.Objects;
 
+import static com.catcher.utils.KeyGenerator.AuthType;
+import static com.catcher.utils.KeyGenerator.generateKey;
+
 @Service
 @RequiredArgsConstructor
 public class CaptchaService {
@@ -22,14 +25,13 @@ public class CaptchaService {
 
     private final KeyValueDataStorePort keyValueDataStorePort;
 
-    public Captcha generateCaptchaAndSaveAnswer(final String email) {
-
+    public Captcha generateCaptchaAndSaveAnswer(final String email, AuthType authType) {
         final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
 
         Captcha captcha = generateCaptcha();
 
-        final String generatedUserKey = generateCaptchaUserKey(user.getId());
-        keyValueDataStorePort.saveValidationCodeWithUserId(generatedUserKey, captcha.getAnswer());
+        final String generatedUserKey = generateKey(user.getId(), authType);
+        keyValueDataStorePort.saveValidationCodeWithKey(generatedUserKey, captcha.getAnswer());
 
         return captcha;
     }
@@ -47,17 +49,19 @@ public class CaptchaService {
         return captcha.getImage();
     }
 
-    public boolean validateCaptcha(String userEmail, String userAnswer) {
+    public boolean validateCaptcha(String userEmail, String userAnswer, AuthType authType) {
         final var user = userRepository.findByEmail(userEmail).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
 
-        final String generatedUserKey = generateCaptchaUserKey(user.getId());
+        final String generatedUserKey = generateKey(user.getId(), authType);
         final String answer = keyValueDataStorePort.findValidationCodeWithKey(generatedUserKey);
 
-        return Objects.equals(answer, userAnswer);
-    }
+        boolean isSuccess = Objects.equals(answer, userAnswer);
 
-    private String generateCaptchaUserKey(final Long userId) {
-        return String.format("%s_%s", userId, "CAPTCHA");
+        if(isSuccess) {
+            keyValueDataStorePort.deleteKey(generatedUserKey);
+        }
+
+        return isSuccess;
     }
 
 }

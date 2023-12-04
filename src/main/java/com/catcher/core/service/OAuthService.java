@@ -34,6 +34,8 @@ import java.util.function.Supplier;
 
 import static com.catcher.common.BaseResponseStatus.*;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
+import static com.catcher.utils.KeyGenerator.AuthType.REFRESH_TOKEN;
+import static com.catcher.utils.KeyGenerator.generateKey;
 
 @Service
 @Slf4j
@@ -132,7 +134,7 @@ public class OAuthService {
             String accessToken = jwtTokenProvider.createAccessToken(authentication);
             String refreshToken = jwtTokenProvider.createRefreshToken(authentication);
 
-            dbManager.putValue(username, refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
+            dbManager.putValue(generateKey(username, REFRESH_TOKEN), refreshToken, REFRESH_TOKEN_EXPIRATION_MILLIS);
 
             return new TokenDto(accessToken, refreshToken);
         } catch (BadCredentialsException e) {

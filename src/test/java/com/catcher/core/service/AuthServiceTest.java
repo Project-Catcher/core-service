@@ -6,6 +6,7 @@ import com.catcher.core.database.DBManager;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
+import com.catcher.utils.KeyGenerator;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.junit.jupiter.api.DisplayName;
@@ -19,7 +20,7 @@ import java.time.ZonedDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.catcher.utils.JwtUtils.generateBlackListToken;
+import static com.catcher.utils.KeyGenerator.AuthType.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -89,7 +90,7 @@ class AuthServiceTest {
         //when
         authService.discardAccessToken("Bearer " + tokenDto.getAccessToken());
         //then
-        Optional<String> value = dbManager.getValue(generateBlackListToken(tokenDto.getAccessToken()));
+        Optional<String> value = dbManager.getValue(KeyGenerator.generateKey(tokenDto.getAccessToken(), BLACK_LIST_ACCESS_TOKEN));
         assertThat(value).isPresent();
     }
 

@@ -16,13 +16,18 @@ public class KeyValueDataStoreAdapter implements KeyValueDataStorePort {
     private static final long THREE_MINUTES_AS_MILLISECONDS = 180000L;
 
     @Override
-    public void saveValidationCodeWithUserId(final String userId, final String authCode) {
-        redisManager.putValue(userId, authCode, THREE_MINUTES_AS_MILLISECONDS);
+    public void saveValidationCodeWithKey(final String key, final String authCode) {
+        redisManager.putValue(key, authCode, THREE_MINUTES_AS_MILLISECONDS);
     }
 
     @Override
     public String findValidationCodeWithKey(final String key) {
         return redisManager.getValue(key).orElseThrow(() -> new BaseException(BaseResponseStatus.AUTH_CODE_NOT_FOUND));
+    }
+
+    @Override
+    public void deleteKey(String key) {
+        redisManager.deleteKey(key);
     }
 
 }

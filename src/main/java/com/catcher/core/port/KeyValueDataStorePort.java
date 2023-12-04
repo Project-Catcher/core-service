@@ -2,8 +2,10 @@ package com.catcher.core.port;
 
 public interface KeyValueDataStorePort {
 
-    void saveValidationCodeWithUserId(String userId, String value);
+    void saveValidationCodeWithKey(String key, String value);
 
     String findValidationCodeWithKey(String key);
+
+    void deleteKey(String key);
 
 }
