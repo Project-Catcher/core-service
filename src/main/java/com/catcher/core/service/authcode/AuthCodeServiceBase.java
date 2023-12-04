@@ -5,6 +5,7 @@ import com.catcher.common.exception.BaseException;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.port.KeyValueDataStorePort;
+import com.catcher.resource.request.AuthCodeSendRequest;
 import com.catcher.resource.request.AuthCodeVerifyRequest;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.PWChangeRequest;
@@ -24,8 +25,10 @@ public abstract class AuthCodeServiceBase {
         throw new UnsupportedOperationException();
     }
 
-    public String generateAndSaveRandomKey(final String email) {
-        final var user = userRepository.findByEmail(email).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
+    public String generateAndSaveRandomKey(final AuthCodeSendRequest authCodeSendRequest) {
+        final var user = userRepository.findByEmail(authCodeSendRequest.getEmail()).orElseThrow(() -> new BaseException(BaseResponseStatus.USERS_NOT_EXISTS));
+        authCodeSendRequest.checkValidation(user);
+
         final var generatedKey = String.valueOf(generateSixDigitsRandomCode());
         final var generatedDataStoreKey = generateKey(user.getId(), getAuthType());
         keyValueDataStorePort.saveValidationCodeWithKey(generatedDataStoreKey, generatedKey);

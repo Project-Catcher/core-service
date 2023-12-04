@@ -84,7 +84,7 @@ public class UserController {
             HttpServletRequest request,
             @Valid final IDAuthCodeSendRequest authCodeSendRequest) {
         AuthCodeServiceBase authCodeService = getAuthCodeService(request);
-        final var key = authCodeService.generateAndSaveRandomKey(authCodeSendRequest.getEmail());
+        final var key = authCodeService.generateAndSaveRandomKey(authCodeSendRequest);
         emailService.sendEmail(authCodeSendRequest.getEmail(), "title", key);
 
         return success();
