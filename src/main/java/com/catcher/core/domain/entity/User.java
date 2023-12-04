@@ -67,4 +67,8 @@ public class User extends BaseTimeEntity {
     private ZonedDateTime phoneMarketingTerm; // 핸드폰 선택약관
 
     private ZonedDateTime deletedAt;
+
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
+    }
 }
