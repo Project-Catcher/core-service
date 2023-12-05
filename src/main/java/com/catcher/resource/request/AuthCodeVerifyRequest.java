@@ -5,6 +5,8 @@ import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.User;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 import static com.catcher.common.BaseResponseStatus.CODE_NOT_MATCH;
 import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
 import static com.catcher.utils.KeyGenerator.AuthType;
@@ -28,7 +30,9 @@ public interface AuthCodeVerifyRequest {
 
         @Override
         public void checkValidation(User user, String answer) {
-            if (!authCode.equals(answer)) {
+            if (Arrays.asList(email, authCode).contains(null)) {
+                throw new BaseException(REQUEST_ERROR);
+            } else if (!authCode.equals(answer)) {
                 throw new BaseException(CODE_NOT_MATCH);
             } else if (!email.equals(user.getEmail())) {
                 throw new BaseException(REQUEST_ERROR);
@@ -49,7 +53,9 @@ public interface AuthCodeVerifyRequest {
 
         @Override
         public void checkValidation(User user, String answer) {
-            if (!authCode.equals(answer)) {
+            if (Arrays.asList(email, authCode, username).contains(null)) {
+                throw new BaseException(REQUEST_ERROR);
+            } else if (!authCode.equals(answer)) {
                 throw new BaseException(CODE_NOT_MATCH);
             } else if (!email.equals(user.getEmail()) || !username.equals(user.getUsername())) {
                 throw new BaseException(REQUEST_ERROR);

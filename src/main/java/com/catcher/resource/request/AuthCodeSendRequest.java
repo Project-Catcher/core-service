@@ -5,6 +5,8 @@ import com.catcher.core.domain.entity.User;
 import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
 
 public interface AuthCodeSendRequest {
@@ -13,18 +15,20 @@ public interface AuthCodeSendRequest {
     void checkValidation(User user);
 
     @Getter
-    class IDAuthCodeSendRequest implements AuthCodeSendRequest{
+    class IDAuthCodeSendRequest implements AuthCodeSendRequest {
         @NotNull(message = "이메일을 입력해주세요.")
         private String email;
 
         @Override
         public void checkValidation(User user) {
-
+            if (Arrays.asList(email).contains(null)) {
+                throw new BaseException(REQUEST_ERROR);
+            }
         }
     }
 
     @Getter
-    class PWAuthCodeSendRequest implements AuthCodeSendRequest{
+    class PWAuthCodeSendRequest implements AuthCodeSendRequest {
         @NotNull(message = "이메일을 입력해주세요.")
         private String email;
         @NotNull(message = "아이디를 입력해주세요.")
@@ -32,7 +36,9 @@ public interface AuthCodeSendRequest {
 
         @Override
         public void checkValidation(User user) {
-            if(!email.equals(user.getEmail()) || !username.equals(user.getUsername())) {
+            if (Arrays.asList(email, username).contains(null)) {
+                throw new BaseException(REQUEST_ERROR);
+            } else if (!email.equals(user.getEmail()) || !username.equals(user.getUsername())) {
                 throw new BaseException(REQUEST_ERROR);
             }
         }

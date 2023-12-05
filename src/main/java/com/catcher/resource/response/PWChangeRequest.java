@@ -3,7 +3,10 @@ package com.catcher.resource.response;
 import com.catcher.common.exception.BaseException;
 import lombok.Getter;
 
+import java.util.Arrays;
+
 import static com.catcher.common.BaseResponseStatus.PASSWORD_NOT_MATCH;
+import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
 
 @Getter
 public class PWChangeRequest {
@@ -12,7 +15,9 @@ public class PWChangeRequest {
     private String newPasswordCheck;
 
     public void checkValidation() {
-        if(!newPassword.equals(newPasswordCheck)) {
+        if (Arrays.asList(code, newPassword, newPasswordCheck).contains(null)) {
+            throw new BaseException(REQUEST_ERROR);
+        } else if (!newPassword.equals(newPasswordCheck)) {
             throw new BaseException(PASSWORD_NOT_MATCH);
         }
     }
