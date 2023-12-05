@@ -53,7 +53,7 @@ public abstract class AuthCodeServiceBase {
         return getAuthType().equals(authType);
     }
 
-    protected int generateSixDigitsRandomCode() {
+    private int generateSixDigitsRandomCode() {
         int min = 100000;
         int max = 999999;
         Random random = new Random();
