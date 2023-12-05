@@ -9,8 +9,12 @@ import com.catcher.core.service.CaptchaService;
 import com.catcher.core.service.EmailService;
 import com.catcher.core.service.UserService;
 import com.catcher.core.service.authcode.AuthCodeServiceBase;
+import com.catcher.resource.request.AuthCodeSendRequest;
+import com.catcher.resource.request.AuthCodeVerifyRequest;
 import com.catcher.resource.request.CaptchaGenerateRequest;
 import com.catcher.resource.request.CaptchaValidateRequest;
+import com.catcher.resource.resolver.annotation.AuthCodeSendInject;
+import com.catcher.resource.resolver.annotation.AuthCodeVerifyInject;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.CaptchaValidateResponse;
 import com.catcher.resource.response.PWChangeRequest;
@@ -29,8 +33,6 @@ import java.util.List;
 
 import static com.catcher.common.response.CommonResponse.success;
 import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
-import static com.catcher.resource.request.AuthCodeSendRequest.IDAuthCodeSendRequest;
-import static com.catcher.resource.request.AuthCodeVerifyRequest.IDAuthCodeVerifyRequest;
 import static com.catcher.utils.HttpServletUtils.deleteCookie;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType;
@@ -43,8 +45,8 @@ import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 @RequestMapping("/users")
 @Slf4j
 public class UserController {
-    private final static String FIND_ID_URL = "/find-id";
-    private final static String FIND_PW_URL = "/find-pw";
+    public final static String FIND_ID_URL = "/find-id";
+    public final static String FIND_PW_URL = "/find-pw";
 
     private final UserService userService;
     private final EmailService emailService;
@@ -82,7 +84,7 @@ public class UserController {
     @PostMapping({FIND_ID_URL, FIND_PW_URL})
     public CommonResponse<Void> sendFindIDEmail(
             HttpServletRequest request,
-            @Valid final IDAuthCodeSendRequest authCodeSendRequest) {
+            @AuthCodeSendInject final AuthCodeSendRequest authCodeSendRequest) {
         AuthCodeServiceBase authCodeService = getAuthCodeService(request);
         final var key = authCodeService.generateAndSaveRandomKey(authCodeSendRequest);
         emailService.sendEmail(authCodeSendRequest.getEmail(), "title", key);
@@ -94,7 +96,7 @@ public class UserController {
     @PostMapping({FIND_ID_URL + "/check", FIND_PW_URL + "/check"})
     public CommonResponse<AuthCodeVerifyResponse> verifyAuthCode(
             HttpServletRequest request,
-            @Valid final IDAuthCodeVerifyRequest authCodeVerifyRequest) {
+            @AuthCodeVerifyInject final AuthCodeVerifyRequest authCodeVerifyRequest) {
         AuthCodeServiceBase authCodeService = getAuthCodeService(request);
         AuthCodeVerifyResponse authCodeVerifyResponse = authCodeService.verifyAuthCode(authCodeVerifyRequest);
 
