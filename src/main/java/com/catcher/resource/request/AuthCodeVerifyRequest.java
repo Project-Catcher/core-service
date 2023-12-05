@@ -3,15 +3,14 @@ package com.catcher.resource.request;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 
 import static com.catcher.common.BaseResponseStatus.CODE_NOT_MATCH;
 import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
-import static com.catcher.utils.KeyGenerator.AuthType;
-import static com.catcher.utils.KeyGenerator.AuthType.FIND_ID;
-import static com.catcher.utils.KeyGenerator.AuthType.FIND_PASSWORD;
 
 public interface AuthCodeVerifyRequest {
 
@@ -21,9 +20,9 @@ public interface AuthCodeVerifyRequest {
 
     void checkValidation(User user, String answer);
 
-    AuthType getAuthType();
-
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     class IDAuthCodeVerifyRequest implements AuthCodeVerifyRequest {
         private String email;
         private String authCode;
@@ -38,14 +37,11 @@ public interface AuthCodeVerifyRequest {
                 throw new BaseException(REQUEST_ERROR);
             }
         }
-
-        @Override
-        public AuthType getAuthType() {
-            return FIND_ID;
-        }
     }
 
     @Getter
+    @NoArgsConstructor
+    @AllArgsConstructor
     class PWAuthCodeVerifyRequest implements AuthCodeVerifyRequest {
         private String email;
         private String username;
@@ -60,11 +56,6 @@ public interface AuthCodeVerifyRequest {
             } else if (!email.equals(user.getEmail()) || !username.equals(user.getUsername())) {
                 throw new BaseException(REQUEST_ERROR);
             }
-        }
-
-        @Override
-        public AuthType getAuthType() {
-            return FIND_PASSWORD;
         }
     }
 }
