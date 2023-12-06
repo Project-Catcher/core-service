@@ -1,7 +1,9 @@
 package com.catcher.resource.response;
 
 import com.catcher.common.exception.BaseException;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import java.util.Arrays;
 
@@ -9,6 +11,8 @@ import static com.catcher.common.BaseResponseStatus.PASSWORD_NOT_MATCH;
 import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
 
 @Getter
+@NoArgsConstructor
+@AllArgsConstructor
 public class PWChangeRequest {
     private String code;
     private String newPassword;
