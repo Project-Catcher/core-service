@@ -20,7 +20,10 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import static com.catcher.common.BaseResponseStatus.AUTH_CODE_NOT_FOUND;
+import static com.catcher.common.BaseResponseStatus.CODE_NOT_MATCH;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
+import static com.catcher.testconfiguriation.BaseExceptionUtils.assertBaseException;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_ID;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_PASSWORD;
@@ -104,9 +107,10 @@ class CaptchaServiceTest {
             // when
 
             // then
-            assertThatThrownBy(
-                    () -> captchaService.validateCaptcha(user.getEmail(), captcha.getAnswer() + "1", authType)
-            ).isInstanceOf(BaseException.class);
+            assertBaseException(
+                    () -> captchaService.validateCaptcha(user.getEmail(), captcha.getAnswer() + "1", authType),
+                    CODE_NOT_MATCH
+            );
         }
     }
 
@@ -121,11 +125,12 @@ class CaptchaServiceTest {
 
             // then
             captchaService.validateCaptcha(user.getEmail(), captcha.getAnswer(), authType);
-            assertThatThrownBy(
+            assertBaseException(
                     () -> keyValueDataStorePort.findValidationCodeWithKey(
                             generateKey(user.getId(), authType)
-                    )
-            ).isInstanceOf(BaseException.class);
+                    ),
+                    AUTH_CODE_NOT_FOUND
+            );
         }
     }
 
