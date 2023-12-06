@@ -1,7 +1,6 @@
 package com.catcher.core.service.authcode;
 
 import com.catcher.app.AppApplication;
-import com.catcher.common.exception.BaseException;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
@@ -26,16 +25,17 @@ import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.UUID;
 
+import static com.catcher.common.BaseResponseStatus.*;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.resource.request.AuthCodeVerifyRequest.PWAuthCodeVerifyRequest;
 import static com.catcher.resource.response.AuthCodeVerifyResponse.IDAuthCodeVerifyResponse;
 import static com.catcher.resource.response.AuthCodeVerifyResponse.PWAuthCodeVerifyResponse;
+import static com.catcher.testconfiguriation.BaseExceptionUtils.assertBaseException;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.AuthType.*;
 import static com.catcher.utils.KeyGenerator.generateKey;
 import static java.sql.Date.from;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -61,9 +61,6 @@ class AuthCodeServiceBaseTest {
     PWChangeRequest mockPWChangeRequest;
     @Autowired
     PasswordEncoder passwordEncoder;
-
-    @Mock
-    User mockUser;
 
     User stubUser;
 
@@ -104,9 +101,10 @@ class AuthCodeServiceBaseTest {
             when(mockAuthCodeSendRequest.getEmail()).thenReturn(email);
 
             // then
-            assertThatThrownBy(
-                    () -> authCodeService.generateAndSaveRandomKey(mockAuthCodeSendRequest)
-            ).isInstanceOf(BaseException.class);
+            assertBaseException(
+                    () -> authCodeService.generateAndSaveRandomKey(mockAuthCodeSendRequest),
+                    USERS_NOT_EXISTS
+            );
         }
     }
 
@@ -144,9 +142,10 @@ class AuthCodeServiceBaseTest {
             authCodeService.generateAndSaveRandomKey(mockAuthCodeSendRequest);
 
             // then
-            assertThatThrownBy(
-                    () -> authCodeService.verifyAuthCode(mockAuthCodeVerifyRequest)
-            ).isInstanceOf(BaseException.class);
+            assertBaseException(
+                    () -> authCodeService.verifyAuthCode(mockAuthCodeVerifyRequest),
+                    AUTH_CODE_NOT_FOUND
+            );
         }
     }
 
@@ -160,13 +159,16 @@ class AuthCodeServiceBaseTest {
                 .orElseThrow();
 
         // when
-        when(pwAuthCodeVerifyRequest.getEmail()).thenReturn(stubUser.getEmail());
-        when(pwAuthCodeVerifyRequest.getUsername()).thenReturn(createRandomUUID());
+        when(mockAuthCodeSendRequest.getEmail()).thenReturn(stubUser.getEmail());
+        String answer = pwAuthCodeServiceBase.generateAndSaveRandomKey(mockAuthCodeSendRequest);
+
+        PWAuthCodeVerifyRequest pwAuthCodeVerifyRequest = new PWAuthCodeVerifyRequest(stubUser.getEmail(), createRandomUUID(), answer);
 
         // then
-        assertThatThrownBy(
-                () -> pwAuthCodeServiceBase.verifyAuthCode(pwAuthCodeVerifyRequest)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> pwAuthCodeServiceBase.verifyAuthCode(pwAuthCodeVerifyRequest),
+                REQUEST_ERROR
+        );
     }
 
     @Test
@@ -174,18 +176,16 @@ class AuthCodeServiceBaseTest {
     void invalid_request_not_match_auth_code() {
         for (AuthCodeServiceBase authCodeServiceBase : authCodeServiceBases) {
             // given
-            when(pwAuthCodeVerifyRequest.getEmail()).thenReturn(stubUser.getEmail());
-            when(pwAuthCodeVerifyRequest.getUsername()).thenReturn(stubUser.getUsername());
-            when(pwAuthCodeVerifyRequest.getAuthCode()).thenReturn(createRandomUUID());
             when(mockAuthCodeSendRequest.getEmail()).thenReturn(stubUser.getEmail());
             String answer = authCodeServiceBase.generateAndSaveRandomKey(mockAuthCodeSendRequest);
-
+            PWAuthCodeVerifyRequest pwAuthCodeVerifyRequest = new PWAuthCodeVerifyRequest(stubUser.getEmail(), stubUser.getUsername(), createRandomUUID());
             // when
 
             // then
-            assertThatThrownBy(
-                    () -> authCodeServiceBase.verifyAuthCode(mockAuthCodeVerifyRequest)
-            ).isInstanceOf(BaseException.class);
+            assertBaseException(
+                    () -> authCodeServiceBase.verifyAuthCode(pwAuthCodeVerifyRequest),
+                    CODE_NOT_MATCH
+            );
         }
     }
 
@@ -208,9 +208,10 @@ class AuthCodeServiceBaseTest {
 
         assertThat(authCodeVerifyResponse.getCreatedAt()).isEqualTo(from(stubUser.getCreatedAt().toInstant()));
         assertThat(authCodeVerifyResponse.getUsername()).isEqualTo(stubUser.getUsername());
-        assertThatThrownBy(
-                () -> keyValueDataStorePort.findValidationCodeWithKey(generateKey(stubUser.getEmail(), FIND_ID))
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> keyValueDataStorePort.findValidationCodeWithKey(generateKey(stubUser.getId(), FIND_ID)),
+                AUTH_CODE_NOT_FOUND
+        );
     }
 
     @Test
@@ -240,7 +241,6 @@ class AuthCodeServiceBaseTest {
     @DisplayName("PW - 존재하지 않는 코드로 비밀번호 변경 요청 시 예외 발생")
     void invalid_pw_code_pw_change() {
         // given
-        String previousPassword = new String(stubUser.getPassword());
         String toChangePassword = createRandomUUID();
 
         AuthCodeServiceBase authCodeService = getAuthCodeService(FIND_PASSWORD);
@@ -257,16 +257,16 @@ class AuthCodeServiceBaseTest {
         when(mockPWChangeRequest.getNewPasswordCheck()).thenReturn(toChangePassword);
 
         // then
-        assertThatThrownBy(
-                () -> authCodeService.changePassword(mockPWChangeRequest)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> authCodeService.changePassword(mockPWChangeRequest),
+                NOT_MATCH_OR_EXPIRED_CODE
+        );
     }
 
     @Test
     @DisplayName("PW - 정상 코드로 비밀번호 변경시 정상 변경되어야 한다.")
     void valid_pw_change() {
         // given
-        String previousPassword = new String(stubUser.getPassword());
         String toChangePassword = createRandomUUID();
 
         AuthCodeServiceBase authCodeService = getAuthCodeService(FIND_PASSWORD);
