@@ -1,7 +1,6 @@
 package com.catcher.resource.request;
 
 import com.catcher.app.AppApplication;
-import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.User;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import org.junit.jupiter.api.DisplayName;
@@ -12,8 +11,10 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static com.catcher.resource.request.AuthCodeSendRequest.*;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
+import static com.catcher.resource.request.AuthCodeSendRequest.IDAuthCodeSendRequest;
+import static com.catcher.resource.request.AuthCodeSendRequest.PWAuthCodeSendRequest;
+import static com.catcher.testconfiguriation.BaseExceptionUtils.assertBaseException;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -32,17 +33,21 @@ class AuthCodeSendRequestTest {
 
         //then
         // [ID Request]
-        assertThatThrownBy(() ->
-                new IDAuthCodeSendRequest(null).checkValidation(user)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new IDAuthCodeSendRequest(null).checkValidation(user),
+                REQUEST_ERROR
+        );
 
         // [PW Request]
-        assertThatThrownBy(() ->
-                new PWAuthCodeSendRequest(null, createRandomUUID()).checkValidation(user)
-        ).isInstanceOf(BaseException.class);
-        assertThatThrownBy(() ->
-                new PWAuthCodeSendRequest(createRandomUUID(), null).checkValidation(user)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeSendRequest(null, createRandomUUID()).checkValidation(user),
+                REQUEST_ERROR
+        );
+
+        assertBaseException(
+                () -> new PWAuthCodeSendRequest(createRandomUUID(), null).checkValidation(user),
+                REQUEST_ERROR
+        );
     }
 
     @Test
@@ -59,17 +64,20 @@ class AuthCodeSendRequestTest {
         //then
 
         // [ID Request]
-        assertThatThrownBy(() ->
-                new IDAuthCodeSendRequest(createRandomUUID()).checkValidation(user)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new IDAuthCodeSendRequest(createRandomUUID()).checkValidation(user),
+                REQUEST_ERROR
+        );
 
         // [PW Request]
-        assertThatThrownBy(() ->
-                new PWAuthCodeSendRequest(createRandomUUID(), username).checkValidation(user)
-        ).isInstanceOf(BaseException.class);
-        assertThatThrownBy(() ->
-                new PWAuthCodeSendRequest(email, createRandomUUID()).checkValidation(user)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeSendRequest(createRandomUUID(), username).checkValidation(user),
+                REQUEST_ERROR
+        );
+        assertBaseException(
+                () -> new PWAuthCodeSendRequest(email, createRandomUUID()).checkValidation(user),
+                REQUEST_ERROR
+        );
     }
 
     @Test

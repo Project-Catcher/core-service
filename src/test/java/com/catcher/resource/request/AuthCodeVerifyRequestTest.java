@@ -1,7 +1,6 @@
 package com.catcher.resource.request;
 
 import com.catcher.app.AppApplication;
-import com.catcher.common.exception.BaseException;
 import com.catcher.core.domain.entity.User;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import org.junit.jupiter.api.DisplayName;
@@ -12,9 +11,11 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static com.catcher.resource.request.AuthCodeVerifyRequest.*;
-import static org.assertj.core.api.Assertions.assertThatThrownBy;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.catcher.common.BaseResponseStatus.CODE_NOT_MATCH;
+import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
+import static com.catcher.resource.request.AuthCodeVerifyRequest.IDAuthCodeVerifyRequest;
+import static com.catcher.resource.request.AuthCodeVerifyRequest.PWAuthCodeVerifyRequest;
+import static com.catcher.testconfiguriation.BaseExceptionUtils.assertBaseException;
 import static org.mockito.Mockito.when;
 
 @ActiveProfiles("test")
@@ -28,27 +29,32 @@ class AuthCodeVerifyRequestTest {
     void invalid_request_field_validation() {
         // [ID Request]
         // 이메일이 비어있는 경우
-        assertThatThrownBy(() ->
-                new IDAuthCodeVerifyRequest(null, createRandomUUID()).checkValidation(user, createRandomUUID())
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new IDAuthCodeVerifyRequest(null, createRandomUUID()).checkValidation(user, createRandomUUID()),
+                REQUEST_ERROR
+        );
         // 코드가 비어있는 경우
-        assertThatThrownBy(() ->
-                new IDAuthCodeVerifyRequest(createRandomUUID(), null).checkValidation(user, createRandomUUID())
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new IDAuthCodeVerifyRequest(createRandomUUID(), null).checkValidation(user, createRandomUUID()),
+                REQUEST_ERROR
+        );
 
         // [PW Request]
         // 이메일이 비어있는 경우
-        assertThatThrownBy(() ->
-                new PWAuthCodeVerifyRequest(null, createRandomUUID(), createRandomUUID()).checkValidation(user, createRandomUUID())
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeVerifyRequest(null, createRandomUUID(), createRandomUUID()).checkValidation(user, createRandomUUID()),
+                REQUEST_ERROR
+        );
         // 아이디가 비어있는 경우
-        assertThatThrownBy(() ->
-                new PWAuthCodeVerifyRequest(createRandomUUID(), null, createRandomUUID()).checkValidation(user, createRandomUUID())
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeVerifyRequest(createRandomUUID(), null, createRandomUUID()).checkValidation(user, createRandomUUID()),
+                REQUEST_ERROR
+        );
         // 코드가 비어있는 경우
-        assertThatThrownBy(() ->
-                new PWAuthCodeVerifyRequest(createRandomUUID(), createRandomUUID(), null).checkValidation(user, createRandomUUID())
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeVerifyRequest(createRandomUUID(), createRandomUUID(), null).checkValidation(user, createRandomUUID()),
+                REQUEST_ERROR
+        );
     }
 
     @Test
@@ -61,14 +67,16 @@ class AuthCodeVerifyRequestTest {
 
         //then
         // [ID Request]
-        assertThatThrownBy(() ->
-                new IDAuthCodeVerifyRequest(createRandomUUID(), createRandomUUID()).checkValidation(user, answer)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new IDAuthCodeVerifyRequest(createRandomUUID(), createRandomUUID()).checkValidation(user, answer),
+                CODE_NOT_MATCH
+        );
 
         // [PW Request]
-        assertThatThrownBy(() ->
-                new PWAuthCodeVerifyRequest(createRandomUUID(), createRandomUUID(), createRandomUUID()).checkValidation(user, answer)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeVerifyRequest(createRandomUUID(), createRandomUUID(), createRandomUUID()).checkValidation(user, answer),
+                CODE_NOT_MATCH
+        );
     }
 
     @Test
@@ -85,17 +93,21 @@ class AuthCodeVerifyRequestTest {
 
         //then
         // [ID Request]
-        assertThatThrownBy(() ->
-                new IDAuthCodeVerifyRequest(createRandomUUID(), answer).checkValidation(user, answer)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new IDAuthCodeVerifyRequest(createRandomUUID(), answer).checkValidation(user, answer),
+                REQUEST_ERROR
+        );
 
         // [PW Request]
-        assertThatThrownBy(() ->
-                new PWAuthCodeVerifyRequest(createRandomUUID(), username, answer).checkValidation(user, answer)
-        ).isInstanceOf(BaseException.class);
-        assertThatThrownBy(() ->
-                new PWAuthCodeVerifyRequest(email, createRandomUUID(), answer).checkValidation(user, answer)
-        ).isInstanceOf(BaseException.class);
+        assertBaseException(
+                () -> new PWAuthCodeVerifyRequest(createRandomUUID(), username, answer).checkValidation(user, answer),
+                REQUEST_ERROR
+        );
+
+        assertBaseException(
+                () -> new PWAuthCodeVerifyRequest(email, createRandomUUID(), answer).checkValidation(user, answer),
+                REQUEST_ERROR
+        );
     }
 
     @Test
