@@ -9,9 +9,12 @@ import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.user.UserCreateRequest;
+import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
+import com.catcher.testconfiguriation.WithCustomMockUser;
 import com.catcher.utils.KeyGenerator;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -24,6 +27,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
@@ -39,8 +43,7 @@ import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType.BLACK_LIST_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
@@ -72,6 +75,7 @@ class UserControllerTest {
                 .standaloneSetup(userController)
                 .setControllerAdvice(new CatcherControllerAdvice())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
         user = userRepository.save(createUser());
         flushAndClearPersistence();
@@ -369,6 +373,25 @@ class UserControllerTest {
         ).andExpect(status().isOk());
         //then
         assertThat(dbManager.getValue(KeyGenerator.generateKey(invalidAccessToken, BLACK_LIST_ACCESS_TOKEN))).isEmpty();
+    }
+
+    @DisplayName("로그인 한 유저의 정보를 정상적으로 불러옴")
+    @Test
+    @WithCustomMockUser(username = "test", role = UserRole.USER)
+    void valid_getMyInfo() throws Exception {
+        //given
+
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(get("/users/info")
+                        .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+
+        CommonResponse<UserInfoResponse> commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>(){});
+
+        //then
+        assertThat(commonResponse.isSuccess()).isTrue();
+        assertThat(commonResponse.getResult().getUsername()).isEqualTo("test");
     }
 
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
