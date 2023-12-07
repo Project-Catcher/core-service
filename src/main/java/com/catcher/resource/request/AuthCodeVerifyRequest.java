@@ -16,8 +16,6 @@ public interface AuthCodeVerifyRequest {
 
     String getEmail();
 
-    String getAuthCode();
-
     void checkValidation(User user, String answer);
 
     @Getter
