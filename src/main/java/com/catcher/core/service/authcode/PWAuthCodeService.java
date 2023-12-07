@@ -1,5 +1,6 @@
 package com.catcher.core.service.authcode;
 
+import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
@@ -11,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
-import static com.catcher.common.BaseResponseStatus.EXPIRED_CODE;
+import static com.catcher.common.BaseResponseStatus.*;
 import static com.catcher.resource.response.AuthCodeVerifyResponse.PWAuthCodeVerifyResponse;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_PASSWORD;
@@ -36,7 +37,7 @@ public class PWAuthCodeService extends AuthCodeServiceBase {
         try {
             email = keyValueDataStorePort.findValidationCodeWithKey(key);
         } catch (BaseException e) {
-            throw new BaseException(EXPIRED_CODE);
+            throw new BaseException(NOT_MATCH_OR_EXPIRED_CODE);
         }
 
         User user = userRepository.findByEmail(email).orElseThrow();
