@@ -27,6 +27,10 @@ public interface AuthCodeSendRequest {
         public void checkValidation(User user) {
             if (Arrays.asList(email).contains(null)) {
                 throw new BaseException(REQUEST_ERROR);
+            } else {
+                if(!email.equals(user.getEmail())) {
+                    throw new BaseException(REQUEST_ERROR);
+                }
             }
         }
     }
