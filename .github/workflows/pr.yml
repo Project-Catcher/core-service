@@ -53,8 +53,8 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           files: build/test-results/**/*.xml
 
-      # - name: notification to swit
-      #   uses: roharon/action-swit@v1
-      #   with:
-      #     webhooks_url: ${{ env.webhook_url }}
-      #     MESSAGE: "🏷 ${{ job.status }} 백엔드 Unit Test : Core-service - by ${{ github.actor }}"
+      - name: notification to swit
+        uses: roharon/action-swit@v1
+        with:
+          webhooks_url: ${{ env.webhook_url }}
+          MESSAGE: "🏷 ${{ job.status }} 백엔드 Unit Test : Core-service - by ${{ github.actor }}"

@@ -22,8 +22,8 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
           LANGUAGE: Korean
       
-      # - name: notification to swit
-      #   uses: roharon/action-swit@v1
-      #   with:
-      #     webhooks_url: ${{ env.webhook_url }}
-      #     MESSAGE: "🏷 ${{ job.status }} 백엔드 OpenAI 코드 리뷰 : Core-service - by ${{ github.actor }}"
+      - name: notification to swit
+        uses: roharon/action-swit@v1
+        with:
+          webhooks_url: ${{ env.webhook_url }}
+          MESSAGE: "🏷 ${{ job.status }} 백엔드 OpenAI 코드 리뷰 : Core-service - by ${{ github.actor }}"

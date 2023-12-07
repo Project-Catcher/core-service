@@ -2,14 +2,13 @@ name: Java CI with Gradle
 
 on:
   push:
-    branches: [ "main", "dev", "refactor-jdb-gitaction-workflow" ]
+    branches: [ "main", "dev" ]
 
 env:
   AWS_REGION: ${{ secrets.AWS_REGION }}
   OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE }}
   DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-  ECR_URL: ${{ secrets.AWS_ECR_DEV_CORE }}
   AWS_DEV_CORE_ECR: ${{ secrets.AWS_DEV_CORE_ECR }}
   AWS_PRD_CORE_ECR: ${{ secrets.AWS_PRD_CORE_ECR }}
   webhook_url: ${{ secrets.WEBHOOK }}
@@ -64,11 +63,11 @@ jobs:
             docker push ${{ env.AWS_DEV_CORE_ECR }}:${{ github.sha }}
           fi
 
-      # - name: notification to swit
-      #   uses: roharon/action-swit@v1
-      #   with:
-      #     webhooks_url: ${{ env.webhook_url }}
-      #     MESSAGE: "🏷 ${{ job.status }} 백엔드 ECR 도커파일 업로드 : Core-service - by ${{ github.actor }}"
+      - name: notification to swit
+        uses: roharon/action-swit@v1
+        with:
+          webhooks_url: ${{ env.webhook_url }}
+          MESSAGE: "🏷 ${{ job.status }} 백엔드 ECR 도커파일 업로드 : Core-service - by ${{ github.actor }}"
 
       - name: Setup Kustomize
         uses: imranismail/setup-kustomize@v1
