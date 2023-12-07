@@ -2,7 +2,6 @@ package com.catcher.config;
 
 import com.catcher.common.exception.BaseException;
 import com.catcher.core.database.DBManager;
-import com.catcher.utils.JwtUtils;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,6 +16,8 @@ import java.io.IOException;
 
 import static com.catcher.common.BaseResponseStatus.REDIS_ERROR;
 import static com.catcher.utils.HttpServletUtils.getHeader;
+import static com.catcher.utils.KeyGenerator.AuthType.BLACK_LIST_ACCESS_TOKEN;
+import static com.catcher.utils.KeyGenerator.generateKey;
 import static org.apache.http.HttpHeaders.AUTHORIZATION;
 
 /**
@@ -51,8 +52,7 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     private boolean isBlackList(String accessToken) {
-        String blackListToken = JwtUtils.generateBlackListToken(accessToken);
-        return dbManager.getValue(blackListToken).isPresent();
+        return dbManager.getValue(generateKey(accessToken, BLACK_LIST_ACCESS_TOKEN)).isPresent();
     }
 
     private String getAccessToken(HttpServletRequest request) {
