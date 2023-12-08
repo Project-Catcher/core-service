@@ -1,4 +1,4 @@
-package com.catcher.resource.response;
+package com.catcher.resource.request;
 
 import com.catcher.common.exception.BaseException;
 import lombok.Getter;
