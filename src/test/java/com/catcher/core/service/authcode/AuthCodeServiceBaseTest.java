@@ -7,7 +7,7 @@ import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.port.KeyValueDataStorePort;
 import com.catcher.resource.request.AuthCodeSendRequest;
 import com.catcher.resource.request.AuthCodeVerifyRequest;
-import com.catcher.resource.response.PWChangeRequest;
+import com.catcher.resource.request.PWChangeRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
