@@ -1,6 +1,7 @@
 package com.catcher.resource.response;
 
 import com.catcher.app.AppApplication;
+import com.catcher.resource.request.PWChangeRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
