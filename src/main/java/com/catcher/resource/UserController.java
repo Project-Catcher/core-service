@@ -17,7 +17,7 @@ import com.catcher.resource.resolver.annotation.AuthCodeSendInject;
 import com.catcher.resource.resolver.annotation.AuthCodeVerifyInject;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.CaptchaValidateResponse;
-import com.catcher.resource.response.PWChangeRequest;
+import com.catcher.resource.request.PWChangeRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -82,10 +82,10 @@ public class UserController {
 
     @Operation(summary = "이메일 인증코드 발송")
     @PostMapping({FIND_ID_URL, FIND_PW_URL})
-    public CommonResponse<Void> sendFindIDEmail(
+    public CommonResponse<Void> sendEmailWithAuthCode(
             HttpServletRequest request,
             @AuthCodeSendInject final AuthCodeSendRequest authCodeSendRequest) {
-        AuthCodeServiceBase authCodeService = getAuthCodeService(request);
+        AuthCodeServiceBase authCodeService = getAuthCodeService(getAuthType(request));
         final var key = authCodeService.generateAndSaveRandomKey(authCodeSendRequest);
         emailService.sendEmail(authCodeSendRequest.getEmail(), "title", key);
 
@@ -97,7 +97,7 @@ public class UserController {
     public CommonResponse<AuthCodeVerifyResponse> verifyAuthCode(
             HttpServletRequest request,
             @AuthCodeVerifyInject final AuthCodeVerifyRequest authCodeVerifyRequest) {
-        AuthCodeServiceBase authCodeService = getAuthCodeService(request);
+        AuthCodeServiceBase authCodeService = getAuthCodeService(getAuthType(request));
         AuthCodeVerifyResponse authCodeVerifyResponse = authCodeService.verifyAuthCode(authCodeVerifyRequest);
 
         return success(authCodeVerifyResponse);
@@ -133,11 +133,11 @@ public class UserController {
     }
 
     @Operation(summary = "비밀번호 변경")
-    @PostMapping(FIND_PW_URL + "/edit")
+    @PostMapping("password/edit")
     public CommonResponse<Void> sendEmailWithAuthCode(
             HttpServletRequest request,
             @Valid final PWChangeRequest pwChangeRequest) {
-        AuthCodeServiceBase authCodeService = getAuthCodeService(request);
+        AuthCodeServiceBase authCodeService = getAuthCodeService(FIND_PASSWORD);
         authCodeService.changePassword(pwChangeRequest);
 
         return success();
@@ -145,13 +145,11 @@ public class UserController {
 
     @Operation(summary = "아이디 존재여부 확인")
     @PostMapping(FIND_ID_URL + "/exist")
-    public CommonResponse<Boolean> isExistId(String username) {
-        return success(userService.isExistsUsername(username));
+    public CommonResponse<Boolean> isIdPresent(String username) {
+        return success(userService.checkUsernameExist(username));
     }
 
-    private AuthCodeServiceBase getAuthCodeService(HttpServletRequest request) {
-        AuthType authType = getAuthType(request);
-
+    private AuthCodeServiceBase getAuthCodeService(AuthType authType) {
         return authCodeServices.stream()
                 .filter(service -> service.support(authType))
                 .findAny()

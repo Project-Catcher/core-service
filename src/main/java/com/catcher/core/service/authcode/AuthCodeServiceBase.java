@@ -8,8 +8,9 @@ import com.catcher.core.port.KeyValueDataStorePort;
 import com.catcher.resource.request.AuthCodeSendRequest;
 import com.catcher.resource.request.AuthCodeVerifyRequest;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
-import com.catcher.resource.response.PWChangeRequest;
+import com.catcher.resource.request.PWChangeRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Random;
 
@@ -21,6 +22,7 @@ public abstract class AuthCodeServiceBase {
     protected final KeyValueDataStorePort keyValueDataStorePort;
     protected final UserRepository userRepository;
 
+    @Transactional
     public void changePassword(PWChangeRequest pwChangeRequest) {
         throw new UnsupportedOperationException();
     }

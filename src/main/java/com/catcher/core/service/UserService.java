@@ -66,7 +66,7 @@ public class UserService {
         authService.discardRefreshToken(refreshToken);
     }
 
-    public boolean isExistsUsername(String username) {
+    public boolean checkUsernameExist(String username) {
         return userRepository.findByUsername(username).isPresent();
     }
 
