@@ -5,7 +5,7 @@ import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.port.KeyValueDataStorePort;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
-import com.catcher.resource.response.PWChangeRequest;
+import com.catcher.resource.request.PWChangeRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
