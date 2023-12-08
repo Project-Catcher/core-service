@@ -3,6 +3,6 @@ package com.catcher.resource.request;
 import lombok.Getter;
 
 @Getter
-public class ExistIDRequest {
+public class IDPresentRequest {
     private String username;
 }
