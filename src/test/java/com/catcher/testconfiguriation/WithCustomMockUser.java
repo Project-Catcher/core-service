@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 @Retention(RetentionPolicy.RUNTIME)
 @WithSecurityContext(factory = WithCustomMockUserSecurityContextFactory.class)
 public @interface WithCustomMockUser{
-    long id() default 1L;
+    Long id() default 1L;
     String username() default "username";
     String password() default "password";
     String phone() default "phone";
