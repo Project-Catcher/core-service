@@ -67,6 +67,10 @@ public class UserService {
         authService.discardRefreshToken(refreshToken);
     }
 
+    public boolean checkUsernameExist(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
         try {
             CatcherUser authentication = (CatcherUser) authenticationManager.authenticate(

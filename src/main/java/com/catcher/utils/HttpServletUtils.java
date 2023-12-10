@@ -6,6 +6,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.Arrays;
 import java.util.Optional;
 
@@ -42,6 +46,22 @@ public final class HttpServletUtils {
     public static Optional<String> getCookieValue(HttpServletRequest request, String name) {
         return getCookie(request, name)
                 .map(Cookie::getValue);
+    }
+
+    public static String getBodyData(HttpServletRequest request) throws IOException {
+        try (
+                InputStream inputStream = request.getInputStream();
+                BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))
+        ) {
+            StringBuilder sb = new StringBuilder();
+
+            char[] buffer = new char[1024];
+            int bytesToRead;
+            while ((bytesToRead = reader.read(buffer)) != -1) {
+                sb.append(buffer, 0, bytesToRead);
+            }
+            return sb.toString();
+        }
     }
 
     private static Optional<Cookie> getCookie(HttpServletRequest request, String name) {
