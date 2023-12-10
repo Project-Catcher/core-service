@@ -72,7 +72,7 @@ public class UserService {
     }
 
     public void signOutUser(User user) {
-        if(user == null && (user = userRepository.findById(user.getId()).orElseGet(null)) != null) {
+        if(user == null) {
             throw new BaseException(USERS_NOT_LOGIN);
         }
 
