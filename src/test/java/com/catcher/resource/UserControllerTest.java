@@ -381,7 +381,6 @@ class UserControllerTest {
     void valid_getMyInfo() throws Exception {
         //given
 
-
         //when
         MvcResult mvcResult = mockMvc.perform(get("/users/info")
                         .contentType(MediaType.APPLICATION_JSON)
