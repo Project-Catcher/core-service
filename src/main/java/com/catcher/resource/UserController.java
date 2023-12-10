@@ -83,6 +83,14 @@ public class UserController {
         return success();
     }
 
+    @Operation(summary = "회원탈퇴")
+    @DeleteMapping("/sign-out")
+    public CommonResponse<Void> signOut(@CurrentUser User user) {
+        userService.signOutUser(user);
+
+        return success();
+    }
+
     @Operation(summary = "이메일 인증코드 발송")
     @PostMapping({FIND_ID_URL, FIND_PW_URL})
     public CommonResponse<Void> sendEmailWithAuthCode(

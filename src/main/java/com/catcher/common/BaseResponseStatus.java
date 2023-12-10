@@ -37,7 +37,7 @@ public enum BaseResponseStatus {
     CODE_NOT_MATCH(2115, "인증번호가 일치하지 않습니다."),
     PASSWORD_NOT_MATCH(2116, "패스워드가 일치하지 않습니다."),
     EXPIRED_CODE(2117, "코드가 만료되었습니다."),
-
+    USERS_NOT_LOGIN(2118, "로그인 정보를 찾을 수 없습니다."),
 
     /**
      * 3000 : Response 오류

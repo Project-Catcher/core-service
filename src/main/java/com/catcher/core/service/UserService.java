@@ -71,6 +71,14 @@ public class UserService {
         return userRepository.findByUsername(username).isPresent();
     }
 
+    public void signOutUser(User user) {
+        if(user == null && (user = userRepository.findById(user.getId()).orElseGet(null)) != null) {
+            throw new BaseException(USERS_NOT_LOGIN);
+        }
+
+        user.signOut();
+    }
+
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
         try {
             CatcherUser authentication = (CatcherUser) authenticationManager.authenticate(
