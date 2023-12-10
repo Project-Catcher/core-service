@@ -8,6 +8,7 @@ import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
+import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.security.CatcherUser;
 import com.catcher.utils.KeyGenerator;
@@ -117,5 +118,15 @@ public class UserService {
         if(!user.getUserProvider().equals(CATCHER)) {
             throw new BaseException(INVALID_USER_INFO);
         }
+    }
+
+    public UserInfoResponse getMyInfo(User user){
+        return new UserInfoResponse(user.getUsername(),
+                user.getPhone(),
+                user.getEmail(),
+                user.getProfileImageUrl(),
+                user.getNickname(),
+                user.getEmailMarketingTerm(),
+                user.getPhoneMarketingTerm());
     }
 }
