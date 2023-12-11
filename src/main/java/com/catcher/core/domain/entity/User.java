@@ -5,6 +5,7 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 import com.catcher.core.domain.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Where;
 
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -16,6 +17,7 @@ import java.util.Date;
 @Table(name = "users")
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
+@Where(clause = "deleted_at is null")
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -70,5 +72,9 @@ public class User extends BaseTimeEntity {
 
     public void changePassword(String newPassword) {
         this.password = newPassword;
+    }
+
+    public void signOut() {
+        this.deletedAt = ZonedDateTime.now();
     }
 }
