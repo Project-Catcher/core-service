@@ -14,6 +14,7 @@ import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.resource.request.PromotionRequest;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import com.catcher.testconfiguriation.WithCustomMockUser;
 import com.catcher.utils.KeyGenerator;
@@ -448,6 +449,76 @@ class UserControllerTest {
         //then
         CommonResponse commonResponse = objectMapper.readValue(reLoginAction.andReturn().getResponse().getContentAsString(), CommonResponse.class);
         assertThat(commonResponse.isSuccess()).isFalse();
+    }
+
+    @DisplayName("핸드폰 수신정보 동의 변경 요청 시 값이 정상적으로 변경되어야 한다.")
+    @Test
+    void email_promotion_request() throws Exception {
+        //given
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        String returnString = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andReturn().getResponse().getContentAsString();
+        String accessToken = (String) objectMapper.readValue(returnString, CommonResponse.class).getResult();
+
+        for (int i = 0; i < 2; i++) {
+            boolean beforeCurrentPhonePromotionOn = null != userRepository.findById(user.getId())
+                    .orElseThrow()
+                    .getPhoneMarketingTerm();
+
+
+            //when
+            mockMvc.perform(post("/users/promotion/phone")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .content(objectMapper.writeValueAsString(new PromotionRequest(!beforeCurrentPhonePromotionOn)))
+            ).andExpect(status().isOk());
+            flushAndClearPersistence();
+
+            //then
+            User currentUser = userRepository.findById(user.getId()).orElseThrow();
+            if (beforeCurrentPhonePromotionOn) {
+                assertThat(currentUser.getPhoneMarketingTerm()).isNull();
+            } else {
+                assertThat(currentUser.getPhoneMarketingTerm()).isNotNull();
+            }
+        }
+    }
+
+    @DisplayName("이메일 수신정보 동의 변경 요청 시 값이 정상적으로 변경되어야 한다.")
+    @Test
+    void phone_promotion_request() throws Exception {
+        //given
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        String returnString = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andReturn().getResponse().getContentAsString();
+        String accessToken = (String) objectMapper.readValue(returnString, CommonResponse.class).getResult();
+
+        for (int i = 0; i < 2; i++) {
+            boolean beforeCurrentEmailPromotionOn = null != userRepository.findById(user.getId())
+                    .orElseThrow()
+                    .getEmailMarketingTerm();
+
+
+            //when
+            mockMvc.perform(post("/users/promotion/email")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+                    .content(objectMapper.writeValueAsString(new PromotionRequest(!beforeCurrentEmailPromotionOn)))
+            ).andExpect(status().isOk());
+            flushAndClearPersistence();
+
+            //then
+            User currentUser = userRepository.findById(user.getId()).orElseThrow();
+            if (beforeCurrentEmailPromotionOn) {
+                assertThat(currentUser.getEmailMarketingTerm()).isNull();
+            } else {
+                assertThat(currentUser.getEmailMarketingTerm()).isNotNull();
+            }
+        }
     }
 
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
