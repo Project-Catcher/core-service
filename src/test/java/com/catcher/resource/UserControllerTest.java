@@ -3,7 +3,10 @@ package com.catcher.resource;
 import com.catcher.app.AppApplication;
 import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.CatcherControllerAdvice;
+import com.catcher.common.GlobalExceptionHandlerFilter;
 import com.catcher.common.response.CommonResponse;
+import com.catcher.config.JwtFilter;
+import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.database.DBManager;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
@@ -23,7 +26,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,6 +41,7 @@ import org.springframework.web.filter.CharacterEncodingFilter;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+import static com.catcher.common.BaseResponseStatus.USERS_NOT_LOGIN;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType.BLACK_LIST_ACCESS_TOKEN;
@@ -62,6 +65,8 @@ class UserControllerTest {
     ObjectMapper objectMapper;
     @Autowired
     DBManager dbManager;
+    @Autowired
+    JwtTokenProvider jwtTokenProvider;
 
     User user;
 
@@ -75,6 +80,8 @@ class UserControllerTest {
                 .standaloneSetup(userController)
                 .setControllerAdvice(new CatcherControllerAdvice())
                 .addFilter(new CharacterEncodingFilter("UTF-8", true))
+                .addFilter(new GlobalExceptionHandlerFilter(objectMapper))
+                .addFilter(new JwtFilter(jwtTokenProvider, dbManager))
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
         user = userRepository.save(createUser());
@@ -258,7 +265,7 @@ class UserControllerTest {
 
     @DisplayName("정상 회원가입 시 토큰 발행")
     @Test
-    void valid_signup() throws Exception{
+    void valid_signup() throws Exception {
         //given
         UserCreateRequest userCreateRequest = userCreateRequest(
                 createRandomUUID(),
@@ -357,20 +364,20 @@ class UserControllerTest {
         //then
         assertThat(dbManager.getValue(KeyGenerator.generateKey(accessToken, BLACK_LIST_ACCESS_TOKEN))).isPresent();
     }
-    @Autowired
-    RedisTemplate redisTemplate;
-    
-    @DisplayName("비정상 토큰으로 로그아웃 시, 200 정상 응답")
+
+    @DisplayName("비정상 토큰으로 로그아웃 시, 400 응답")
     @Test
     void invalid_logout() throws Exception {
         UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
         String invalidAccessToken = "gadsklgasg.fadsfklalsfjks.fadsklfsa";
+
         //when
         ResultActions logoutResult = mockMvc.perform(delete("/users/logout")
                 .contentType(MediaType.APPLICATION_JSON)
-                .header(HttpHeaders.AUTHORIZATION, invalidAccessToken)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + invalidAccessToken)
                 .content(objectMapper.writeValueAsString(userLoginRequest))
-        ).andExpect(status().isOk());
+        ).andExpect(status().isBadRequest());
+
         //then
         assertThat(dbManager.getValue(KeyGenerator.generateKey(invalidAccessToken, BLACK_LIST_ACCESS_TOKEN))).isEmpty();
     }
@@ -383,14 +390,64 @@ class UserControllerTest {
 
         //when
         MvcResult mvcResult = mockMvc.perform(get("/users/info")
-                        .contentType(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
         ).andReturn();
 
-        CommonResponse<UserInfoResponse> commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>(){});
+        CommonResponse<UserInfoResponse> commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+        });
 
         //then
         assertThat(commonResponse.isSuccess()).isTrue();
         assertThat(commonResponse.getResult().getUsername()).isEqualTo("test");
+    }
+
+    @DisplayName("로그인하지 않은 회원이 회원탈퇴 시 예외 반환")
+    @Test
+    void invalid_sign_out() throws Exception {
+        // given
+
+        // when
+        MvcResult mvcResult = mockMvc.perform(delete("/users/sign-out")
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andReturn();
+        CommonResponse commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), CommonResponse.class);
+
+        // then
+        assertThat(commonResponse.isSuccess()).isFalse();
+        assertThat(commonResponse.getCode()).isEqualTo(USERS_NOT_LOGIN.getCode());
+        assertThat(commonResponse.getResult()).isEqualTo(USERS_NOT_LOGIN.getMessage());
+    }
+
+    @DisplayName("탈퇴한 유저는 로그인에 실패해야 한다.")
+    @Test
+    void sign_out_user_login() throws Exception {
+        //given
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        //로그인 요청
+        ResultActions loginAction = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+
+        );
+        String accessToken = (String) objectMapper.readValue(loginAction.andReturn().getResponse().getContentAsString(), CommonResponse.class).getResult();
+        // 회원 탈퇴
+        ResultActions signOutAction = mockMvc.perform(delete("/users/sign-out")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+        );
+
+        //when
+        //로그인 요청
+        ResultActions reLoginAction = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+
+        );
+
+        //then
+        CommonResponse commonResponse = objectMapper.readValue(reLoginAction.andReturn().getResponse().getContentAsString(), CommonResponse.class);
+        assertThat(commonResponse.isSuccess()).isFalse();
     }
 
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
