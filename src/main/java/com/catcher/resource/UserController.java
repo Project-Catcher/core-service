@@ -34,6 +34,7 @@ import java.util.List;
 import static com.catcher.common.response.CommonResponse.success;
 import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
 import static com.catcher.core.domain.entity.enums.UserRole.USER;
+import static com.catcher.resource.request.PromotionRequest.PromotionType.*;
 import static com.catcher.utils.HttpServletUtils.deleteCookie;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType;
@@ -161,8 +162,24 @@ public class UserController {
     @Operation(summary = "내 정보 가져오기")
     @GetMapping("/info")
     @AuthorizationRequired(value = USER)
-    public CommonResponse<UserInfoResponse> getMyInfo(@CurrentUser User user){
+    public CommonResponse<UserInfoResponse> getMyInfo(@CurrentUser User user) {
         return success(userService.getMyInfo(user));
+    }
+
+    @Operation(summary = "휴대폰 수신 동의 토글")
+    @PostMapping("/promotion/phone")
+    @AuthorizationRequired(value = USER)
+    public CommonResponse<Void> togglePhone(@CurrentUser User user, @Valid @RequestBody PromotionRequest promotionRequest) {
+        userService.togglePhonePromotion(user, promotionRequest, PHONE);
+        return success();
+    }
+
+    @Operation(summary = "이메일 수신 동의 토글")
+    @PostMapping("/promotion/email")
+    @AuthorizationRequired(value = USER)
+    public CommonResponse<Void> toggleEmail(@CurrentUser User user, @Valid @RequestBody PromotionRequest promotionRequest) {
+        userService.togglePhonePromotion(user, promotionRequest, EMAIL);
+        return success();
     }
 
     private AuthCodeServiceBase getAuthCodeService(AuthType authType) {
