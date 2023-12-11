@@ -78,13 +78,13 @@ public class User extends BaseTimeEntity {
         this.deletedAt = ZonedDateTime.now();
     }
 
-    public void changeEmailTerm(boolean toggle) {
-        if (toggle == true) emailMarketingTerm = ZonedDateTime.now();
+    public void changeEmailTerm(boolean shouldOn) {
+        if (shouldOn) emailMarketingTerm = ZonedDateTime.now();
         else emailMarketingTerm = null;
     }
 
-    public void changePhoneTerm(boolean toggle) {
-        if (toggle == true) phoneMarketingTerm = ZonedDateTime.now();
+    public void changePhoneTerm(boolean shouldOn) {
+        if (shouldOn) phoneMarketingTerm = ZonedDateTime.now();
         else phoneMarketingTerm = null;
     }
 }
