@@ -17,6 +17,7 @@ public enum BaseResponseStatus {
     INVALID_JWT(2003, "지원되지 않거나 잘못된 토큰 입니다."),
     NOT_EXIST_REFRESH_JWT(2005, "존재하지 않거나 만료된 Refresh 토큰입니다. 다시 로그인해주세요."),
     EXPIRED_JWT(2006, "만료된 Access 토큰입니다. Refresh 토큰을 이용해서 새로운 Access 토큰을 발급 받으세요."),
+    NO_ACCESS_AUTHORIZATION(2007, "접근 권한이 없습니다."),
 
     // users
     USERS_DUPLICATED_USER_NAME(2100, "이미 존재하는 아이디 입니다."),

@@ -11,15 +11,12 @@ import com.catcher.core.service.CaptchaService;
 import com.catcher.core.service.EmailService;
 import com.catcher.core.service.UserService;
 import com.catcher.core.service.authcode.AuthCodeServiceBase;
-import com.catcher.resource.request.AuthCodeSendRequest;
-import com.catcher.resource.request.AuthCodeVerifyRequest;
-import com.catcher.resource.request.CaptchaGenerateRequest;
-import com.catcher.resource.request.CaptchaValidateRequest;
+import com.catcher.resource.request.*;
 import com.catcher.resource.resolver.annotation.AuthCodeSendInject;
 import com.catcher.resource.resolver.annotation.AuthCodeVerifyInject;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.CaptchaValidateResponse;
-import com.catcher.resource.request.PWChangeRequest;
+import com.catcher.security.annotation.AuthorizationRequired;
 import com.catcher.security.annotation.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
@@ -36,6 +33,7 @@ import java.util.List;
 
 import static com.catcher.common.response.CommonResponse.success;
 import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
+import static com.catcher.core.domain.entity.enums.UserRole.USER;
 import static com.catcher.utils.HttpServletUtils.deleteCookie;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType;
@@ -152,6 +150,13 @@ public class UserController {
         return success(userService.checkUsernameExist(username));
     }
 
+    @Operation(summary = "내 정보 가져오기")
+    @GetMapping("/info")
+    @AuthorizationRequired(value = USER)
+    public CommonResponse<UserInfoResponse> getMyInfo(@CurrentUser User user){
+        return success(userService.getMyInfo(user));
+    }
+
     private AuthCodeServiceBase getAuthCodeService(AuthType authType) {
         return authCodeServices.stream()
                 .filter(service -> service.support(authType))
@@ -169,11 +174,5 @@ public class UserController {
         }
 
         return authType;
-    }
-
-    @Operation(summary = "내 정보 가져오기")
-    @GetMapping("/info")
-    public CommonResponse<UserInfoResponse> getMyInfo(@CurrentUser User user){
-        return success(userService.getMyInfo(user));
     }
 }
