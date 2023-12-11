@@ -19,7 +19,7 @@ import static com.catcher.testconfiguriation.BaseExceptionUtils.assertBaseExcept
 class PWChangeRequestTest {
 
     @Test
-    @DisplayName("어떤 필드로 비어있으면 예외 발생")
+    @DisplayName("어떤 필드든 비어있으면 예외 발생")
     void invalid_field_request_validation() {
         // given
         String code = createRandomUUID();
