@@ -77,4 +77,12 @@ public class User extends BaseTimeEntity {
     public void signOut() {
         this.deletedAt = ZonedDateTime.now();
     }
+
+    public void changeEmailTerm(boolean shouldOn) {
+        emailMarketingTerm = shouldOn ? ZonedDateTime.now() : null;
+    }
+
+    public void changePhoneTerm(boolean shouldOn) {
+        phoneMarketingTerm = shouldOn ? ZonedDateTime.now() : null;
+    }
 }

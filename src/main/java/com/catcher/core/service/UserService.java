@@ -10,6 +10,7 @@ import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.resource.request.PromotionRequest;
 import com.catcher.security.CatcherUser;
 import com.catcher.utils.KeyGenerator;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ import static com.catcher.common.BaseResponseStatus.*;
 import static com.catcher.core.domain.entity.BaseTimeEntity.zoneId;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.core.domain.entity.enums.UserRole.USER;
+import static com.catcher.resource.request.PromotionRequest.*;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
 import static com.catcher.utils.KeyGenerator.AuthType.*;
 
@@ -72,11 +74,18 @@ public class UserService {
     }
 
     public void signOutUser(User user) {
-        if(user == null) {
+        if (user == null) {
             throw new BaseException(USERS_NOT_LOGIN);
         }
 
         user.signOut();
+    }
+
+    public void togglePhonePromotion(User user, PromotionRequest promotionRequest, PromotionType type) {
+        switch (type) {
+            case PHONE -> user.changePhoneTerm(promotionRequest.getIsOn());
+            case EMAIL -> user.changeEmailTerm(promotionRequest.getIsOn());
+        }
     }
 
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
