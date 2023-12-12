@@ -5,6 +5,7 @@ import com.catcher.core.domain.entity.enums.UserProvider;
 import com.catcher.core.domain.entity.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
+import org.apache.commons.lang3.StringUtils;
 import org.hibernate.annotations.Where;
 
 import java.time.ZonedDateTime;
@@ -84,5 +85,17 @@ public class User extends BaseTimeEntity {
 
     public void changePhoneTerm(boolean shouldOn) {
         phoneMarketingTerm = shouldOn ? ZonedDateTime.now() : null;
+    }
+
+    public void changeMyInfo(String nickname, UserGender gender, Date birthDate) {
+        if (!StringUtils.equals(nickname, this.nickname)) {
+            this.nickname = nickname;
+        }
+        this.userGender = gender;
+        this.birthDate = birthDate;
+    }
+
+    public void changeProfileUrl(String filename) {
+        this.profileImageUrl = filename;
     }
 }

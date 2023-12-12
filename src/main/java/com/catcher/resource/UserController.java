@@ -16,6 +16,7 @@ import com.catcher.resource.resolver.annotation.AuthCodeSendInject;
 import com.catcher.resource.resolver.annotation.AuthCodeVerifyInject;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.CaptchaValidateResponse;
+import com.catcher.resource.response.UserDetailsResponse;
 import com.catcher.security.annotation.AuthorizationRequired;
 import com.catcher.security.annotation.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
@@ -25,6 +26,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
@@ -34,13 +36,15 @@ import java.util.List;
 import static com.catcher.common.response.CommonResponse.success;
 import static com.catcher.config.JwtTokenProvider.setRefreshCookie;
 import static com.catcher.core.domain.entity.enums.UserRole.USER;
-import static com.catcher.resource.request.PromotionRequest.PromotionType.*;
+import static com.catcher.resource.request.PromotionRequest.PromotionType.EMAIL;
+import static com.catcher.resource.request.PromotionRequest.PromotionType.PHONE;
 import static com.catcher.utils.HttpServletUtils.deleteCookie;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_ID;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_PASSWORD;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.MediaType.MULTIPART_FORM_DATA_VALUE;
 
 @RequiredArgsConstructor
 @RestController
@@ -179,6 +183,23 @@ public class UserController {
     @AuthorizationRequired(value = USER)
     public CommonResponse<Void> toggleEmail(@CurrentUser User user, @Valid @RequestBody PromotionRequest promotionRequest) {
         userService.togglePhonePromotion(user, promotionRequest, EMAIL);
+        return success();
+    }
+
+    @Operation(summary = "내 세부 정보 가져오기")
+    @GetMapping("/info/details")
+    @AuthorizationRequired(USER)
+    public CommonResponse<UserDetailsResponse> getDetailsInfo(@CurrentUser User user) {
+        return success(userService.getDetailsInfo(user));
+    }
+
+    @Operation(summary = "내 정보 수정하기")
+    @PostMapping(value = "/info/edit", consumes = {MULTIPART_FORM_DATA_VALUE})
+    @AuthorizationRequired(USER)
+    public CommonResponse<Void> editMyInfo(@CurrentUser User user,
+                                           @RequestPart(value = "profile_file", required = false) MultipartFile file,
+                                           @RequestPart(value = "userInfoEditRequest", required = false) UserInfoEditRequest userInfoEditRequest) {
+        userService.editUserInfo(user, file, userInfoEditRequest);
         return success();
     }
 
