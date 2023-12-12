@@ -79,12 +79,10 @@ public class User extends BaseTimeEntity {
     }
 
     public void changeEmailTerm(boolean shouldOn) {
-        if (shouldOn) emailMarketingTerm = ZonedDateTime.now();
-        else emailMarketingTerm = null;
+        emailMarketingTerm = shouldOn ? ZonedDateTime.now() : null;
     }
 
     public void changePhoneTerm(boolean shouldOn) {
-        if (shouldOn) phoneMarketingTerm = ZonedDateTime.now();
-        else phoneMarketingTerm = null;
+        phoneMarketingTerm = shouldOn ? ZonedDateTime.now() : null;
     }
 }

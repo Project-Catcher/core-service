@@ -9,9 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class PromotionRequest {
-    // true : on / false : off
     @NotNull
-    private Boolean status;
+    private Boolean isOn;
 
     public enum PromotionType {
         PHONE, EMAIL,

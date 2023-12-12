@@ -83,8 +83,8 @@ public class UserService {
 
     public void togglePhonePromotion(User user, PromotionRequest promotionRequest, PromotionType type) {
         switch (type) {
-            case PHONE -> user.changePhoneTerm(promotionRequest.getStatus());
-            case EMAIL -> user.changeEmailTerm(promotionRequest.getStatus());
+            case PHONE -> user.changePhoneTerm(promotionRequest.getIsOn());
+            case EMAIL -> user.changeEmailTerm(promotionRequest.getIsOn());
         }
     }
 

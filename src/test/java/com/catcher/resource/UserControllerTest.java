@@ -467,7 +467,6 @@ class UserControllerTest {
                     .orElseThrow()
                     .getPhoneMarketingTerm();
 
-
             //when
             mockMvc.perform(post("/users/promotion/phone")
                     .contentType(MediaType.APPLICATION_JSON)
