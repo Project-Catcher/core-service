@@ -43,11 +43,6 @@ public final class HttpServletUtils {
         });
     }
 
-    public static Optional<String> getCookieValue(HttpServletRequest request, String name) {
-        return getCookie(request, name)
-                .map(Cookie::getValue);
-    }
-
     public static String getBodyData(HttpServletRequest request) throws IOException {
         try (
                 InputStream inputStream = request.getInputStream();

@@ -8,10 +8,11 @@ import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.request.PWChangeRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static com.catcher.common.BaseResponseStatus.EXPIRED_CODE;
+import static com.catcher.common.BaseResponseStatus.*;
 import static com.catcher.resource.response.AuthCodeVerifyResponse.PWAuthCodeVerifyResponse;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_PASSWORD;
@@ -28,6 +29,7 @@ public class PWAuthCodeService extends AuthCodeServiceBase {
     }
 
     @Override
+    @Transactional
     public void changePassword(PWChangeRequest pwChangeRequest) {
         pwChangeRequest.checkValidation();
         String key = generateKey(pwChangeRequest.getCode(), FIND_PASSWORD_SUCCESS);
@@ -36,11 +38,11 @@ public class PWAuthCodeService extends AuthCodeServiceBase {
         try {
             email = keyValueDataStorePort.findValidationCodeWithKey(key);
         } catch (BaseException e) {
-            throw new BaseException(EXPIRED_CODE);
+            throw new BaseException(NOT_MATCH_OR_EXPIRED_CODE);
         }
 
         User user = userRepository.findByEmail(email).orElseThrow();
-        String encodedNewPassword = passwordEncoder.encode(pwChangeRequest.getNewPassword());
+        String encodedNewPassword = passwordEncoder.encode(pwChangeRequest.getPassword());
         user.changePassword(encodedNewPassword);
     }
 
