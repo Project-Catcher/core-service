@@ -2,8 +2,10 @@ package com.catcher.resource;
 
 import cn.apiclub.captcha.Captcha;
 import com.catcher.common.response.CommonResponse;
+import com.catcher.core.domain.entity.User;
 import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
+import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.core.service.CaptchaService;
 import com.catcher.core.service.EmailService;
@@ -18,6 +20,7 @@ import com.catcher.resource.resolver.annotation.AuthCodeVerifyInject;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.response.CaptchaValidateResponse;
 import com.catcher.resource.request.PWChangeRequest;
+import com.catcher.security.annotation.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -166,5 +169,11 @@ public class UserController {
         }
 
         return authType;
+    }
+
+    @Operation(summary = "내 정보 가져오기")
+    @GetMapping("/info")
+    public CommonResponse<UserInfoResponse> getMyInfo(@CurrentUser User user){
+        return success(userService.getMyInfo(user));
     }
 }
