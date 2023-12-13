@@ -133,7 +133,7 @@ public class UserController {
     }
 
     @Operation(summary = "비밀번호 변경")
-    @PostMapping("password/edit")
+    @PostMapping("/password/edit")
     public CommonResponse<Void> sendEmailWithAuthCode(
             HttpServletRequest request,
             @Valid final PWChangeRequest pwChangeRequest) {
