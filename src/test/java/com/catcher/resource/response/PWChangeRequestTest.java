@@ -10,7 +10,6 @@ import org.springframework.test.context.ActiveProfiles;
 
 import java.util.UUID;
 
-import static com.catcher.common.BaseResponseStatus.PASSWORD_NOT_MATCH;
 import static com.catcher.common.BaseResponseStatus.REQUEST_ERROR;
 import static com.catcher.testconfiguriation.BaseExceptionUtils.assertBaseException;
 
@@ -24,39 +23,17 @@ class PWChangeRequestTest {
         // given
         String code = createRandomUUID();
         String newPassword = createRandomUUID();
-        String newPasswordCheck = createRandomUUID();
         // when
 
         // then
         assertBaseException(
-                () -> new PWChangeRequest(null, newPassword, newPasswordCheck).checkValidation(),
+                () -> new PWChangeRequest(null, newPassword).checkValidation(),
                 REQUEST_ERROR
         );
 
         assertBaseException(
-                () -> new PWChangeRequest(code, null, newPasswordCheck).checkValidation(),
+                () -> new PWChangeRequest(code, null).checkValidation(),
                 REQUEST_ERROR
-        );
-
-        assertBaseException(
-                () -> new PWChangeRequest(code, newPassword, null).checkValidation(),
-                REQUEST_ERROR
-        );
-    }
-
-    @Test
-    @DisplayName("비밀번호와 비밀번호 확인 필드가 일치하지 않으면 예외 발생")
-    void not_match_password_validation() {
-        // given
-        String code = createRandomUUID();
-        String newPassword = createRandomUUID();
-        String newPasswordCheck = createRandomUUID();
-        // when
-
-        // then
-        assertBaseException(
-                () -> new PWChangeRequest(code, newPassword, newPasswordCheck).checkValidation(),
-                PASSWORD_NOT_MATCH
         );
     }
 
@@ -71,7 +48,7 @@ class PWChangeRequestTest {
         // when
 
         // then
-        new PWChangeRequest(code, newPassword, newPasswordCheck).checkValidation();
+        new PWChangeRequest(code, newPassword).checkValidation();
     }
 
     private String createRandomUUID() {
