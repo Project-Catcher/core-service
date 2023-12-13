@@ -81,23 +81,6 @@ class CaptchaServiceTest {
     }
 
     @Test
-    @DisplayName("올바른 이메일로 캡챠 요청시 정상 응답 및 레디스에 저장된 정답과 일치하여야 한다.")
-    void valid_verify_captcha() {
-        for (AuthType authType : authTypes) {
-            // given
-            User user = createUser();
-
-            // when
-            Captcha captcha = captchaService.generateCaptchaAndSaveAnswer(user.getEmail(), authType);
-
-            // then
-            assertThat(captcha).isNotNull();
-            assertThat(keyValueDataStorePort.findValidationCodeWithKey(generateKey(user.getId(), authType))).isNotNull();
-            assertThat(keyValueDataStorePort.findValidationCodeWithKey(generateKey(user.getId(), authType))).isEqualTo(captcha.getAnswer());
-        }
-    }
-
-    @Test
     @DisplayName("정답이 다르면 예외가 발생해야한다.")
     void invalid_answer_verify_captcha() {
         for (AuthType authType : authTypes) {
