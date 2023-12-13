@@ -35,8 +35,7 @@ public enum BaseResponseStatus {
     USERS_DUPLICATED_PHONE(2113, "이미 사용중인 핸드폰입니다."),
     AUTH_CODE_NOT_FOUND(2114, "해당 유저의 인증번호가 저장되지 않았습니다."),
     CODE_NOT_MATCH(2115, "인증번호가 일치하지 않습니다."),
-    PASSWORD_NOT_MATCH(2116, "패스워드가 일치하지 않습니다."),
-    NOT_MATCH_OR_EXPIRED_CODE(2117, "코드가 만료되었거나 존재하지 않습니다."),
+    NOT_MATCH_OR_EXPIRED_CODE(2116, "코드가 만료되었거나 존재하지 않습니다."),
 
 
     /**
