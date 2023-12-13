@@ -53,9 +53,9 @@ class AuthCodeSendResolverTest {
     @DisplayName("AuthCodeInject 어노테이션이 붙은 파라미터를 지원해야한다.")
     void valid_support() {
         //given
-        when(mockMethodParameter.getParameterAnnotation(AuthCodeSendInject.class)).thenReturn(mockAuthCodeSendInjectAnnotation);
 
         //when
+        when(mockMethodParameter.getParameterAnnotation(AuthCodeSendInject.class)).thenReturn(mockAuthCodeSendInjectAnnotation);
 
         //then
         assertThat(authCodeSendResolver.supportsParameter(mockMethodParameter)).isTrue();
@@ -65,9 +65,9 @@ class AuthCodeSendResolverTest {
     @DisplayName("AuthCodeInject 어노테이션이 붙지 않은 파라미터는 지원하지 않아야 한다.")
     void invalid_support() {
         //given
-        when(mockMethodParameter.getParameterAnnotation(AuthCodeSendInject.class)).thenReturn(null);
 
         //when
+        when(mockMethodParameter.getParameterAnnotation(AuthCodeSendInject.class)).thenReturn(null);
 
         //then
         assertThat(authCodeSendResolver.supportsParameter(mockMethodParameter)).isFalse();
