@@ -42,7 +42,7 @@ public class PWAuthCodeService extends AuthCodeServiceBase {
         }
 
         User user = userRepository.findByEmail(email).orElseThrow();
-        String encodedNewPassword = passwordEncoder.encode(pwChangeRequest.getNewPassword());
+        String encodedNewPassword = passwordEncoder.encode(pwChangeRequest.getPassword());
         user.changePassword(encodedNewPassword);
     }
 
