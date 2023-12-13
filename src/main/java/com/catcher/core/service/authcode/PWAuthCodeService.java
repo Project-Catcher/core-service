@@ -8,6 +8,7 @@ import com.catcher.resource.response.AuthCodeVerifyResponse;
 import com.catcher.resource.request.PWChangeRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
@@ -28,6 +29,7 @@ public class PWAuthCodeService extends AuthCodeServiceBase {
     }
 
     @Override
+    @Transactional
     public void changePassword(PWChangeRequest pwChangeRequest) {
         pwChangeRequest.checkValidation();
         String key = generateKey(pwChangeRequest.getCode(), FIND_PASSWORD_SUCCESS);
