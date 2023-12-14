@@ -91,8 +91,12 @@ public class User extends BaseTimeEntity {
         if (!StringUtils.equals(nickname, this.nickname)) {
             this.nickname = nickname;
         }
-        this.userGender = gender;
-        this.birthDate = birthDate;
+        if (!this.userGender.equals(gender)) {
+            this.userGender = gender;
+        }
+        if (!this.birthDate.equals(birthDate)) {
+            this.birthDate = birthDate;
+        }
     }
 
     public void changeProfileUrl(String filename) {
