@@ -11,10 +11,14 @@ import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.resource.request.PromotionRequest;
+import com.catcher.infrastructure.external.service.S3UploadService;
+import com.catcher.resource.request.UserInfoEditRequest;
+import com.catcher.resource.response.UserDetailsResponse;
 import com.catcher.security.CatcherUser;
 import com.catcher.utils.KeyGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
@@ -22,6 +26,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.ZonedDateTime;
 import java.util.Optional;
@@ -45,6 +50,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final DBManager dbManager;
     private final AuthService authService;
+    private final S3UploadService s3UploadService;
 
     @Transactional
     public TokenDto signUpUser(UserCreateRequest userCreateRequest) {
@@ -85,6 +91,48 @@ public class UserService {
         switch (type) {
             case PHONE -> user.changePhoneTerm(promotionRequest.getIsOn());
             case EMAIL -> user.changeEmailTerm(promotionRequest.getIsOn());
+        }
+    }
+
+    public UserInfoResponse getMyInfo(User user) {
+        return new UserInfoResponse(user.getUsername(),
+                user.getPhone(),
+                user.getEmail(),
+                user.getProfileImageUrl(),
+                user.getNickname(),
+                user.getEmailMarketingTerm(),
+                user.getPhoneMarketingTerm());
+    }
+
+    public UserDetailsResponse getDetailsInfo(User user) {
+        return new UserDetailsResponse(
+                user.getNickname(),
+                user.getPhone(),
+                user.getEmail(),
+                user.getBirthDate(),
+                user.getUserGender()
+        );
+    }
+
+    @Transactional
+    public void editUserInfo(User user,
+                             MultipartFile profileFile,
+                             UserInfoEditRequest userInfoEditRequest) {
+        if (!StringUtils.equals(user.getNickname(), userInfoEditRequest.getNickname())) {
+            Optional<User> optionalUser = userRepository.findByNickname(userInfoEditRequest.getNickname());
+            if (optionalUser.isPresent()) {
+                throw new BaseException(USERS_DUPLICATED_NICKNAME);
+            }
+        }
+
+        user.changeMyInfo(userInfoEditRequest.getNickname(),
+                userInfoEditRequest.getGender(),
+                userInfoEditRequest.getBirth()
+        );
+
+        if (profileFile != null && !profileFile.isEmpty()) {
+            String fileName = s3UploadService.uploadFile(profileFile);
+            user.changeProfileUrl(fileName);
         }
     }
 
@@ -136,18 +184,8 @@ public class UserService {
     }
 
     private void checkOAuthUser(User user) {
-        if(!user.getUserProvider().equals(CATCHER)) {
+        if (!user.getUserProvider().equals(CATCHER)) {
             throw new BaseException(INVALID_USER_INFO);
         }
-    }
-
-    public UserInfoResponse getMyInfo(User user){
-        return new UserInfoResponse(user.getUsername(),
-                user.getPhone(),
-                user.getEmail(),
-                user.getProfileImageUrl(),
-                user.getNickname(),
-                user.getEmailMarketingTerm(),
-                user.getPhoneMarketingTerm());
     }
 }

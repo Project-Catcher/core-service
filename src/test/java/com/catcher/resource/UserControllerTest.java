@@ -10,11 +10,15 @@ import com.catcher.config.JwtTokenProvider;
 import com.catcher.core.database.DBManager;
 import com.catcher.core.database.UserRepository;
 import com.catcher.core.domain.entity.User;
+import com.catcher.core.domain.entity.enums.UserGender;
 import com.catcher.core.domain.entity.enums.UserRole;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
+import com.catcher.infrastructure.external.service.S3UploadService;
 import com.catcher.resource.request.PromotionRequest;
+import com.catcher.resource.request.UserInfoEditRequest;
+import com.catcher.resource.response.UserDetailsResponse;
 import com.catcher.testconfiguriation.EmbeddedRedisConfiguration;
 import com.catcher.testconfiguriation.WithCustomMockUser;
 import com.catcher.utils.KeyGenerator;
@@ -22,31 +26,40 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
+import java.nio.charset.StandardCharsets;
+import java.text.SimpleDateFormat;
 import java.time.ZonedDateTime;
+import java.util.Date;
 import java.util.UUID;
 
+import static com.catcher.common.BaseResponseStatus.SUCCESS;
 import static com.catcher.common.BaseResponseStatus.USERS_NOT_LOGIN;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_NAME;
 import static com.catcher.utils.KeyGenerator.AuthType.BLACK_LIST_ACCESS_TOKEN;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -68,6 +81,8 @@ class UserControllerTest {
     DBManager dbManager;
     @Autowired
     JwtTokenProvider jwtTokenProvider;
+    @MockBean
+    S3UploadService mockS3UploadService;
 
     User user;
 
@@ -520,6 +535,91 @@ class UserControllerTest {
         }
     }
 
+    @DisplayName("세부 정보 요청 시, 응답 값이 현재 유저 정보와 일치해야한다.")
+    @Test
+    void request_user_info_details() throws Exception {
+        //given
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        String returnString = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andReturn().getResponse().getContentAsString();
+        String accessToken = (String) objectMapper.readValue(returnString, CommonResponse.class).getResult();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        //when
+        MvcResult mvcResult = mockMvc.perform(get("/users/info/details")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+        ).andReturn();
+        CommonResponse<UserDetailsResponse> commonResponse = objectMapper.readValue(mvcResult.getResponse().getContentAsString(), new TypeReference<>() {
+        });
+        UserDetailsResponse result = commonResponse.getResult();
+
+        // then
+        assertThat(commonResponse.isSuccess()).isTrue();
+        assertThat(commonResponse.getCode()).isEqualTo(SUCCESS.getCode());
+        assertThat(dateFormat.format(user.getBirthDate())).isEqualTo(dateFormat.format(result.getBirth()));
+        assertThat(user.getNickname()).isEqualTo(result.getNickname());
+        assertThat(user.getUserGender()).isEqualTo(result.getUserGender());
+        assertThat(user.getPhone()).isEqualTo(result.getPhone());
+        assertThat(user.getEmail()).isEqualTo(result.getEmail());
+    }
+
+    @DisplayName("유저 정보와 썸네일 변경 시 정상적으로 변경되어야 한다.")
+    @Test
+    void edit_request_user() throws Exception {
+        //given
+        UserLoginRequest userLoginRequest = new UserLoginRequest(user.getUsername(), rawPassword);
+        String returnString = mockMvc.perform(post("/users/login")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(userLoginRequest))
+        ).andReturn().getResponse().getContentAsString();
+        String accessToken = (String) objectMapper.readValue(returnString, CommonResponse.class).getResult();
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+
+        for (UserGender gender : UserGender.values()) {
+            MockMultipartFile mockMultipartFile = new MockMultipartFile(
+                    "profile_file",
+                    createRandomUUID().getBytes()
+            );
+            UserInfoEditRequest userInfoEditRequest = new UserInfoEditRequest(
+                    createRandomUUID(),
+                    new LocalDateTime().minusDays(1).toDate(),
+                    gender
+            );
+            String editRequestJson = "{" +
+                    "\"nickname\":\"" + userInfoEditRequest.getNickname() + "\"," +
+                    "\"birth\":\"" + dateFormat.format(userInfoEditRequest.getBirth()) + "\"," +
+                    "\"gender\":\"" + userInfoEditRequest.getGender().name() + "\"" +
+                    "}";
+            MockMultipartFile requestJson = new MockMultipartFile("userInfoEditRequest", "test", "application/json", editRequestJson.getBytes(StandardCharsets.UTF_8));
+
+            //when
+            String fileUri = createRandomUUID();
+            when(mockS3UploadService.uploadFile(mockMultipartFile)).thenReturn(fileUri);
+
+            mockMvc.perform(
+                    MockMvcRequestBuilders.multipart("/users/info/edit")
+                            .file(mockMultipartFile)
+                            .file(requestJson)
+                            .contentType(MediaType.MULTIPART_FORM_DATA)
+                            .header(HttpHeaders.AUTHORIZATION, "Bearer " + accessToken)
+            );
+            flushAndClearPersistence();
+
+            //then
+            User user = userRepository.findByNickname(userInfoEditRequest.getNickname())
+                    .orElseThrow();
+
+            assertThat(user.getUserGender()).isEqualTo(userInfoEditRequest.getGender());
+            assertThat(dateFormat.format(user.getBirthDate())).isEqualTo(dateFormat.format(userInfoEditRequest.getBirth()));
+            assertThat(user.getNickname()).isEqualTo(userInfoEditRequest.getNickname());
+            assertThat(user.getProfileImageUrl()).isEqualTo(fileUri);
+        }
+    }
+
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
         return UserCreateRequest.builder()
                 .nickname(nickname)
@@ -551,6 +651,7 @@ class UserControllerTest {
                 .userPrivacyTerm(ZonedDateTime.now())
                 .emailMarketingTerm(ZonedDateTime.now())
                 .phoneMarketingTerm(ZonedDateTime.now())
+                .birthDate(new Date())
                 .build();
     }
 

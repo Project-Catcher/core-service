@@ -2,15 +2,16 @@ package com.catcher.testconfiguriation;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.TestConfiguration;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import redis.embedded.RedisServer;
 
 @TestConfiguration
 public class EmbeddedRedisConfiguration {
     private RedisServer redisServer;
+    private final static Logger logger = LoggerFactory.getLogger(EmbeddedRedisConfiguration.class);
 
     public EmbeddedRedisConfiguration(@Value("${spring.data.redis.port}") int port) {
         this.redisServer = new RedisServer(port);
@@ -18,12 +19,16 @@ public class EmbeddedRedisConfiguration {
 
     @PostConstruct
     public void startRedis() {
-        redisServer.start();
+        try {
+            redisServer.start();
+        } catch (Exception e) {
+            logger.error("error = {}", e.getMessage());
+        }
     }
 
     @PreDestroy
     public void stopRedis() {
-        if(redisServer != null) {
+        if (redisServer != null) {
             redisServer.stop();
         }
     }
