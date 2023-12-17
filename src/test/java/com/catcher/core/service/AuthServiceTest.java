@@ -16,7 +16,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -97,10 +97,10 @@ class AuthServiceTest {
     private UserCreateRequest userCreateRequest(String username, String email, String nickname, String phone) {
         return UserCreateRequest.builder()
                 .nickname(nickname)
-                .ageTerm(ZonedDateTime.now())
-                .serviceTerm(ZonedDateTime.now())
-                .marketingTerm(ZonedDateTime.now())
-                .privacyTerm(ZonedDateTime.now())
+                .ageTerm(LocalDateTime.now())
+                .serviceTerm(LocalDateTime.now())
+                .marketingTerm(LocalDateTime.now())
+                .privacyTerm(LocalDateTime.now())
                 .phone(phone)
                 .email(email)
                 .username(username)

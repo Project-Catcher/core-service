@@ -29,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
@@ -138,10 +138,10 @@ class AuthControllerTest {
     private UserCreateRequest userCreateRequest() {
         return UserCreateRequest.builder()
                 .nickname(createRandomUUID())
-                .ageTerm(ZonedDateTime.now())
-                .serviceTerm(ZonedDateTime.now())
-                .marketingTerm(ZonedDateTime.now())
-                .privacyTerm(ZonedDateTime.now())
+                .ageTerm(LocalDateTime.now())
+                .serviceTerm(LocalDateTime.now())
+                .marketingTerm(LocalDateTime.now())
+                .privacyTerm(LocalDateTime.now())
                 .phone(createRandomUUID())
                 .email(createRandomUUID())
                 .username(createRandomUUID())

@@ -6,9 +6,9 @@ import com.catcher.core.port.KeyValueDataStorePort;
 import com.catcher.resource.response.AuthCodeVerifyResponse;
 import org.springframework.stereotype.Service;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
-import static com.catcher.resource.response.AuthCodeVerifyResponse.*;
+import static com.catcher.resource.response.AuthCodeVerifyResponse.IDAuthCodeVerifyResponse;
 import static com.catcher.utils.KeyGenerator.AuthType;
 import static com.catcher.utils.KeyGenerator.AuthType.FIND_ID;
 
@@ -21,7 +21,7 @@ public class IDAuthCodeService extends AuthCodeServiceBase {
 
     @Override
     protected AuthCodeVerifyResponse createAuthCodeVerifyResponse(User user) {
-        return new IDAuthCodeVerifyResponse(user.getUsername(), Date.from(user.getCreatedAt().toInstant()));
+        return new IDAuthCodeVerifyResponse(user.getUsername(), Timestamp.valueOf(user.getCreatedAt()));
     }
 
     @Override

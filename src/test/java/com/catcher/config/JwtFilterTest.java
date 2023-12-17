@@ -29,7 +29,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
@@ -154,11 +154,11 @@ class JwtFilterTest {
                 .nickname(createRandomUUID())
                 .userProvider(CATCHER)
                 .userRole(UserRole.USER)
-                .userAgeTerm(ZonedDateTime.now())
-                .userServiceTerm(ZonedDateTime.now())
-                .userPrivacyTerm(ZonedDateTime.now())
-                .emailMarketingTerm(ZonedDateTime.now())
-                .phoneMarketingTerm(ZonedDateTime.now())
+                .userAgeTerm(LocalDateTime.now())
+                .userServiceTerm(LocalDateTime.now())
+                .userPrivacyTerm(LocalDateTime.now())
+                .emailMarketingTerm(LocalDateTime.now())
+                .phoneMarketingTerm(LocalDateTime.now())
                 .build();
 
         userRepository.save(user);
