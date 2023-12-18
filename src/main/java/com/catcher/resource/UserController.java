@@ -121,7 +121,7 @@ public class UserController {
     @PostMapping({FIND_ID_URL + "/captcha", FIND_PW_URL + "/captcha"})
     public void captchaGenerate(
             HttpServletRequest request,
-            final CaptchaGenerateRequest captchaGenerateRequest,
+            @RequestBody final CaptchaGenerateRequest captchaGenerateRequest,
             HttpServletResponse response) throws IOException {
         AuthType authType = getAuthType(request);
         Captcha captcha = captchaService.generateCaptchaAndSaveAnswer(captchaGenerateRequest.getEmail(), authType);
@@ -134,10 +134,10 @@ public class UserController {
     }
 
     @Operation(summary = "캡챠 이미지 정답 검증")
-    @PostMapping({FIND_PW_URL + "/captcha/check", FIND_PW_URL + "/captcha/check"})
+    @PostMapping({FIND_ID_URL + "/captcha/check", FIND_PW_URL + "/captcha/check"})
     public CommonResponse<CaptchaValidateResponse> validateCaptcha(
             HttpServletRequest request,
-            final CaptchaValidateRequest captchaValidateRequest) {
+            @RequestBody final CaptchaValidateRequest captchaValidateRequest) {
         AuthType authType = getAuthType(request);
 
         captchaService.validateCaptcha(captchaValidateRequest.getEmail(), captchaValidateRequest.getUserAnswer(), authType);

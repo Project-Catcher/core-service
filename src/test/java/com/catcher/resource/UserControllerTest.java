@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -48,8 +47,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.filter.CharacterEncodingFilter;
 
 import java.nio.charset.StandardCharsets;
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.UUID;
 
@@ -586,7 +586,7 @@ class UserControllerTest {
             );
             UserInfoEditRequest userInfoEditRequest = new UserInfoEditRequest(
                     createRandomUUID(),
-                    new LocalDateTime().minusDays(1).toDate(),
+                    Timestamp.valueOf(LocalDateTime.now().minusDays(1)),
                     gender
             );
             String editRequestJson = "{" +
@@ -623,10 +623,10 @@ class UserControllerTest {
     private UserCreateRequest userCreateRequest(String username, String nickname, String phone, String email) {
         return UserCreateRequest.builder()
                 .nickname(nickname)
-                .ageTerm(ZonedDateTime.now())
-                .serviceTerm(ZonedDateTime.now())
-                .marketingTerm(ZonedDateTime.now())
-                .privacyTerm(ZonedDateTime.now())
+                .ageTerm(LocalDateTime.now())
+                .serviceTerm(LocalDateTime.now())
+                .marketingTerm(LocalDateTime.now())
+                .privacyTerm(LocalDateTime.now())
                 .phone(phone)
                 .email(email)
                 .username(username)
@@ -646,11 +646,11 @@ class UserControllerTest {
                 .nickname(createRandomUUID())
                 .userProvider(CATCHER)
                 .userRole(UserRole.USER)
-                .userAgeTerm(ZonedDateTime.now())
-                .userServiceTerm(ZonedDateTime.now())
-                .userPrivacyTerm(ZonedDateTime.now())
-                .emailMarketingTerm(ZonedDateTime.now())
-                .phoneMarketingTerm(ZonedDateTime.now())
+                .userAgeTerm(LocalDateTime.now())
+                .userServiceTerm(LocalDateTime.now())
+                .userPrivacyTerm(LocalDateTime.now())
+                .emailMarketingTerm(LocalDateTime.now())
+                .phoneMarketingTerm(LocalDateTime.now())
                 .birthDate(new Date())
                 .build();
     }

@@ -21,7 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -157,11 +157,11 @@ class UserServiceTest {
                 .nickname(createRandomUUID())
                 .userProvider(KAKAO)
                 .userRole(UserRole.USER)
-                .userAgeTerm(ZonedDateTime.now())
-                .userServiceTerm(ZonedDateTime.now())
-                .userPrivacyTerm(ZonedDateTime.now())
-                .emailMarketingTerm(ZonedDateTime.now())
-                .phoneMarketingTerm(ZonedDateTime.now())
+                .userAgeTerm(LocalDateTime.now())
+                .userServiceTerm(LocalDateTime.now())
+                .userPrivacyTerm(LocalDateTime.now())
+                .emailMarketingTerm(LocalDateTime.now())
+                .phoneMarketingTerm(LocalDateTime.now())
                 .build();
         userRepository.save(oAuthUser);
         flushAndClearPersistence();
@@ -190,11 +190,11 @@ class UserServiceTest {
                 .nickname(createRandomUUID())
                 .userProvider(NAVER)
                 .userRole(UserRole.USER)
-                .userAgeTerm(ZonedDateTime.now())
-                .userServiceTerm(ZonedDateTime.now())
-                .userPrivacyTerm(ZonedDateTime.now())
-                .emailMarketingTerm(ZonedDateTime.now())
-                .phoneMarketingTerm(ZonedDateTime.now())
+                .userAgeTerm(LocalDateTime.now())
+                .userServiceTerm(LocalDateTime.now())
+                .userPrivacyTerm(LocalDateTime.now())
+                .emailMarketingTerm(LocalDateTime.now())
+                .phoneMarketingTerm(LocalDateTime.now())
                 .build();
         userRepository.save(oAuthUser);
         flushAndClearPersistence();
@@ -292,10 +292,10 @@ class UserServiceTest {
     private UserCreateRequest userCreateRequest(String username, String email, String nickname, String phone) {
         return UserCreateRequest.builder()
                 .nickname(nickname)
-                .ageTerm(ZonedDateTime.now())
-                .serviceTerm(ZonedDateTime.now())
-                .marketingTerm(ZonedDateTime.now())
-                .privacyTerm(ZonedDateTime.now())
+                .ageTerm(LocalDateTime.now())
+                .serviceTerm(LocalDateTime.now())
+                .marketingTerm(LocalDateTime.now())
+                .privacyTerm(LocalDateTime.now())
                 .phone(phone)
                 .email(email)
                 .username(username)
@@ -314,11 +314,11 @@ class UserServiceTest {
                 .nickname(nickname)
                 .userProvider(CATCHER)
                 .userRole(UserRole.USER)
-                .userAgeTerm(ZonedDateTime.now())
-                .userServiceTerm(ZonedDateTime.now())
-                .userPrivacyTerm(ZonedDateTime.now())
-                .emailMarketingTerm(ZonedDateTime.now())
-                .phoneMarketingTerm(ZonedDateTime.now())
+                .userAgeTerm(LocalDateTime.now())
+                .userServiceTerm(LocalDateTime.now())
+                .userPrivacyTerm(LocalDateTime.now())
+                .emailMarketingTerm(LocalDateTime.now())
+                .phoneMarketingTerm(LocalDateTime.now())
                 .build();
     }
 

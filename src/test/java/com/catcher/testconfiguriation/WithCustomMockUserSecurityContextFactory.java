@@ -7,8 +7,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.test.context.support.WithSecurityContextFactory;
-
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 
@@ -49,11 +48,11 @@ public class WithCustomMockUserSecurityContextFactory implements WithSecurityCon
                 .nickname(nickname)
                 .userProvider(CATCHER)
                 .userRole(role)
-                .userAgeTerm(ZonedDateTime.now())
-                .userServiceTerm(ZonedDateTime.now())
-                .userPrivacyTerm(ZonedDateTime.now())
-                .emailMarketingTerm(ZonedDateTime.now())
-                .phoneMarketingTerm(ZonedDateTime.now())
+                .userAgeTerm(LocalDateTime.now())
+                .userServiceTerm(LocalDateTime.now())
+                .userPrivacyTerm(LocalDateTime.now())
+                .emailMarketingTerm(LocalDateTime.now())
+                .phoneMarketingTerm(LocalDateTime.now())
                 .build();
     }
 }

@@ -4,8 +4,7 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -16,6 +15,6 @@ public class UserInfoResponse {
     private String email;
     private String profileImageUrl;
     private String nickname;
-    private ZonedDateTime emailMarketingTerm;
-    private ZonedDateTime phoneMarketingTerm;
+    private LocalDateTime emailMarketingTerm;
+    private LocalDateTime phoneMarketingTerm;
 }

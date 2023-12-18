@@ -1,10 +1,10 @@
 package com.catcher.core.dto.user;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.NotNull;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
 
-import java.time.ZonedDateTime;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,18 +27,18 @@ public class UserCreateRequest {
     private String nickname;
 
     @NotNull(message = "필수 약관 14세 이상 동의해주세요.")
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
-    private ZonedDateTime ageTerm;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime ageTerm;
 
     @NotNull(message = "필수 약관 서비스 이용 동의해주세요.")
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
-    private ZonedDateTime serviceTerm;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime serviceTerm;
 
     @NotNull(message = "필수 약관 개인정보 이용 동의해주세요.")
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
-    private ZonedDateTime privacyTerm;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime privacyTerm;
 
-    @DateTimeFormat(pattern = "yyyy-MM-ddTHH:mm:ssZZ")
-    private ZonedDateTime marketingTerm;
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
+    private LocalDateTime marketingTerm;
 }
 
