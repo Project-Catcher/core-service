@@ -3,7 +3,9 @@ package com.catcher.infrastructure.external.service;
 import com.amazonaws.services.kms.model.AWSKMSException;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.AmazonS3Exception;
+import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.catcher.common.BaseResponseStatus;
 import com.catcher.common.exception.BaseException;
 import com.catcher.infrastructure.utils.KmsUtils;
@@ -33,7 +35,15 @@ public class S3UploadService {
             metadata.setContentType(multipartFile.getContentType());
 
             String decryptedBucketName = kmsUtils.decrypt(bucket);
-            amazonS3.putObject(decryptedBucketName, fileName, multipartFile.getInputStream(), metadata);
+
+            amazonS3.putObject(
+                    new PutObjectRequest(
+                            decryptedBucketName,
+                            fileName,
+                            multipartFile.getInputStream(),
+                            metadata
+                    ).withCannedAcl(CannedAccessControlList.PublicRead)
+            );
 
             return amazonS3.getUrl(decryptedBucketName, fileName).toString();
         } catch (AWSKMSException awskmsException) {
