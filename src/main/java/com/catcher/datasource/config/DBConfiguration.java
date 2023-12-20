@@ -77,8 +77,8 @@ public class DBConfiguration {
         Properties properties = new Properties();
         properties.setProperty("driverClassName", "org.mariadb.jdbc.Driver");
         properties.setProperty("jdbcUrl", kmsUtils.decrypt(databaseUrl).replace(Integer.toString(localPort), Integer.toString(assignedPort)));
-        properties.setProperty("maxLifetime", "1790");
-        properties.setProperty("idleTimeout", "1860");
+        properties.setProperty("maxLifetime", "179000");
+        properties.setProperty("idleTimeout", "185000");
         properties.setProperty("password", kmsUtils.decrypt(databasePassword));
         properties.setProperty("username", kmsUtils.decrypt(databaseUsername));
         properties.setProperty("leakDetectionThreshold", "2000");
