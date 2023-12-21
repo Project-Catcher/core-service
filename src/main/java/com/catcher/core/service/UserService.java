@@ -10,8 +10,8 @@ import com.catcher.core.dto.TokenDto;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
-import com.catcher.resource.request.PromotionRequest;
 import com.catcher.infrastructure.external.service.S3UploadService;
+import com.catcher.resource.request.PromotionRequest;
 import com.catcher.resource.request.UserInfoEditRequest;
 import com.catcher.resource.response.UserDetailsResponse;
 import com.catcher.security.CatcherUser;
@@ -28,16 +28,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.ZonedDateTime;
 import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.*;
-import static com.catcher.core.domain.entity.BaseTimeEntity.zoneId;
 import static com.catcher.core.domain.entity.enums.UserProvider.CATCHER;
 import static com.catcher.core.domain.entity.enums.UserRole.USER;
-import static com.catcher.resource.request.PromotionRequest.*;
+import static com.catcher.resource.request.PromotionRequest.PromotionType;
 import static com.catcher.utils.JwtUtils.REFRESH_TOKEN_EXPIRATION_MILLIS;
-import static com.catcher.utils.KeyGenerator.AuthType.*;
+import static com.catcher.utils.KeyGenerator.AuthType.REFRESH_TOKEN;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -174,7 +172,7 @@ public class UserService {
                 .nickname(userCreateRequest.getNickname())
                 .userProvider(CATCHER)
                 .userRole(USER)
-                .phoneAuthentication(ZonedDateTime.now(zoneId))
+                .phoneAuthentication(userCreateRequest.getMarketingTerm())
                 .userAgeTerm(userCreateRequest.getAgeTerm())
                 .userServiceTerm(userCreateRequest.getServiceTerm())
                 .userPrivacyTerm(userCreateRequest.getPrivacyTerm())
