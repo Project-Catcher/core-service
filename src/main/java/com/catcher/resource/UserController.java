@@ -4,6 +4,7 @@ import cn.apiclub.captcha.Captcha;
 import com.catcher.common.response.CommonResponse;
 import com.catcher.core.domain.entity.User;
 import com.catcher.core.dto.TokenDto;
+import com.catcher.core.dto.user.UserAdditionalInfoRequest;
 import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
@@ -147,10 +148,9 @@ public class UserController {
     }
 
     @Operation(summary = "비밀번호 변경")
-    @PostMapping("password/edit")
+    @PostMapping("/password/edit")
     public CommonResponse<Void> sendEmailWithAuthCode(
-            HttpServletRequest request,
-            @Valid final PWChangeRequest pwChangeRequest) {
+            @RequestBody @Valid final PWChangeRequest pwChangeRequest) {
         AuthCodeServiceBase authCodeService = getAuthCodeService(FIND_PASSWORD);
         authCodeService.changePassword(pwChangeRequest);
 
@@ -200,6 +200,19 @@ public class UserController {
                                            @RequestPart(value = "profile_file", required = false) MultipartFile file,
                                            @RequestPart(value = "userInfoEditRequest", required = false) UserInfoEditRequest userInfoEditRequest) {
         userService.editUserInfo(user, file, userInfoEditRequest);
+        return success();
+    }
+
+    @Operation(summary = "추가 정보 기입하기")
+    @PutMapping(value = "/info/edit")
+    @AuthorizationRequired(USER)
+    public CommonResponse<Void> putAdditionalInfo(
+            @RequestHeader(AUTHORIZATION) String token,
+            @CurrentUser User user,
+            @RequestBody @Valid UserAdditionalInfoRequest request
+            ) {
+        userService.updateAdditionalInfo(user, request, token);
+
         return success();
     }
 

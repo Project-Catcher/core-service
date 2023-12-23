@@ -11,6 +11,8 @@ import com.catcher.core.dto.user.UserCreateRequest;
 import com.catcher.core.dto.user.UserInfoResponse;
 import com.catcher.core.dto.user.UserLoginRequest;
 import com.catcher.infrastructure.external.service.S3UploadService;
+import com.catcher.core.dto.user.*;
+import com.catcher.resource.external.CatcherFeignController;
 import com.catcher.resource.request.PromotionRequest;
 import com.catcher.resource.request.UserInfoEditRequest;
 import com.catcher.resource.response.UserDetailsResponse;
@@ -28,6 +30,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Optional;
 
 import static com.catcher.common.BaseResponseStatus.*;
@@ -49,6 +54,7 @@ public class UserService {
     private final DBManager dbManager;
     private final AuthService authService;
     private final S3UploadService s3UploadService;
+    private final CatcherFeignController catcherFeignController;
 
     @Transactional
     public TokenDto signUpUser(UserCreateRequest userCreateRequest) {
@@ -77,7 +83,10 @@ public class UserService {
         return userRepository.findByUsername(username).isPresent();
     }
 
+    @Transactional
     public void signOutUser(User user) {
+        user = userRepository.findById(user.getId()).orElseThrow();
+
         if (user == null) {
             throw new BaseException(USERS_NOT_LOGIN);
         }
@@ -85,7 +94,9 @@ public class UserService {
         user.signOut();
     }
 
+    @Transactional
     public void togglePhonePromotion(User user, PromotionRequest promotionRequest, PromotionType type) {
+        user = userRepository.findById(user.getId()).orElseThrow();
         switch (type) {
             case PHONE -> user.changePhoneTerm(promotionRequest.getIsOn());
             case EMAIL -> user.changeEmailTerm(promotionRequest.getIsOn());
@@ -116,6 +127,7 @@ public class UserService {
     public void editUserInfo(User user,
                              MultipartFile profileFile,
                              UserInfoEditRequest userInfoEditRequest) {
+        user = userRepository.findById(user.getId()).orElseThrow();
         if (!StringUtils.equals(user.getNickname(), userInfoEditRequest.getNickname())) {
             Optional<User> optionalUser = userRepository.findByNickname(userInfoEditRequest.getNickname());
             if (optionalUser.isPresent()) {
@@ -132,6 +144,14 @@ public class UserService {
             String fileName = s3UploadService.uploadFile(profileFile);
             user.changeProfileUrl(fileName);
         }
+    }
+
+    @Transactional
+    public void updateAdditionalInfo(User user, UserAdditionalInfoRequest request, String token) {
+        user = userRepository.findById(user.getId()).orElseThrow();
+        user.changeIntroduceContent(request.getIntroduceContent());
+
+        catcherFeignController.changeUserTags(new UserTagsEdit(request.getTags()), token);
     }
 
     private TokenDto checkAuthenticationAndGetTokenDto(String username, String password) {
