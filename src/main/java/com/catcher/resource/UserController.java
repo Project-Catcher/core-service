@@ -210,7 +210,7 @@ public class UserController {
             @RequestHeader(AUTHORIZATION) String token,
             @CurrentUser User user,
             @RequestBody @Valid UserAdditionalInfoRequest request
-            ) {
+    ) {
         userService.updateAdditionalInfo(user, request, token);
 
         return success();
