@@ -97,4 +97,8 @@ public class User extends BaseTimeEntity {
     public void changeProfileUrl(String filename) {
         this.profileImageUrl = filename;
     }
+
+    public void changeIntroduceContent(String content) {
+        this.introduceContent = content;
+    }
 }
