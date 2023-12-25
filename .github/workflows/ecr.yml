@@ -9,7 +9,8 @@ env:
   OIDC_ROLE_ARN: ${{ secrets.OIDC_ROLE }}
   DEPLOY_ENV: ${{ github.ref == 'refs/heads/main' && 'PROD' || 'DEV' }}
   GITHUB_TOKEN: ${{ secrets.GIT_TOKEN }}
-  ECR_URL: ${{ secrets.AWS_ECR_DEV_CORE }}
+  AWS_DEV_CORE_ECR: ${{ secrets.AWS_DEV_CORE_ECR }}
+  AWS_PRD_CORE_ECR: ${{ secrets.AWS_PRD_CORE_ECR }}
   webhook_url: ${{ secrets.WEBHOOK }}
 
 permissions:
@@ -54,8 +55,13 @@ jobs:
 
       - name: Publish Image to ECR(CORE-SERVICE)
         run: |
-          docker tag core-service:latest ${{ env.ECR_URL }}:${{ github.sha }}
-          docker push ${{ env.ECR_URL }}:${{ github.sha }}
+          if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
+            docker tag core-service:latest ${{ env.AWS_PRD_CORE_ECR }}:${{ github.sha }}
+            docker push ${{ env.AWS_PRD_CORE_ECR }}:${{ github.sha }}
+          else
+            docker tag core-service:latest ${{ env.AWS_DEV_CORE_ECR }}:${{ github.sha }}
+            docker push ${{ env.AWS_DEV_CORE_ECR }}:${{ github.sha }}
+          fi
 
       - name: notification to swit
         uses: roharon/action-swit@v1
@@ -77,14 +83,13 @@ jobs:
       - name: Update Kustomize image
         run: |
           if [ "${{ env.DEPLOY_ENV }}" == "PROD" ]; then
-            KUSTOMIZE_PATH="core-service-kusto/overlays/prd"
+            KUSTOMIZE_PATH="core-service-kusto/overlays/prd" && cd $KUSTOMIZE_PATH
+            kustomize edit set image app-core-img="${{ env.AWS_PRD_CORE_ECR }}:${{ github.sha }}"
           else
-            KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
+            KUSTOMIZE_PATH="core-service-kusto/overlays/dev" && cd $KUSTOMIZE_PATH
+            kustomize edit set image app-core-img="${{ env.AWS_DEV_CORE_ECR }}:${{ github.sha }}"
           fi
 
-          KUSTOMIZE_PATH="core-service-kusto/overlays/dev"
-          cd $KUSTOMIZE_PATH
-          kustomize edit set image app-core-img="${{ env.ECR_URL }}:${{ github.sha }}"
           kustomize build .
           
       - name: Commit minifest files
